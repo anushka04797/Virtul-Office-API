@@ -46,3 +46,44 @@ class LoginSerializer(serializers.Serializer):
                 'token': '',
                 'group': '',
             }
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomUser
+        fields = ('id', 'first_name', 'last_name', 'password', 'email')
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        user = CustomUser.objects.create_user(**validated_data)
+        return user
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone']
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone']
+
+    def update(self, instance, validated_data):
+        instance.phone = validated_data.get('phone', instance.phone)
+        # instance.gender = validated_data.get('gender', instance.gender)
+        instance.date_of_birth = validated_data.get('date_of_birth', instance.date_of_birth)
+        # instance.address = validated_data.get('address', instance.address)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.save()
+        return instance
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = CustomUser
+
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
