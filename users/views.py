@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import os
-from users.serializers import LoginSerializer
+from users.serializers import ChangePasswordSerializer, LoginSerializer, RegisterSerializer, UserDetailSerializer, UserUpdateSerializer
 from users.models import CustomUser
 from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated
@@ -19,6 +19,28 @@ from django.shortcuts import get_object_or_404
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
 
+
+
+# user register
+class Register(APIView):
+    serializer_class = RegisterSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        response = {
+            'success': 'True',
+            'status code': status.HTTP_200_OK,
+            'message': 'User registered  successfully',
+            'data': []
+        }
+        status_code = status.HTTP_200_OK
+        return Response(response, status=status_code)
+
+
+# user login
 class Login(RetrieveAPIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
@@ -40,11 +62,8 @@ class Login(RetrieveAPIView):
                 #     profilePic = '/media/'+str(user_data.profile_pic)
                 # else:
                 #     profilePic = str(user_data.profile_pic)
-
                 # is_subs = ''
-
                 # if serializer.data['group'] == 'seller':
-
                     # if user_data.is_subscribed == True:
                     #     subs_info = Subscription.objects.filter(seller=user_data.id).order_by('-id').first()
                     #     # print(subs_info.end_date)
@@ -57,7 +76,6 @@ class Login(RetrieveAPIView):
                     #             is_subs = 'No'
                     #     else:
                     #         is_subs = 'Never subscribe'
-
                 response['token'] = serializer.data['token']
                 response['group'] = serializer.data['group']
                 # response['full_name'] = user_data.full_name
@@ -65,8 +83,6 @@ class Login(RetrieveAPIView):
                 # response['is_subscribed'] = is_subs
                 # response['is_approved'] = user_data.is_approved
                 response['is_active'] = user_data.is_active
-
-
             else:
                 response['success'] = 'False'
                 response['status code'] = status.HTTP_400_BAD_REQUEST
@@ -82,5 +98,98 @@ class Login(RetrieveAPIView):
                 response['message'] = 'Please Check Your Email to Verify...!'
         else:
             response['message'] = 'User Not Found!'
-
         return Response(response, status=status_code)
+
+
+# user logout 
+class Logout(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request, format=None):
+        # using Django logout
+        logout(request)
+        content = {
+            'success': True,
+            'status code': status.HTTP_201_CREATED,
+            'message': 'logout Successfully',
+        }
+        return Response(content)
+
+
+# user profile view
+class UserDetail(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, pk):
+        response = {
+            'success': 'True',
+            'status code': status.HTTP_200_OK,
+            'message': 'User found successfully',
+            'data': []
+        }
+        try:
+            user = CustomUser.objects.get(id=pk)
+        except ObjectDoesNotExist:
+            response['message'] = 'User not found'
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        serializer = UserDetailSerializer(user, many=False)
+        response['data'] = serializer.data
+        return Response(response, status=status.HTTP_200_OK)
+
+
+# user  profile update
+class UserUpdate(APIView):
+    permission_classes = (IsAuthenticated, )
+    authentication_class = JSONWebTokenAuthentication
+
+    def post(self, request, pk):
+        print(request.data)
+        response = {
+            'success': 'True',
+            'status code': status.HTTP_200_OK,
+            'message': 'Profile Updated',
+            'data': []
+        }
+        if self.request.user.id != int(pk):
+            response['status code'] = status.HTTP_400_BAD_REQUEST
+            response['message'] = 'You can not update this profile!!'
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        user = CustomUser.objects.get(id=pk)
+        id = user.id
+        serializer = UserUpdateSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response['data'] = serializer.data
+            return Response(response, status=status.HTTP_201_CREATED)
+        response['message'] = 'Something went wrong'
+        response['data'] = serializer.errors
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChangePassword(generics.UpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ChangePasswordSerializer
+    model = CustomUser
+
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            # Check old password
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'Password updated successfully',
+                'data': []
+            }
+            return Response(response)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

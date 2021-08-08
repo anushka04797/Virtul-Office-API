@@ -3,7 +3,7 @@ import shutil
 import django
 from django.db import connection
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "emdad.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "virtual_office_API.settings")
 django.setup()
 
 db_name = connection.settings_dict['NAME']
