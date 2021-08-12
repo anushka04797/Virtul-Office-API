@@ -16,8 +16,14 @@ Including another URLconf
 from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path
+from rest_framework.documentation import include_docs_urls
+from rest_framework.permissions import AllowAny
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include("users.urls")),
+    path('project/', include("projects.urls")),
+
+    path('docs/', include_docs_urls(title="Virtual Office", description="A Project management platform",
+                                    permission_classes=(AllowAny,))),
 ]
