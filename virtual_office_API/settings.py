@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'users',
     'organizations',
-    'projects'
+    'projects',
+    'wbs'
 ]
 
 # added for custom user start==>

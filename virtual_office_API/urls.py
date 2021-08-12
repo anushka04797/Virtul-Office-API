@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include("users.urls")),
     path('project/', include("projects.urls")),
+    path('wbs/', include("wbs.urls")),
 
     path('docs/', include_docs_urls(title="Virtual Office", description="A Project management platform",
                                     permission_classes=(AllowAny,))),

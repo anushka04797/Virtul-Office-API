@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 from users.models import CustomUser
 
 
@@ -18,6 +19,8 @@ class Projects(models.Model):
     planned_hours = models.DecimalField(_('planned hours'), max_digits=6, decimal_places=1, blank=False)
     planned_value = models.IntegerField(_('planned value'), max_length=10, blank=True)
     remaining_hours = models.DecimalField(_('remaining hours'), max_digits=6, decimal_places=1, blank=False)
+    date_created = models.DateTimeField(_('date created'), default=timezone.now)
+    date_updated = models.DateTimeField(_('date updated'), default=timezone.now)
 
     class Meta:
         db_table = 'project'
