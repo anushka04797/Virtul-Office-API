@@ -2,28 +2,29 @@ from django.contrib import admin
 from organizations.models import Company, Department, Designation, HolidayPlan, Calender, Slc
 
 
-class CompanyAdmin():
+class CompanyAdmin(admin.ModelAdmin):
     list_display = (
-        'name',  'license_number',
+        'name', 'license_number',
     )
-    list_display_links = ('name',)
     search_fields = ('name', 'license_number')
     ordering = ('name',)
 
 
-class DepartmentAdmin():
+class DepartmentAdmin(admin.ModelAdmin):
     list_display = (
-        'name',  'details',
+        'name', 'details', 'parent'
     )
+    list_filter = ['parent', ]
     list_display_links = ('name',)
     search_fields = ('name', 'details')
     ordering = ('name',)
 
 
-class DesignationAdmin():
+class DesignationAdmin(admin.ModelAdmin):
     list_display = (
-        'name',  'details',
+        'name', 'details', 'parent'
     )
+    list_filter = ['parent', ]
     list_display_links = ('name',)
     search_fields = ('name', 'details')
     ordering = ('name',)
@@ -31,33 +32,34 @@ class DesignationAdmin():
 
 class HolidayPlanAdmin(admin.ModelAdmin):
     list_display = (
-        'week_start_day'
+        'week_start_day', 'week_holiday_1', 'week_holiday_2'
     )
     list_display_links = ('week_start_day',)
-    search_fields = ('week_start_day')
+    search_fields = ['week_start_day']
     ordering = ('week_start_day',)
 
 
 class CalenderAdmin(admin.ModelAdmin):
     list_display = (
-        'vacation_title'
+        'vacation_title', 'vacation_type', 'start_data', 'end_date', 'duration'
     )
     list_display_links = ('vacation_title',)
-    search_fields = ('vacation_title')
+    search_fields = ['vacation_title']
     ordering = ('vacation_title',)
 
 
 class SlcAdmin(admin.ModelAdmin):
-    list_display = (
-        'employee_id'
-    )
-    list_display_links = ('employee_id',)
-    search_fields = ('employee_id')
-    ordering = ('employee_id',)
+    list_display = [
+        'employee'
+    ]
+    list_display_links = ('employee',)
+    search_fields = ['employee']
+    ordering = ('employee',)
 
-admin.site.register(Company)
-admin.site.register(Department)
-admin.site.register(Designation)
-admin.site.register(HolidayPlan)
-admin.site.register(Calender)
-admin.site.register(Slc)
+
+admin.site.register(Company, CompanyAdmin)
+admin.site.register(Department, DepartmentAdmin)
+admin.site.register(Designation, DesignationAdmin)
+admin.site.register(HolidayPlan, HolidayPlanAdmin)
+admin.site.register(Calender, CalenderAdmin)
+admin.site.register(Slc, SlcAdmin)
