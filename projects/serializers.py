@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils import timezone
 from .models import Projects
 from users.serializers import UserDetailSerializer
 
@@ -19,7 +20,9 @@ class CreateProjectSerializer(serializers.ModelSerializer):
             'is_assignee_active',
             'planned_hours', 
             'planned_value', 
-            'remaining_hours'
+            'remaining_hours',
+            'date_created',
+            'date_updated'
         )
 
 
@@ -42,6 +45,28 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
             'planned_hours',
             'planned_value',
             'remaining_hours',
+            'date_created',
+            'date_updated'
+        )
+
+
+class ProjectDetailsForWbsSerializer(serializers.ModelSerializer):
+    assignee = UserDetailSerializer()
+
+    class Meta:
+        model = Projects
+        fields = (
+            'id',
+            'task_delivery_order',
+            'sub_task',
+            'work_package_number',
+            'work_package_index',
+            'task_title',
+            'planned_delivery_date',
+            'assignee',
+            'is_assignee_active',
+            'planned_hours',
+            'remaining_hours',
         )
 
 
@@ -55,6 +80,7 @@ class UpdateProductSerializer(serializers.ModelSerializer):
             'planned_hours',
             'planned_value',
             'remaining_hours',
+            'date_updated'
         )
 
     def update(self, instance, validated_data):
@@ -64,6 +90,7 @@ class UpdateProductSerializer(serializers.ModelSerializer):
         instance.planned_hours = validated_data.get('planned_hours', instance.planned_hours)
         instance.planned_value = validated_data.get('planned_value', instance.planned_value)
         instance.remaining_hours = validated_data.get('remaining_hours', instance.remaining_hours)
+        instance.date_updated = validated_data.get('date_updated', timezone.now)
         instance.save()
         return instance
 

@@ -20,7 +20,6 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
 
 
-
 # user register
 class Register(APIView):
     serializer_class = RegisterSerializer
