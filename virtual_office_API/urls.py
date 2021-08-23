@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path
@@ -28,3 +29,4 @@ urlpatterns = [
     path('docs/', include_docs_urls(title="Virtual Office", description="A Project management platform",
                                     permission_classes=(AllowAny,))),
 ]
+urlpatterns += staticfiles_urlpatterns()
