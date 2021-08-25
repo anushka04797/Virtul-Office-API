@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework import status
 import sys
 import os
-from wbs.serializers import CreateWbsSerializer, WbsDetailsSerializer, WbsUpdateSerializer
-from wbs.models import Wbs
+from wbs.serializers import CreateTimeCardSerializer, CreateWbsSerializer, WbsDetailsSerializer, WbsUpdateSerializer, TimeCardDetailsSerializer
+from wbs.models import TimeCard, Wbs
 from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated
 # from django.contrib.auth.models import User
@@ -46,7 +46,7 @@ class WbsDetails(APIView):
 
     def get(self, request, pk):
         try:
-            wbs = Wbs.objects.filter(id=pk)
+            wbs = Wbs.objects.get(id=pk)
             serializer = WbsDetailsSerializer(wbs, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'WBS Details',
                         'data': serializer.data}
@@ -79,3 +79,38 @@ class UpdateWbs(APIView):
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
             return Response(response)
+
+
+
+# create time card
+class CreateTimeCard(APIView):
+    serializer_class = CreateTimeCardSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        response = {
+            'success': 'True',
+            'status code': status.HTTP_200_OK,
+            'message': 'Time card created successfully',
+            'data': []
+        }
+        status_code = status.HTTP_200_OK
+        return Response(response, status=status_code)
+
+
+# time card details
+class TimeCardDetails(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, pk):
+        try:
+            time_card = TimeCard.objects.get(id=pk)
+            serializer = TimeCardDetailsSerializer(time_card)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'time card details',
+                        'data': serializer.data}
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+        return Response(response)
