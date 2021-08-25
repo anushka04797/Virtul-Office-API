@@ -7,7 +7,7 @@ from users.models import CustomUser
 class Projects(models.Model):
     task_delivery_order = models.CharField(_('task delivery order'), max_length=50, blank=False)
     sub_task = models.CharField(_('subtask name'), max_length=50, blank=True)
-    work_package_number = models.IntegerField(_('work package number'), max_length=10, blank=True)
+    work_package_number = models.IntegerField(_('work package number'), blank=True)
     work_package_index = models.DecimalField(_('work package index'), max_digits=7, decimal_places=1, blank=True,
                                              null=True)
     task_title = models.CharField(_('task title'), max_length=150, blank=True)
@@ -17,7 +17,7 @@ class Projects(models.Model):
                                  on_delete=models.CASCADE)
     is_assignee_active = models.BooleanField(_('task title'), default=True, blank=False)
     planned_hours = models.DecimalField(_('planned hours'), max_digits=6, decimal_places=1, blank=False)
-    planned_value = models.IntegerField(_('planned value'), max_length=10, blank=True)
+    planned_value = models.IntegerField(_('planned value'), blank=True)
     remaining_hours = models.DecimalField(_('remaining hours'), max_digits=6, decimal_places=1, blank=False)
     date_created = models.DateTimeField(_('date created'), default=timezone.now)
     date_updated = models.DateTimeField(_('date updated'), default=timezone.now)

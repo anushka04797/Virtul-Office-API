@@ -129,7 +129,6 @@ class RemoveProjectAssignee(APIView):
                 # print(serializer.is_valid())
                 # print(serializer.errors)
                 if serializer.is_valid():
-                    print('executed')
                     serializer.save()
                     response = {
                         'success': 'True',
