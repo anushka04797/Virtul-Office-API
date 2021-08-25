@@ -15,6 +15,8 @@ class Projects(models.Model):
     planned_delivery_date = models.DateField(_('planned delivery date'), blank=False)
     assignee = models.ForeignKey(CustomUser, related_name="project_assignee", blank=False, null=False,
                                  on_delete=models.CASCADE)
+    pm = models.ForeignKey(CustomUser, related_name="project_manager", blank=False, null=True,
+                                 on_delete=models.CASCADE)
     is_assignee_active = models.BooleanField(_('task title'), default=True, blank=False)
     planned_hours = models.DecimalField(_('planned hours'), max_digits=6, decimal_places=1, blank=False)
     planned_value = models.IntegerField(_('planned value'), blank=True)
