@@ -8,6 +8,7 @@ from users.models import CustomUser
 class Wbs(models.Model):
     project = models.ForeignKey(Projects, related_name="wbs_pro_details", blank=False, null=False,
                                 on_delete=models.CASCADE)
+    work_package_number = models.IntegerField(null=True, blank=False)
     assignee = models.ForeignKey(CustomUser, related_name="employee_assigned", blank=False, null=False,
                                  on_delete=models.CASCADE)
     reporter = models.ForeignKey(CustomUser, related_name="wbs_reporter", blank=False, null=False,
@@ -18,7 +19,7 @@ class Wbs(models.Model):
     end_date = models.DateField(_('end date'), blank=False)
     hours_worked = models.DecimalField(_('hours worked'), max_digits=6, decimal_places=1, blank=False)
     status = models.IntegerField(_('wbs status'), default=True, blank=False)
-    progress = models.IntegerField(_('progress percentage'), default=True, blank=False)
+    progress = models.IntegerField(_('progress percentage'), blank=False)
     comments = models.TextField(_('comments'), max_length=150, blank=True)
     deliverable = models.CharField(_('deliverable'), max_length=50, blank=True)
     date_created = models.DateField(_('date created'), default=timezone.now)
