@@ -25,6 +25,8 @@ urlpatterns = [
     path('auth/', include("users.urls")),
     path('project/', include("projects.urls")),
     path('wbs/', include("wbs.urls")),
+    path('evms/', include("evms.urls")),
+    path('meetings/', include("meetings.urls")),
 
     path('docs/', include_docs_urls(title="Virtual Office", description="A Project management platform",
                                     permission_classes=(AllowAny,))),
