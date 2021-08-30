@@ -23,12 +23,12 @@ class CreateEvmsSerializer(serializers.ModelSerializer):
 
 
 class EvmsDetailsSerializer(serializers.ModelSerializer):
-    projects = serializers.CharField(read_only=True)
+    project = ProjectDetailsSerializer()
 
     class Meta:
         model = Evms
         fields = (
-            'projects',
+            'project',
             'work_package_number',
             'earned_value',
             'actual_cost',

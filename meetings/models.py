@@ -7,7 +7,7 @@ from users.models import CustomUser
 
 class Meetings(models.Model):
     room_id = models.CharField(max_length=12, blank=False, null=False)
-    participant = models.CharField(_('participants'), max_length=150, blank=False, null=False)
+    participant = models.ForeignKey(CustomUser, related_name="meeting_participant", blank=False, null=False, on_delete=models.CASCADE)
     project = models.ForeignKey(Projects, related_name="meeting_project_details", blank=False, null=False,
                                  on_delete=models.CASCADE)
     agenda = models.TextField(_('meeting agenda'), max_length=150, blank=True)

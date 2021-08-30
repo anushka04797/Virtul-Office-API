@@ -1,4 +1,6 @@
 from datetime import date
+
+from rest_framework.serializers import Serializer
 from projects.models import Projects
 from django.contrib.auth.models import Group
 from django.http import Http404
@@ -37,7 +39,7 @@ class CreateEvms(APIView):
 
 
 # EVMS details
-class WbsDetails(APIView):
+class EvmsDetails(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):
@@ -84,3 +86,22 @@ class UpdateEvms(APIView):
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
             return Response(response)
+
+
+# EVMS list for PM
+class EvmsListForPm(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, pk):
+        evms_data = []
+        try:
+            evms_list = Evms.objects.all()
+            for evms in evms_list:
+                if evms.project.pm_id is int(pk):
+                    Serializer = EvmsDetailsSerializer(evms)
+                    evms_data.append(Serializer.data)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'EVMS list',
+                        'data': evms_data}
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+        return Response(response)
