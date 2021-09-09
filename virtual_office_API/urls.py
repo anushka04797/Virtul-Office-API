@@ -16,6 +16,8 @@ Including another URLconf
 from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path
+from virtual_office_API import settings
+from django.conf.urls.static import static
 from rest_framework.documentation import include_docs_urls
 from rest_framework.permissions import AllowAny
 
@@ -29,4 +31,4 @@ urlpatterns = [
 
     path('docs/', include_docs_urls(title="Virtual Office", description="A Project management platform",
                                     permission_classes=(AllowAny,))),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

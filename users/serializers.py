@@ -9,6 +9,7 @@ from rest_framework_jwt.settings import api_settings
 JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
 JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.CharField(max_length=255, required=True)
     password = serializers.CharField(max_length=128, write_only=True)
@@ -51,7 +52,7 @@ class LoginSerializer(serializers.Serializer):
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('id', 'first_name', 'last_name', 'password', 'email')
+        fields = ('first_name', 'last_name', 'password', 'email', 'phone')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -86,3 +87,14 @@ class ChangePasswordSerializer(serializers.Serializer):
 
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+
+
+class UploadProPicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'profile_pic']
+
+    def update(self, instance, validated_data):
+        instance.profile_pic = validated_data.get('profile_pic', instance.profile_pic)
+        instance.save()
+        return instance
