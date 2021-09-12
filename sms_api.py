@@ -7,6 +7,6 @@ class SmsGateway():
         r = requests.post(url, request)
         # print(r)
         if (r.status_code == 200):
-            print("Successfully sent to pisci!!")
+            print("Successfully sent to user!!")
         else:
-            print("Unsuccessful sending to pisci!!")
+            print("Unsuccessful sending to user!!")
