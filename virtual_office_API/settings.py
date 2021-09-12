@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     'wbs',
     'evms',
     'meetings',
-    'clear_cache',
 ]
 
 # added for custom user start==>
