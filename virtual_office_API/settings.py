@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'projects',
     'wbs',
     'evms',
-    'meetings'
+    'meetings',
+    'django_seed'
 ]
 
 # added for custom user start==>

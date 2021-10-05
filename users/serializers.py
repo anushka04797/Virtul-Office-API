@@ -19,6 +19,11 @@ class LoginSerializer(serializers.Serializer):
         email = data.get("email", None)
         password = data.get("password", None)
         user = authenticate(email=email, password=password)
+        groups = []
+        group_list = user.groups.all()
+        for group in group_list.iterator():
+            print(group)
+            groups.append(group)
         if user is None:
             raise serializers.ValidationError(
                 'A user with this email and password is not found.'
@@ -38,7 +43,7 @@ class LoginSerializer(serializers.Serializer):
             return {
                 'email': user.email,
                 'token': jwt_token,
-                'group': group,
+                'group': groups,
             }
         else:
             return {

@@ -4,7 +4,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from .managers import CustomUserManager
 
-
 class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(_('email address'), unique=True)
