@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group, update_last_login
+import json
 from rest_framework import serializers
 
 from users.models import CustomUser
@@ -23,7 +24,7 @@ class LoginSerializer(serializers.Serializer):
         group_list = user.groups.all()
         for group in group_list.iterator():
             print(group)
-            groups.append(group)
+            groups.append(group.name)
         if user is None:
             raise serializers.ValidationError(
                 'A user with this email and password is not found.'
@@ -43,7 +44,7 @@ class LoginSerializer(serializers.Serializer):
             return {
                 'email': user.email,
                 'token': jwt_token,
-                'group': groups,
+                'group': json.dumps(groups),
             }
         else:
             return {
