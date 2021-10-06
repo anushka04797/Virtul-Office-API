@@ -105,7 +105,7 @@ class PmProjectList(APIView):
 
 # assigned project list for employee
 class AssignedProjectList(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
     def get(self, request, pk):
         try:
@@ -114,8 +114,26 @@ class AssignedProjectList(APIView):
             for project in projects:
                 serializer = ProjectDetailsSerializer(project)
                 projects_data.append(serializer.data)
-                response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Assigned Project List for an employee',
-                            'data': projects_data}
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Assigned Project List for an employee',
+                        'data': projects_data}
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+        return Response(response)
+
+
+# assignee list of a project
+class ProjectAssigneeList(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request, pk):
+        try:
+            projects_data = []
+            projects = Projects.objects.filter(work_package_number=pk)
+            for project in projects:
+                serializer = ProjectDetailsSerializer(project)
+                projects_data.append(serializer.data)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'project assignee list',
+                        'data': projects_data}
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)

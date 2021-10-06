@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'wbs',
     'evms',
     'meetings',
-    'django_seed'
+    'corsheaders'
 ]
 
 # added for custom user start==>
@@ -81,6 +81,7 @@ EMAIL_HOST_PASSWORD = 'truofqahfsiyxrxn'
 # <==end of custom user
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -90,6 +91,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'virtual_office_API.urls'
 
@@ -125,9 +128,9 @@ WSGI_APPLICATION = 'virtual_office_API.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'virtual_office_v1',
+        'NAME': 'virtual_office',
         'USER': 'root',
-        'PASSWORD': 'Dhaka!027',
+        'PASSWORD': '',
         # 'HOST': '127.0.0.1',
         'PORT': '3306',
     }
