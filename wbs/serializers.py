@@ -11,6 +11,7 @@ class CreateWbsSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'project',
+            'work_package_number',
             'assignee',
             'reporter',
             'title',
