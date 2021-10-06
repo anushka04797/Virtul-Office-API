@@ -52,8 +52,7 @@ INSTALLED_APPS = [
     'projects',
     'wbs',
     'evms',
-    'meetings',
-    'corsheaders'
+    'meetings'
 ]
 
 # added for custom user start==>
