@@ -9,7 +9,7 @@ from users.serializers import ChangePasswordSerializer, LoginSerializer, Registe
 from users.models import CustomUser
 from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated
-# from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 from rest_framework import generics
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
@@ -71,10 +71,11 @@ class Login(RetrieveAPIView):
             # 'exp': serializer.data['token'],
         }
         user_data = CustomUser.objects.filter(email=request.data.get('email')).first()
+        #print(user_data.groups())
         status_code = status.HTTP_200_OK
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            if serializer.data['group'] == request.data.get('group'):
+            if len(serializer.data['group']) > 0:
                 # if user_data.profile_pic:
                 #     profilePic = '/media/'+str(user_data.profile_pic)
                 # else:
