@@ -96,6 +96,7 @@ class Login(RetrieveAPIView):
                         groups.append(group.name)
                     update_last_login(None, auth_user)
                     response['success'] = 'True'
+                    response['user_id']= auth_user.id
                     response['token'] = jwt_token
                     response['groups'] = json.dumps(groups)
                     response['status code'] = status.HTTP_200_OK
