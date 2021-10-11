@@ -14,15 +14,17 @@ JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 class LoginSerializer(serializers.Serializer):
     email = serializers.CharField(max_length=255, required=True)
     password = serializers.CharField(max_length=128, write_only=True)
-    token = serializers.CharField(max_length=255, read_only=True)
-    group = serializers.CharField(max_length=255, read_only=True)
+    # token = serializers.CharField(max_length=255, read_only=True)
+    # group = serializers.CharField(max_length=255, read_only=True)
 
     def validate(self, data):
         email = data.get("email", None)
         password = data.get("password", None)
         user = authenticate(email=email, password=password)
+        print('user auth: ', user)
         groups = []
         group_list = user.groups.all()
+
         for group in group_list.iterator():
             print(group)
             groups.append(group.name)
@@ -58,7 +60,7 @@ class LoginSerializer(serializers.Serializer):
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'password', 'email', 'phone')
+        fields = ('first_name', 'last_name', 'password', 'email', 'phone', 'profile_pic')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):

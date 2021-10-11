@@ -1,11 +1,13 @@
+import json
 from datetime import date, datetime
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, update_last_login
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import os
-from users.serializers import ChangePasswordSerializer, LoginSerializer, RegisterSerializer, UserDetailSerializer, UserUpdateSerializer, UploadProPicSerializer
+from users.serializers import ChangePasswordSerializer, LoginSerializer, RegisterSerializer, UserDetailSerializer, \
+    UserUpdateSerializer, UploadProPicSerializer, JWT_PAYLOAD_HANDLER, JWT_ENCODE_HANDLER
 from users.models import CustomUser
 from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated
@@ -18,6 +20,7 @@ from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
+from django.contrib.auth import authenticate
 from django.core.mail import send_mail
 import sms_api
 import sys
@@ -71,52 +74,45 @@ class Login(RetrieveAPIView):
             # 'exp': serializer.data['token'],
         }
         user_data = CustomUser.objects.filter(email=request.data.get('email')).first()
-        #print(user_data.groups())
-        status_code = status.HTTP_200_OK
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            if len(serializer.data['group']) > 0:
-                # if user_data.profile_pic:
-                #     profilePic = '/media/'+str(user_data.profile_pic)
-                # else:
-                #     profilePic = str(user_data.profile_pic)
-                # is_subs = ''
-                # if serializer.data['group'] == 'seller':
-                    # if user_data.is_subscribed == True:
-                    #     subs_info = Subscription.objects.filter(seller=user_data.id).order_by('-id').first()
-                    #     # print(subs_info.end_date)
-                    #     if subs_info:
-                    #         today = date.today()
-                    #         expdate = subs_info.end_date
-                    #         if today <= expdate:
-                    #             is_subs = 'Yes'
-                    #         else:
-                    #             is_subs = 'No'
-                    #     else:
-                    #         is_subs = 'Never subscribe'
-                response['token'] = serializer.data['token']
-                response['group'] = serializer.data['group']
-                # response['full_name'] = user_data.full_name
-                # response['profile_pic'] = profilePic
-                # response['is_subscribed'] = is_subs
-                # response['is_approved'] = user_data.is_approved
-                response['is_active'] = user_data.is_active
+        if user_data is None:
+            response['success']='False'
+            response['status code']=status.HTTP_404_NOT_FOUND
+            response['message']="User Not Found"
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        elif user_data.is_active == 1 and user_data.groups.count() > 0:
+            auth_user = authenticate(email=request.data.get('email'),password=request.data.get('password'))
+            if auth_user is None:
+                response['success']="False"
+                response['status code']=status.HTTP_400_BAD_REQUEST
+                response['message']="Wrong Credentials"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
             else:
-                response['success'] = 'False'
-                response['status code'] = status.HTTP_400_BAD_REQUEST
-                response['message'] = 'Forbidden for this user!!'
-                status_code = status.HTTP_400_BAD_REQUEST
-            return Response(response, status=status_code)
-        response['success'] = 'False'
-        response['status code'] = status.HTTP_400_BAD_REQUEST
-        if user_data:
-            if user_data.is_active == 1:
-                response['message'] = 'Please Enter Valid Credentials!'
-            else:
-                response['message'] = 'Please wait until your account get activated!'
+                try:
+                    payload = JWT_PAYLOAD_HANDLER(auth_user)
+                    jwt_token = JWT_ENCODE_HANDLER(payload)
+                    groups=[]
+                    group_list = auth_user.groups.all()
+                    for group in group_list.iterator():
+                        groups.append(group.name)
+                    update_last_login(None, auth_user)
+                    response['success'] = 'True'
+                    response['user_id']= auth_user.id
+                    response['token'] = jwt_token
+                    response['groups'] = json.dumps(groups)
+                    response['status code'] = status.HTTP_200_OK
+                    response['message'] = 'User Logged in'
+                    return Response(response, status=status.HTTP_200_OK)
+                except CustomUser.DoesNotExist:
+                    response['success'] = 'False'
+                    response['status code'] = status.HTTP_500_INTERNAL_SERVER_ERROR
+                    response['message'] = 'Internal Server Error'
+                    return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         else:
-            response['message'] = 'User Not Found!'
-        return Response(response, status=status_code)
+            response['success'] = 'False'
+            response['status code'] = status.HTTP_403_FORBIDDEN
+            response['message'] = 'Forbidden for this user!!'
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
 
 
 # user logout 
