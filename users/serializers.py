@@ -71,7 +71,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone']
+        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'profile_pic']
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
