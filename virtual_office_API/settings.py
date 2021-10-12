@@ -129,7 +129,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'virtual_office_v1',
         'USER': 'root',
-        'PASSWORD': 'Dhaka!027#',
+        'PASSWORD': 'Dhaka!027',
         'PORT': '3306',
     }
 }
