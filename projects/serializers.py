@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-from .models import Projects
+from .models import Projects, ProjectAssignee
 from users.serializers import UserDetailSerializer
 
 
@@ -15,10 +15,8 @@ class CreateProjectSerializer(serializers.ModelSerializer):
             'work_package_index', 
             'task_title', 
             'estimated_person', 
-            'planned_delivery_date', 
-            'assignee',
+            'planned_delivery_date',
             'pm',
-            'is_assignee_active',
             'planned_hours', 
             'planned_value', 
             'remaining_hours',
@@ -27,8 +25,21 @@ class CreateProjectSerializer(serializers.ModelSerializer):
         )
 
 
+class ProjectAssigneeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectAssignee
+        fields = (
+            'id',
+            'assignee',
+            'is_assignee_active',
+            'project',
+            'date_created',
+            'date_updated'
+        )
+
+
 class ProjectDetailsSerializer(serializers.ModelSerializer):
-    assignee = UserDetailSerializer()
+    # assignee = UserDetailSerializer()
 
     class Meta:
         model = Projects
@@ -41,9 +52,8 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
             'task_title',
             'estimated_person',
             'planned_delivery_date',
-            'assignee',
+            # 'assignee',
             'pm',
-            'is_assignee_active',
             'planned_hours',
             'planned_value',
             'remaining_hours',

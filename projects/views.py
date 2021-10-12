@@ -5,7 +5,7 @@ import sys
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer
+from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer, ProjectAssigneeSerializer
 from users.models import CustomUser
 from projects.models import Projects
 from rest_framework import permissions
@@ -18,6 +18,7 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 # create project
 class CreateProject(APIView):
     serializer_class = CreateProjectSerializer
+    serializer_class2 = ProjectAssigneeSerializer
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
@@ -26,15 +27,26 @@ class CreateProject(APIView):
         # request.data._mutable = True
         request.data['work_package_index'] = float(work_package_index)
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        response = {
-            'success': 'True',
-            'status code': status.HTTP_200_OK,
-            'message': 'Project created successfully',
-            'data': []
-        }
-        status_code = status.HTTP_200_OK
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            # print(serializer.data)
+            for item in request.data['assignee']:
+                if serializer.data is not None:
+                    temp_data = {
+                        'assignee': item,
+                        'is_assignee_active': 1,
+                        'project': serializer.data['id']
+                    }
+                    serializer2 = self.serializer_class2(data=temp_data)
+                    if serializer2.is_valid(raise_exception=True):
+                        serializer2.save()
+                        response = {
+                            'success': 'True',
+                            'status code': status.HTTP_200_OK,
+                            'message': 'Project created successfully',
+                            'data': serializer.data
+                        }
+            status_code = status.HTTP_200_OK
         return Response(response, status=status_code)
 
 
