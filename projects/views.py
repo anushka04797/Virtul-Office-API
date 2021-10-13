@@ -1,3 +1,4 @@
+import json
 from datetime import date
 from django.contrib.auth.models import Group
 from django.http import Http404
@@ -5,7 +6,8 @@ import sys
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer, ProjectAssigneeSerializer
+from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer, \
+    ProjectAssigneeSerializer
 from users.models import CustomUser
 from projects.models import Projects
 from rest_framework import permissions
@@ -126,7 +128,8 @@ class AssignedProjectList(APIView):
             for project in projects:
                 serializer = ProjectDetailsSerializer(project)
                 projects_data.append(serializer.data)
-            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Assigned Project List for an employee',
+            response = {'success': 'True', 'status code': status.HTTP_200_OK,
+                        'message': 'Assigned Project List for an employee',
                         'data': projects_data}
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
@@ -149,7 +152,6 @@ class ProjectAssigneeList(APIView):
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
-
 
 # update project
 # class AddProjectAssignee(APIView):
