@@ -31,7 +31,7 @@ from rest_framework.parsers import MultiPartParser
 class Register(APIView):
     serializer_class = RegisterSerializer
     permission_classes = (AllowAny,)
-    parser_classes = (MultiPartParser, )
+    parser_classes = (MultiPartParser,)
 
     def post(self, request):
         try:
@@ -50,11 +50,30 @@ class Register(APIView):
                       "you will be notified soon once it is get activated. "
             sms_api.SmsGateway.post(
                 {
-                'number': request.data['phone'],
-                'message': message
+                    'number': request.data['phone'],
+                    'message': message
                 }
             )
-            send_mail('New user registration', message, 'awronno.adhar@gmail.com', [request.data['email']], fail_silently=False,)
+            send_mail('New user registration', message, 'awronno.adhar@gmail.com', [request.data['email']],
+                      fail_silently=False, )
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+        return Response(response)
+
+
+# possible assignees for a new project
+class PossibleAssigneeList(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        try:
+            possible_assignees = []
+            users = CustomUser.objects.all()
+            for user in users:
+                serializer = UserDetailSerializer(user)
+                possible_assignees.append(serializer.data)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Possible assignee list',
+                        'data': possible_assignees}
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
@@ -75,28 +94,28 @@ class Login(RetrieveAPIView):
         }
         user_data = CustomUser.objects.filter(email=request.data.get('email')).first()
         if user_data is None:
-            response['success']='False'
-            response['status code']=status.HTTP_404_NOT_FOUND
-            response['message']="User Not Found"
+            response['success'] = 'False'
+            response['status code'] = status.HTTP_404_NOT_FOUND
+            response['message'] = "User Not Found"
             return Response(response, status=status.HTTP_404_NOT_FOUND)
         elif user_data.is_active == 1 and user_data.groups.count() > 0:
-            auth_user = authenticate(email=request.data.get('email'),password=request.data.get('password'))
+            auth_user = authenticate(email=request.data.get('email'), password=request.data.get('password'))
             if auth_user is None:
-                response['success']="False"
-                response['status code']=status.HTTP_400_BAD_REQUEST
-                response['message']="Wrong Credentials"
+                response['success'] = "False"
+                response['status code'] = status.HTTP_400_BAD_REQUEST
+                response['message'] = "Wrong Credentials"
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
             else:
                 try:
                     payload = JWT_PAYLOAD_HANDLER(auth_user)
                     jwt_token = JWT_ENCODE_HANDLER(payload)
-                    groups=[]
+                    groups = []
                     group_list = auth_user.groups.all()
                     for group in group_list.iterator():
                         groups.append(group.name)
                     update_last_login(None, auth_user)
                     response['success'] = 'True'
-                    response['user_id']= auth_user.id
+                    response['user_id'] = auth_user.id
                     response['token'] = jwt_token
                     response['groups'] = json.dumps(groups)
                     response['status code'] = status.HTTP_200_OK
@@ -153,7 +172,7 @@ class UserDetail(APIView):
 
 # user  profile update
 class UserUpdate(APIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     authentication_class = JSONWebTokenAuthentication
 
     def post(self, request, pk):
