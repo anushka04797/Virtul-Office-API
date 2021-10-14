@@ -16,8 +16,6 @@ class CreateTdoSerializer(serializers.ModelSerializer):
 
 
 class CreateProjectSerializer(serializers.ModelSerializer):
-    task_delivery_order = CreateTdoSerializer()
-
     class Meta:
         model = Projects
         fields = (
@@ -52,6 +50,8 @@ class ProjectAssigneeSerializer(serializers.ModelSerializer):
 
 
 class ProjectDetailsSerializer(serializers.ModelSerializer):
+    task_delivery_order = CreateTdoSerializer()
+
     class Meta:
         model = Projects
         fields = (
