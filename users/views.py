@@ -68,7 +68,7 @@ class PossibleAssigneeList(APIView):
     def get(self, request):
         try:
             possible_assignees = []
-            users = CustomUser.objects.all()
+            users = CustomUser.objects.all().exclude(is_superuser=1)
             for user in users:
                 serializer = UserDetailSerializer(user)
                 possible_assignees.append(serializer.data)
