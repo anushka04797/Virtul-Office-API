@@ -5,9 +5,9 @@ import sys
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer, ProjectAssigneeSerializer
+from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer, ProjectAssigneeSerializer, CreateTdoSerializer
 from users.models import CustomUser
-from projects.models import Projects
+from projects.models import Projects, ProjectAssignee
 from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import generics
@@ -17,35 +17,47 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 # create project
 class CreateProject(APIView):
-    serializer_class = CreateProjectSerializer
-    serializer_class2 = ProjectAssigneeSerializer
+    serializer_class = CreateTdoSerializer
+    serializer_class2 = CreateProjectSerializer
+    serializer_class3 = ProjectAssigneeSerializer
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         count_project_wp = Projects.objects.filter(work_package_number=request.data['work_package_number'])
         work_package_index = request.data['work_package_number'] + '.' + str(len(count_project_wp) + 1)
-        # request.data._mutable = True
         request.data['work_package_index'] = float(work_package_index)
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            # print(serializer.data)
-            for item in request.data['assignee']:
-                if serializer.data is not None:
-                    temp_data = {
-                        'assignee': item,
-                        'is_assignee_active': 1,
-                        'project': serializer.data['id']
-                    }
-                    serializer2 = self.serializer_class2(data=temp_data)
-                    if serializer2.is_valid(raise_exception=True):
-                        serializer2.save()
-                        response = {
-                            'success': 'True',
-                            'status code': status.HTTP_200_OK,
-                            'message': 'Project created successfully',
-                            'data': serializer.data
+
+        # create tdo block #####################
+        tdo_data = {
+            'title': request.data['task_delivery_order']
+        }
+        serializer_tdo = self.serializer_class(data=tdo_data)
+        if serializer_tdo.is_valid(raise_exception=True):
+            serializer_tdo.save()
+
+            # create project block #####################
+            request.data['task_delivery_order'] = serializer_tdo.data['id']
+            serializer = self.serializer_class2(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                for item in request.data['assignee']:
+                    if serializer.data is not None:
+
+                        # create assignee block #####################
+                        temp_data = {
+                            'assignee': item,
+                            'is_assignee_active': 1,
+                            'project': serializer.data['id']
                         }
+                        serializer2 = self.serializer_class3(data=temp_data)
+                        if serializer2.is_valid(raise_exception=True):
+                            serializer2.save()
+                            response = {
+                                'success': 'True',
+                                'status code': status.HTTP_200_OK,
+                                'message': 'Project created successfully',
+                                'data': serializer.data
+                            }
             status_code = status.HTTP_200_OK
         return Response(response, status=status_code)
 
@@ -56,13 +68,22 @@ class ProjectDetails(APIView):
 
     def get(self, request, pk):
         try:
-            projects_data = []
+            results = []
             projects = Projects.objects.filter(work_package_number=pk)
             for project in projects:
+                temp_data = {
+                    "projects": {},
+                    "assignee": []
+                }
                 serializer = ProjectDetailsSerializer(project)
-                projects_data.append(serializer.data)
-                response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Project Details',
-                            'data': projects_data}
+                temp_data["projects"] = serializer.data
+                assignees = ProjectAssignee.objects.filter(project=project.id)
+                for assignee in assignees:
+                    assignee_serializer = ProjectAssigneeSerializer(assignee)
+                    temp_data["assignee"].append(assignee_serializer.data)
+                results.append(temp_data)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Project Details',
+                        'data': results}
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
@@ -73,7 +94,11 @@ class UpdateProject(APIView):
     permission_classes = (IsAuthenticated,)
 
     def put(self, request, pk, format=None):
-        # print(request.data)
+        print(request.data)
+        if request.data['sub_task'] is '':
+            print(request.data['sub_task'])
+        else:
+            print(request.data['sub_task'])
         try:
             projects = Projects.objects.filter(work_package_index=pk)
             for project in projects:
@@ -81,8 +106,8 @@ class UpdateProject(APIView):
                 # print(serializer.is_valid())
                 # print(serializer.errors)
                 if serializer.is_valid():
-                    print('executed')
-                    serializer.save()
+                    print('executed: ', serializer.data)
+                    # serializer.save()
                     response = {
                         'success': 'True',
                         'status code': status.HTTP_200_OK,

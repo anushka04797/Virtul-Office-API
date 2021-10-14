@@ -1,10 +1,23 @@
 from rest_framework import serializers
 from django.utils import timezone
-from .models import Projects, ProjectAssignee
+from .models import Projects, ProjectAssignee, Tdo
 from users.serializers import UserDetailSerializer
 
 
+class CreateTdoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tdo
+        fields = (
+            'id',
+            'title',
+            'date_created',
+            'date_updated'
+        )
+
+
 class CreateProjectSerializer(serializers.ModelSerializer):
+    task_delivery_order = CreateTdoSerializer()
+
     class Meta:
         model = Projects
         fields = (
@@ -39,8 +52,6 @@ class ProjectAssigneeSerializer(serializers.ModelSerializer):
 
 
 class ProjectDetailsSerializer(serializers.ModelSerializer):
-    # assignee = UserDetailSerializer()
-
     class Meta:
         model = Projects
         fields = (
@@ -52,7 +63,6 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
             'task_title',
             'estimated_person',
             'planned_delivery_date',
-            # 'assignee',
             'pm',
             'planned_hours',
             'planned_value',
