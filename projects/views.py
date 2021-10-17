@@ -9,7 +9,7 @@ from rest_framework import status
 from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer, \
     ProjectAssigneeSerializer
 from users.models import CustomUser
-from projects.models import Projects
+from projects.models import Projects, ProjectAssignee
 from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import generics
@@ -124,9 +124,10 @@ class AssignedProjectList(APIView):
     def get(self, request, pk):
         try:
             projects_data = []
-            projects = Projects.objects.filter(assignee=pk)
-            for project in projects:
-                serializer = ProjectDetailsSerializer(project)
+            assigned_projects = ProjectAssignee.objects.filter(assignee=pk).select_related('project').all()
+            for project in assigned_projects:
+                temp_project = Projects.objects.get(pk=project.id)
+                serializer = ProjectDetailsSerializer(temp_project)
                 projects_data.append(serializer.data)
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
                         'message': 'Assigned Project List for an employee',

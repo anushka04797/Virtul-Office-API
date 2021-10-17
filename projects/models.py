@@ -13,8 +13,7 @@ class Projects(models.Model):
     task_title = models.CharField(_('task title'), max_length=150, blank=True)
     estimated_person = models.DecimalField(_('estimated person'), max_digits=4, decimal_places=2, blank=True)
     planned_delivery_date = models.DateField(_('planned delivery date'), blank=False)
-    pm = models.ForeignKey(CustomUser, related_name="project_manager", blank=False, null=True,
-                           on_delete=models.CASCADE)
+    pm = models.ForeignKey(CustomUser, related_name="project_manager", blank=False, null=True, on_delete=models.CASCADE)
     planned_hours = models.DecimalField(_('planned hours'), max_digits=6, decimal_places=1, blank=False)
     planned_value = models.IntegerField(_('planned value'), blank=True)
     remaining_hours = models.DecimalField(_('remaining hours'), max_digits=6, decimal_places=1, blank=False)
