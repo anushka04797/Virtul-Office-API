@@ -126,7 +126,7 @@ class AssignedProjectList(APIView):
             projects_data = []
             assigned_projects = ProjectAssignee.objects.filter(assignee=pk).select_related('project').all()
             for project in assigned_projects:
-                temp_project = Projects.objects.get(pk=project.id)
+                temp_project = Projects.objects.prefetch_related('pm').get(pk=project.id)
                 serializer = ProjectDetailsSerializer(temp_project)
                 projects_data.append(serializer.data)
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
