@@ -1,3 +1,4 @@
+import datetime
 import json
 from datetime import date
 from django.contrib.auth.models import Group
@@ -31,13 +32,15 @@ class CreateProject(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            # print(serializer.data)
             for item in request.data['assignee']:
                 if serializer.data is not None:
+                    print(serializer.data)
                     temp_data = {
-                        'assignee': item,
+                        'assignee_id': item,
                         'is_assignee_active': 1,
-                        'project': serializer.data['id']
+                        'project_id': serializer.data['id'],
+                        'date_created':datetime.datetime.now(),
+                        'date_updated':datetime.datetime.now()
                     }
                     serializer2 = self.serializer_class2(data=temp_data)
                     if serializer2.is_valid(raise_exception=True):
