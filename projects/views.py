@@ -124,11 +124,24 @@ class AssignedProjectList(APIView):
     def get(self, request, pk):
         try:
             projects_data = []
-            assigned_projects = ProjectAssignee.objects.filter(assignee=pk).select_related('project').all()
+            assigned_projects = ProjectAssignee.objects.filter(assignee=pk).select_related('project')
             for project in assigned_projects:
-                temp_project = Projects.objects.prefetch_related('pm').get(pk=project.id)
+                temp_project = Projects.objects.get(pk=project.project_id)
+                assignees_query_set = ProjectAssignee.objects.filter(project=temp_project.id).values()
+                #print('assignee query set',assignees_query_set)
+                assignees=[]
+                for assignee in assignees_query_set:
+                    if assignee._meta.get_field('assignee_id') is not None:
+                        print('assignee id', assignee.assignee_id)
+                        # temp = CustomUser.objects.filter(pk=assignee.assignee_id)
+                        # assignees.append(temp)
                 serializer = ProjectDetailsSerializer(temp_project)
-                projects_data.append(serializer.data)
+                print(assignees)
+                temp_data = {
+                    'assignees': assignees,
+                    'project': serializer.data
+                }
+                projects_data.append(temp_data)
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
                         'message': 'Assigned Project List for an employee',
                         'data': projects_data}

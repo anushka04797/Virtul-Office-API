@@ -8,32 +8,19 @@ class CreateProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projects
         fields = (
-            'id', 
-            'task_delivery_order', 
-            'sub_task', 
-            'work_package_number', 
-            'work_package_index', 
-            'task_title', 
-            'estimated_person', 
+            'id',
+            'task_delivery_order',
+            'sub_task',
+            'work_package_number',
+            'work_package_index',
+            'task_title',
+            'estimated_person',
             'planned_delivery_date',
             'pm',
-            'planned_hours', 
-            'planned_value', 
+            'planned_hours',
+            'planned_value',
             'remaining_hours',
             'status',
-            'date_created',
-            'date_updated'
-        )
-
-
-class ProjectAssigneeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProjectAssignee
-        fields = (
-            'id',
-            'assignee',
-            'is_assignee_active',
-            'project',
             'date_created',
             'date_updated'
         )
@@ -42,9 +29,10 @@ class ProjectAssigneeSerializer(serializers.ModelSerializer):
 class ProjectDetailsSerializer(serializers.ModelSerializer):
     # assignee = UserDetailSerializer()
     pm = UserDetailSerializer()
-    planned_delivery_date = serializers.DateTimeField(format="%d-%m-%Y")
+    planned_delivery_date = serializers.DateField(format="%d-%m-%Y")
     date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
     date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+
     class Meta:
         model = Projects
         fields = (
@@ -64,6 +52,23 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
             'status',
             'date_created',
             'date_updated',
+        )
+
+
+class ProjectAssigneeSerializer(serializers.ModelSerializer):
+    assignee = UserDetailSerializer()
+    project = ProjectDetailsSerializer()
+    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+    class Meta:
+        model = ProjectAssignee
+        fields = (
+            'id',
+            'assignee',
+            'is_assignee_active',
+            'project',
+            'date_created',
+            'date_updated'
         )
 
 
@@ -113,7 +118,6 @@ class ProjectDetailsForWbsSerializer(serializers.ModelSerializer):
             'remaining_hours',
             'status',
         )
-
 
 # class AddAssigneeSerializer(serializers.ModelSerializer):
 #     class Meta:
