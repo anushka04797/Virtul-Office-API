@@ -42,7 +42,9 @@ class ProjectAssigneeSerializer(serializers.ModelSerializer):
 class ProjectDetailsSerializer(serializers.ModelSerializer):
     # assignee = UserDetailSerializer()
     pm = UserDetailSerializer()
-
+    planned_delivery_date = serializers.DateTimeField(format="%d-%m-%Y")
+    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
     class Meta:
         model = Projects
         fields = (
