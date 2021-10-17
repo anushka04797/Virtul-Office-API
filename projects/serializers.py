@@ -20,6 +20,7 @@ class CreateProjectSerializer(serializers.ModelSerializer):
             'planned_hours', 
             'planned_value', 
             'remaining_hours',
+            'status',
             'date_created',
             'date_updated'
         )
@@ -40,6 +41,7 @@ class ProjectAssigneeSerializer(serializers.ModelSerializer):
 
 class ProjectDetailsSerializer(serializers.ModelSerializer):
     # assignee = UserDetailSerializer()
+    pm = UserDetailSerializer()
 
     class Meta:
         model = Projects
@@ -57,8 +59,9 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
             'planned_hours',
             'planned_value',
             'remaining_hours',
+            'status',
             'date_created',
-            'date_updated'
+            'date_updated',
         )
 
 
@@ -72,6 +75,7 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
             'planned_hours',
             'planned_value',
             'remaining_hours',
+            'status',
             'date_updated'
         )
 
@@ -105,6 +109,7 @@ class ProjectDetailsForWbsSerializer(serializers.ModelSerializer):
             'is_assignee_active',
             'planned_hours',
             'remaining_hours',
+            'status',
         )
 
 
