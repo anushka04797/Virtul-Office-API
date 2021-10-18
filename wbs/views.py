@@ -103,10 +103,11 @@ class WbsListForEmployee(APIView):
                 wbs_list.append(Serializer.data)
                 response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Assigned WBS List for an employee',
                             'data': wbs_list}
+            return Response(response)
         except Exception as e:
             response = 'on line {}'.format(
                 sys.exc_info()[-1].tb_lineno), str(e)
-        return Response(response)
+        return Response({'success': 'False', 'status code': status.HTTP_400_BAD_REQUEST, 'message': 'Bad Request'})
 
 
 # project wise WBS list

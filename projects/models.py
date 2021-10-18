@@ -53,18 +53,15 @@ class Projects(models.Model):
     def __str__(self):
         return self.task_delivery_order
 
-    def project_status(self):
+    def is_ongoing(self):
         return self.status in {
-            self.ProjectStatus.HOLD,
-            self.ProjectStatus.CANCELLED,
+            self.ProjectStatus.GOING
         }
 
 
 class ProjectAssignee(models.Model):
-    project = models.ForeignKey(Projects, related_name="project_assignee", blank=False, null=False,
-                                on_delete=models.CASCADE)
-    assignee = models.ForeignKey(CustomUser, related_name="project_assignee", blank=False, null=False,
-                                 on_delete=models.CASCADE)
+    project = models.ForeignKey(Projects, related_name="project_assignee", blank=False, null=False, on_delete=models.CASCADE)
+    assignee = models.ForeignKey(CustomUser, related_name="project_assignee", blank=False, null=False, on_delete=models.CASCADE)
     is_assignee_active = models.BooleanField(_('assignee status'), default=True, blank=False)
     date_created = models.DateTimeField(_('date created'), default=timezone.now)
     date_updated = models.DateTimeField(_('date updated'), default=timezone.now)

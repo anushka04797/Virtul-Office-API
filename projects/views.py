@@ -1,3 +1,4 @@
+import datetime
 import json
 from datetime import date
 from django.contrib.auth.models import Group
@@ -17,6 +18,9 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 
 # create project
+from users.serializers import UserDetailSerializer
+
+
 class CreateProject(APIView):
     serializer_class = CreateTdoSerializer
     serializer_class2 = CreateProjectSerializer
@@ -147,14 +151,29 @@ class AssignedProjectList(APIView):
     def get(self, request, pk):
         try:
             projects_data = []
-            assigned_projects = ProjectAssignee.objects.filter(assignee=pk).select_related('project').all()
+            assigned_projects = ProjectAssignee.objects.filter(assignee=pk).select_related('project')
             for project in assigned_projects:
-                temp_project = Projects.objects.prefetch_related('pm').get(pk=project.id)
+                temp_project = Projects.objects.get(pk=project.project_id)
+                assignees_query_set = ProjectAssignee.objects.filter(project=temp_project.id).values()
+                #print('assignee query set',assignees_query_set)
+                assignees=[]
+                if len(assignees_query_set) > 0 :
+                    for assignee in assignees_query_set:
+                        temp = CustomUser.objects.get(pk=assignee['assignee_id'])
+                        print('assignee', UserDetailSerializer(temp).data)
+                        assignees.append(UserDetailSerializer(temp).data)
+
                 serializer = ProjectDetailsSerializer(temp_project)
-                projects_data.append(serializer.data)
+                #print(assignees)
+                temp_data = {
+                    'assignees': assignees,
+                    'project': serializer.data
+                }
+                projects_data.append(temp_data)
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
                         'message': 'Assigned Project List for an employee',
                         'data': projects_data}
+            return Response(response)
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
