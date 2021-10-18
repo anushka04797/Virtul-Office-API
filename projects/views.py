@@ -1,3 +1,4 @@
+import json
 from datetime import date
 from django.contrib.auth.models import Group
 from django.http import Http404
@@ -146,11 +147,13 @@ class AssignedProjectList(APIView):
     def get(self, request, pk):
         try:
             projects_data = []
-            projects = Projects.objects.filter(assignee=pk)
-            for project in projects:
-                serializer = ProjectDetailsSerializer(project)
+            assigned_projects = ProjectAssignee.objects.filter(assignee=pk).select_related('project').all()
+            for project in assigned_projects:
+                temp_project = Projects.objects.prefetch_related('pm').get(pk=project.id)
+                serializer = ProjectDetailsSerializer(temp_project)
                 projects_data.append(serializer.data)
-            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Assigned Project List for an employee',
+            response = {'success': 'True', 'status code': status.HTTP_200_OK,
+                        'message': 'Assigned Project List for an employee',
                         'data': projects_data}
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
@@ -173,7 +176,6 @@ class ProjectAssigneeList(APIView):
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
-
 
 # update project
 # class AddProjectAssignee(APIView):

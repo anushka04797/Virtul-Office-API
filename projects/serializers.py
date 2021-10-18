@@ -31,6 +31,7 @@ class CreateProjectSerializer(serializers.ModelSerializer):
             'planned_hours', 
             'planned_value', 
             'remaining_hours',
+            'status',
             'date_created',
             'date_updated'
         )
@@ -50,7 +51,14 @@ class ProjectAssigneeSerializer(serializers.ModelSerializer):
 
 
 class ProjectDetailsSerializer(serializers.ModelSerializer):
+
     task_delivery_order = CreateTdoSerializer()
+
+    # assignee = UserDetailSerializer()
+    pm = UserDetailSerializer()
+    planned_delivery_date = serializers.DateTimeField(format="%d-%m-%Y")
+    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
 
     class Meta:
         model = Projects
@@ -67,8 +75,9 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
             'planned_hours',
             'planned_value',
             'remaining_hours',
+            'status',
             'date_created',
-            'date_updated'
+            'date_updated',
         )
 
 
@@ -82,6 +91,7 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
             'planned_hours',
             'planned_value',
             'remaining_hours',
+            'status',
             'date_updated'
         )
 
@@ -115,6 +125,7 @@ class ProjectDetailsForWbsSerializer(serializers.ModelSerializer):
             'is_assignee_active',
             'planned_hours',
             'remaining_hours',
+            'status',
         )
 
 
