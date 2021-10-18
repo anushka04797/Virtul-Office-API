@@ -4,6 +4,20 @@ from django.utils import timezone
 from users.models import CustomUser
 
 
+class Tdo(models.Model):
+    title = models.CharField(_('task delivery order'), max_length=50, blank=False, null=True, default=1)
+    date_created = models.DateTimeField(_('date created'), default=timezone.now)
+    date_updated = models.DateTimeField(_('date updated'), default=timezone.now)
+
+    class Meta:
+        db_table = 'tdo'
+        verbose_name = _('tdo')
+        verbose_name_plural = _('tdos')
+
+    def __str__(self):
+        return self.title
+
+
 class Projects(models.Model):
     class ProjectStatus(models.IntegerChoices):
         GOING = '0', _('OnGoing')
@@ -11,7 +25,8 @@ class Projects(models.Model):
         HOLD = '2', _('Hold')
         CANCELLED = '3', _('Cancelled')
 
-    task_delivery_order = models.CharField(_('task delivery order'), max_length=50, blank=False)
+    task_delivery_order = models.ForeignKey(Tdo, related_name="tdo_title", blank=False, null=False,
+                                            on_delete=models.CASCADE)
     sub_task = models.CharField(_('subtask name'), max_length=50, blank=True)
     work_package_number = models.IntegerField(_('work package number'), blank=True)
     work_package_index = models.DecimalField(_('work package index'), max_digits=7, decimal_places=1, blank=True,
