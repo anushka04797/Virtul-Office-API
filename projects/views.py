@@ -7,7 +7,8 @@ import sys
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer, ProjectAssigneeSerializer, CreateTdoSerializer
+from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer, \
+    ProjectAssigneeSerializer, CreateTdoSerializer, CreateProjectAssigneeSerializer
 from users.models import CustomUser
 from projects.models import Projects, ProjectAssignee
 from rest_framework import permissions
@@ -24,7 +25,7 @@ from users.serializers import UserDetailSerializer
 class CreateProject(APIView):
     serializer_class = CreateTdoSerializer
     serializer_class2 = CreateProjectSerializer
-    serializer_class3 = ProjectAssigneeSerializer
+    serializer_class3 = CreateProjectAssigneeSerializer
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
@@ -49,10 +50,13 @@ class CreateProject(APIView):
                     if serializer.data is not None:
 
                         # create assignee block #####################
+                        print('project ',serializer.data)
                         temp_data = {
                             'assignee': item,
                             'is_assignee_active': 1,
-                            'project': serializer.data['id']
+                            'project': serializer.data['id'],
+                            'date_created':datetime.datetime.now(),
+                            'date_updated': datetime.datetime.now()
                         }
                         serializer2 = self.serializer_class3(data=temp_data)
                         if serializer2.is_valid(raise_exception=True):

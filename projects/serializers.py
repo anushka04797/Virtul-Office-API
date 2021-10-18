@@ -16,7 +16,6 @@ class CreateTdoSerializer(serializers.ModelSerializer):
 
 
 class CreateProjectSerializer(serializers.ModelSerializer):
-    pm = UserDetailSerializer(read_only=True)
     class Meta:
         model = Projects
         fields = (
@@ -70,10 +69,6 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
 
 
 class CreateProjectAssigneeSerializer(serializers.ModelSerializer):
-    assignee = UserDetailSerializer(read_only=True)
-    project = ProjectDetailsSerializer(read_only=True)
-    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
-    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
 
     class Meta:
         model = ProjectAssignee
