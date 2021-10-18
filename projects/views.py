@@ -72,7 +72,7 @@ class ProjectDetails(APIView):
             projects = Projects.objects.filter(work_package_number=pk)
             for project in projects:
                 temp_data = {
-                    "projects": {},
+                    "project": {},
                     "assignee": []
                 }
                 serializer = ProjectDetailsSerializer(project)
@@ -101,22 +101,21 @@ class UpdateProject(APIView):
             print(request.data['sub_task'])
         try:
             projects = Projects.objects.filter(work_package_index=pk)
-            for project in projects:
-                serializer = UpdateProjectSerializer(project, data=request.data)
-                # print(serializer.is_valid())
-                # print(serializer.errors)
-                if serializer.is_valid():
-                    print('executed: ', serializer.data)
-                    # serializer.save()
-                    response = {
-                        'success': 'True',
-                        'status code': status.HTTP_200_OK,
-                        'message': 'Project Updated Successful',
-                        'data': serializer.data
-                    }
-                    return Response(response, status=status.HTTP_200_OK)
-                else:
-                    return Response(serializer.errors)
+            serializer = UpdateProjectSerializer(projects, data=request.data)
+            # print(serializer.is_valid())
+            # print(serializer.errors)
+            if serializer.is_valid():
+                print('executed: ', serializer.data)
+                # serializer.save()
+                response = {
+                    'success': 'True',
+                    'status code': status.HTTP_200_OK,
+                    'message': 'Project Updated Successful',
+                    'data': serializer.data
+                }
+                return Response(response, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors)
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
             return Response(response)
