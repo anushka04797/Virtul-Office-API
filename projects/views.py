@@ -19,6 +19,9 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 
 # create project
+from users.serializers import UserDetailSerializer
+
+
 class CreateProject(APIView):
     serializer_class = CreateProjectSerializer
     serializer_class2 = ProjectAssigneeSerializer
@@ -43,6 +46,8 @@ class CreateProject(APIView):
                         'date_updated':datetime.datetime.now()
                     }
                     serializer2 = self.serializer_class2(data=temp_data)
+                    serializer2.is_valid(raise_exception=True)
+                    print('new project assignee',serializer2.validated_data)
                     if serializer2.is_valid(raise_exception=True):
                         serializer2.save()
                         response = {
@@ -133,13 +138,14 @@ class AssignedProjectList(APIView):
                 assignees_query_set = ProjectAssignee.objects.filter(project=temp_project.id).values()
                 #print('assignee query set',assignees_query_set)
                 assignees=[]
-                for assignee in assignees_query_set:
-                    if assignee._meta.get_field('assignee_id') is not None:
-                        print('assignee id', assignee.assignee_id)
-                        # temp = CustomUser.objects.filter(pk=assignee.assignee_id)
-                        # assignees.append(temp)
+                if len(assignees_query_set) > 0 :
+                    for assignee in assignees_query_set:
+                        temp = CustomUser.objects.get(pk=assignee['assignee_id'])
+                        print('assignee', UserDetailSerializer(temp).data)
+                        assignees.append(UserDetailSerializer(temp).data)
+
                 serializer = ProjectDetailsSerializer(temp_project)
-                print(assignees)
+                #print(assignees)
                 temp_data = {
                     'assignees': assignees,
                     'project': serializer.data
@@ -148,6 +154,7 @@ class AssignedProjectList(APIView):
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
                         'message': 'Assigned Project List for an employee',
                         'data': projects_data}
+            return Response(response)
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)

@@ -38,10 +38,9 @@ class Projects(models.Model):
     def __str__(self):
         return self.task_delivery_order
 
-    def project_status(self):
+    def is_ongoing(self):
         return self.status in {
-            self.ProjectStatus.HOLD,
-            self.ProjectStatus.CANCELLED,
+            self.ProjectStatus.GOING
         }
 
 
