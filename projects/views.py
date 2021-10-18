@@ -159,19 +159,25 @@ class AssignedProjectList(APIView):
             for project in assigned_projects:
                 temp_project = Projects.objects.get(pk=project.project_id)
                 assignees_query_set = ProjectAssignee.objects.filter(project=temp_project.id).values()
-                #print('assignee query set',assignees_query_set)
+                subtask_query_set = Projects.objects.filter(work_package_number=temp_project.work_package_number).values('sub_task','work_package_index')
+                print('subtasks',subtask_query_set)
+                subtasks=[]
+                if len(subtask_query_set) > 0:
+                    for task in subtask_query_set:
+                        subtasks.append(task)
                 assignees=[]
                 if len(assignees_query_set) > 0 :
                     for assignee in assignees_query_set:
                         temp = CustomUser.objects.get(pk=assignee['assignee_id'])
-                        print('assignee', UserDetailSerializer(temp).data)
+                        #print('assignee', UserDetailSerializer(temp).data)
                         assignees.append(UserDetailSerializer(temp).data)
 
                 serializer = ProjectDetailsSerializer(temp_project)
                 #print(assignees)
                 temp_data = {
                     'assignees': assignees,
-                    'project': serializer.data
+                    'project': serializer.data,
+                    'subtasks': subtasks
                 }
                 projects_data.append(temp_data)
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
