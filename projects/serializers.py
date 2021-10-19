@@ -101,15 +101,17 @@ class ProjectAssigneeSerializer(serializers.ModelSerializer):
 
 
 class UpdateProjectSerializer(serializers.ModelSerializer):
+    planned_delivery_date = serializers.DateField(format="%Y-%m-%d")
+
     class Meta:
         model = Projects
         fields = (
             'task_title',
             'estimated_person',
             'planned_delivery_date',
-            'planned_hours',
+            # 'planned_hours',
             'planned_value',
-            'remaining_hours',
+            # 'remaining_hours',
             'status',
             'date_updated'
         )

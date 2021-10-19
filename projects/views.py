@@ -105,9 +105,9 @@ class UpdateProject(APIView):
     def put(self, request, pk, format=None):
         print(request.data)
         if request.data['sub_task'] is '':
-            print(request.data['sub_task'])
+            print(request.data['planned_delivery_date'])
         else:
-            print(request.data['sub_task'])
+            print(request.data['planned_delivery_date'])
         try:
             projects = Projects.objects.filter(work_package_index=pk)
             serializer = UpdateProjectSerializer(projects, data=request.data)
