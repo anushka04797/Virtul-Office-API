@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import CreateProject, ProjectDetails, UpdateProject, PmProjectList, AssignedProjectList, ProjectAssigneeList
+from .views import CreateProject, ProjectDetails, UpdateProject, PmProjectList, AssignedProjectList, \
+    ProjectAssigneeList, DeleteSubTask
 
 urlpatterns = [
     path('create/', CreateProject.as_view()),
@@ -8,6 +9,7 @@ urlpatterns = [
     path('all/<str:pk>/', PmProjectList.as_view()),
     path('assigned/all/<str:pk>/', AssignedProjectList.as_view()),
     path('assignee/list/<str:pk>/', ProjectAssigneeList.as_view()),
+    path('subtask/delete/<str:work_package_index>/', DeleteSubTask.as_view()),
 
     # path('add/assignee/', AddProjectAssignee.as_view()),
     # path('remove/assignee/', RemoveProjectAssignee.as_view()),

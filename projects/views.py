@@ -159,12 +159,13 @@ class AssignedProjectList(APIView):
             for project in assigned_projects:
                 temp_project = Projects.objects.get(pk=project.project_id)
                 assignees_query_set = ProjectAssignee.objects.filter(project=temp_project.id).values()
-                subtask_query_set = Projects.objects.filter(work_package_number=temp_project.work_package_number).values('sub_task','work_package_index')
-                print('subtasks',subtask_query_set)
+                subtask_query_set = Projects.objects.filter(work_package_number=temp_project.work_package_number)
+                #print('subtasks',subtask_query_set)
                 subtasks=[]
                 if len(subtask_query_set) > 0:
                     for task in subtask_query_set:
-                        subtasks.append(task)
+                        serialized_task = ProjectDetailsSerializer(task)
+                        subtasks.append(serialized_task.data)
                 assignees=[]
                 if len(assignees_query_set) > 0 :
                     for assignee in assignees_query_set:
@@ -263,3 +264,17 @@ class ProjectAssigneeList(APIView):
 #         except Exception as e:
 #             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
 #             return Response(response)
+
+
+class DeleteSubTask(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def delete(self,request,work_package_index):
+        try:
+            Projects.objects.filter(work_package_index=work_package_index).delete()
+            response = {'success': 'True', 'status code': status.HTTP_200_OK,
+                        'message': 'Sub Task has been deleted'}
+            return Response(response)
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
