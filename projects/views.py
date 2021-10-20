@@ -10,7 +10,7 @@ from rest_framework import status
 from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer, \
     ProjectAssigneeSerializer, CreateTdoSerializer, CreateProjectAssigneeSerializer
 from users.models import CustomUser
-from projects.models import Projects, ProjectAssignee
+from projects.models import Projects, ProjectAssignee, Tdo
 from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import generics
@@ -274,6 +274,22 @@ class DeleteSubTask(APIView):
             Projects.objects.filter(work_package_index=work_package_index).delete()
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
                         'message': 'Sub Task has been deleted'}
+            return Response(response)
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
+
+
+class ChangeTDOTitle(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def put(self, request, pk):
+        try:
+            tdo = Tdo.objects.get(pk=pk)
+            tdo.title = request.data['title']
+            tdo.save()
+            response = {'success': 'True', 'status code': status.HTTP_200_OK,
+                        'message': 'Task Delivery order name has been changed'}
             return Response(response)
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
