@@ -101,17 +101,19 @@ class ProjectAssigneeSerializer(serializers.ModelSerializer):
 
 
 class UpdateProjectSerializer(serializers.ModelSerializer):
-    planned_delivery_date = serializers.DateField(format="%Y-%m-%d")
+    # planned_delivery_date = serializers.DateField(format="%Y-%m-%d")
+    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
 
     class Meta:
         model = Projects
         fields = (
+            'id',
             'task_title',
             'estimated_person',
             'planned_delivery_date',
-            # 'planned_hours',
+            'planned_hours',
             'planned_value',
-            # 'remaining_hours',
+            'remaining_hours',
             'status',
             'date_updated'
         )
@@ -123,7 +125,22 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
         instance.planned_hours = validated_data.get('planned_hours', instance.planned_hours)
         instance.planned_value = validated_data.get('planned_value', instance.planned_value)
         instance.remaining_hours = validated_data.get('remaining_hours', instance.remaining_hours)
+        instance.status = validated_data.get('status', instance.status)
         instance.date_updated = validated_data.get('date_updated', timezone.now)
+        instance.save()
+        return instance
+
+
+class UpdateSubTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Projects
+        fields = (
+            'id',
+            'sub_task'
+        )
+
+    def update(self, instance, validated_data):
+        instance.sub_task = validated_data.get('sub_task', instance.sub_task)
         instance.save()
         return instance
 

@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer, \
-    ProjectAssigneeSerializer, CreateTdoSerializer, CreateProjectAssigneeSerializer
+    ProjectAssigneeSerializer, CreateTdoSerializer, CreateProjectAssigneeSerializer, UpdateSubTaskSerializer
 from users.models import CustomUser
 from projects.models import Projects, ProjectAssignee
 from rest_framework import permissions
@@ -50,12 +50,12 @@ class CreateProject(APIView):
                     if serializer.data is not None:
 
                         # create assignee block #####################
-                        print('project ',serializer.data)
+                        print('project ', serializer.data)
                         temp_data = {
                             'assignee': item,
                             'is_assignee_active': 1,
                             'project': serializer.data['id'],
-                            'date_created':datetime.datetime.now(),
+                            'date_created': datetime.datetime.now(),
                             'date_updated': datetime.datetime.now()
                         }
                         serializer2 = self.serializer_class3(data=temp_data)
@@ -103,19 +103,31 @@ class UpdateProject(APIView):
     permission_classes = (IsAuthenticated,)
 
     def put(self, request, pk, format=None):
-        print(request.data)
-        if request.data['sub_task'] is '':
-            print(request.data['planned_delivery_date'])
-        else:
-            print(request.data['planned_delivery_date'])
         try:
-            projects = Projects.objects.filter(work_package_index=pk)
+            projects = Projects.objects.get(work_package_index=pk)
             serializer = UpdateProjectSerializer(projects, data=request.data)
-            # print(serializer.is_valid())
-            # print(serializer.errors)
             if serializer.is_valid():
-                print('executed: ', serializer.data)
-                # serializer.save()
+                serializer.save()
+                assignees = request.data['assignee']
+                for assignee in assignees:
+                    if not ProjectAssignee.objects.filter(assignee=assignee, project=serializer.data['id']).exists():
+                        temp_data = {
+                            'assignee': assignee,
+                            'is_assignee_active': 1,
+                            'project': serializer.data['id'],
+                            'date_created': datetime.datetime.now(),
+                            'date_updated': datetime.datetime.now()
+                        }
+                        serializer2 = CreateProjectAssigneeSerializer(data=temp_data)
+                        if serializer2.is_valid(raise_exception=True):
+                            serializer2.save()
+                if request.data['sub_task_updated']:
+                    work_package_number = pk.split('.')[0]
+                    sub_task_to_update = Projects.objects.filter(work_package_number=work_package_number)
+                    for sub_task in sub_task_to_update:
+                        serializer3 = UpdateSubTaskSerializer(sub_task, request.data)
+                        if serializer3.is_valid():
+                            serializer3.save()
                 response = {
                     'success': 'True',
                     'status code': status.HTTP_200_OK,
