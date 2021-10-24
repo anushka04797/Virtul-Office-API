@@ -146,8 +146,6 @@ class UpdateSubTaskSerializer(serializers.ModelSerializer):
 
 
 class ProjectDetailsForWbsSerializer(serializers.ModelSerializer):
-    assignee = UserDetailSerializer()
-
     class Meta:
         model = Projects
         fields = (
@@ -158,9 +156,7 @@ class ProjectDetailsForWbsSerializer(serializers.ModelSerializer):
             'work_package_index',
             'task_title',
             'planned_delivery_date',
-            'assignee',
             'pm',
-            'is_assignee_active',
             'planned_hours',
             'remaining_hours',
             'status',

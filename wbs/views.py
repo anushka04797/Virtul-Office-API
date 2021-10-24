@@ -96,13 +96,10 @@ class WbsListForEmployee(APIView):
 
     def get(self, request, pk):
         try:
-            wbs_list = []
             wbsList = Wbs.objects.filter(assignee=pk)
-            for wbs in wbsList:
-                Serializer = WbsDetailsSerializer(wbs)
-                wbs_list.append(Serializer.data)
-                response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Assigned WBS List for an employee',
-                            'data': wbs_list}
+            Serializer = WbsDetailsSerializer(wbsList, many=True)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Assigned WBS List for an employee',
+                        'data': Serializer.data}
             return Response(response)
         except Exception as e:
             response = 'on line {}'.format(
