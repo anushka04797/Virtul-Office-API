@@ -148,13 +148,10 @@ class PmProjectList(APIView):
 
     def get(self, request, pk):
         try:
-            projects_data = []
             projects = Projects.objects.filter(pm=pk)
-            for project in projects:
-                serializer = ProjectDetailsSerializer(project)
-                projects_data.append(serializer.data)
+            serializer = ProjectDetailsSerializer(projects, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'PM Project List',
-                        'data': projects_data}
+                        'data': serializer.data}
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
@@ -208,13 +205,10 @@ class ProjectAssigneeList(APIView):
 
     def get(self, request, pk):
         try:
-            projects_data = []
             projects = Projects.objects.filter(work_package_number=pk)
-            for project in projects:
-                serializer = ProjectDetailsSerializer(project)
-                projects_data.append(serializer.data)
+            serializer = ProjectDetailsSerializer(projects, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'project assignee list',
-                        'data': projects_data}
+                        'data': serializer.data}
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)

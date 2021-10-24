@@ -98,11 +98,9 @@ class MeetingsList(APIView):
         meeting_list = []
         try:
             meetings = Meetings.objects.filter(participant=pk)
-            for meeting in meetings:
-                serializer = MeetingsDetailsSerializer(meeting)
-                meeting_list.append(serializer.data)
+            serializer = MeetingsDetailsSerializer(meetings, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Meetings list',
-                        'data': meeting_list}
+                        'data': serializer.data}
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
