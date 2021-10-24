@@ -67,13 +67,10 @@ class PossibleAssigneeList(APIView):
 
     def get(self, request):
         try:
-            possible_assignees = []
             users = CustomUser.objects.all().exclude(is_superuser=1)
-            for user in users:
-                serializer = UserDetailSerializer(user)
-                possible_assignees.append(serializer.data)
+            serializer = UserDetailSerializer(users, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Possible assignee list',
-                        'data': possible_assignees}
+                        'data': serializer.data}
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)

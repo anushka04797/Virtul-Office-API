@@ -96,13 +96,10 @@ class WbsListForEmployee(APIView):
 
     def get(self, request, pk):
         try:
-            wbs_list = []
             wbsList = Wbs.objects.filter(assignee=pk)
-            for wbs in wbsList:
-                Serializer = WbsDetailsSerializer(wbs)
-                wbs_list.append(Serializer.data)
-                response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Assigned WBS List for an employee',
-                            'data': wbs_list}
+            Serializer = WbsDetailsSerializer(wbsList, many=True)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Assigned WBS List for an employee',
+                        'data': Serializer.data}
             return Response(response)
         except Exception as e:
             response = 'on line {}'.format(
@@ -116,13 +113,10 @@ class WbsListForProject(APIView):
 
     def get(self, request, pk):
         try:
-            wbs_list = []
             wbsList = Wbs.objects.filter(work_package_number=pk)
-            for wbs in wbsList:
-                Serializer = WbsDetailsSerializer(wbs)
-                wbs_list.append(Serializer.data)
-                response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Assigned WBS List for a project',
-                            'data': wbs_list}
+            Serializer = WbsDetailsSerializer(wbsList, many=True)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Assigned WBS List for a project',
+                            'data': Serializer.data}
         except Exception as e:
             response = 'on line {}'.format(
                 sys.exc_info()[-1].tb_lineno), str(e)
@@ -145,13 +139,11 @@ class AllUserWbsListOfProject(APIView):
             print(AssignedProjectsWpList)
             for AssignedProjectsWp in AssignedProjectsWpList:
                 wbsList = Wbs.objects.filter(work_package_number=AssignedProjectsWp)
-                for wbs in wbsList:
-                    Serializer = WbsDetailsSerializer(wbs)
-                    wbs_list.append(Serializer.data)
+                Serializer = WbsDetailsSerializer(wbsList, many=True)
             print(wbs_list)
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
                         'message': 'Assigned WBS List for a project',
-                        'data': wbs_list}
+                        'data': Serializer.data}
         except Exception as e:
             response = 'on line {}'.format(
                 sys.exc_info()[-1].tb_lineno), str(e)

@@ -43,16 +43,13 @@ class EvmsDetails(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):
-        project_data = []
         try:
             evms_list = Evms.objects.get(work_package_number=pk)
             serializer = EvmsDetailsSerializer(evms_list)
             projects = Projects.objects.filter(work_package_number=pk)
-            for project in projects:
-                project_serializer = ProjectDetailsSerializer(project)
-                project_data.append(project_serializer.data)
+            project_serializer = ProjectDetailsSerializer(projects, many=True)
             data = {
-                "projects": project_data,
+                "projects": project_serializer.data,
                 "evms": serializer.data
             }
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'EVMS Details',
