@@ -4,7 +4,7 @@ from .models import Projects, ProjectAssignee, Tdo
 from users.serializers import UserDetailSerializer
 
 
-class CreateTdoSerializer(serializers.ModelSerializer):
+class TdoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tdo
         fields = (
@@ -39,7 +39,7 @@ class CreateProjectSerializer(serializers.ModelSerializer):
 
 class ProjectDetailsSerializer(serializers.ModelSerializer):
 
-    task_delivery_order = CreateTdoSerializer()
+    task_delivery_order = TdoSerializer()
 
     # assignee = UserDetailSerializer()
     pm = UserDetailSerializer()

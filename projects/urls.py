@@ -1,8 +1,9 @@
 from django.urls import path
 from .views import CreateProject, ProjectDetails, UpdateProject, PmProjectList, AssignedProjectList, \
-    ProjectAssigneeList, DeleteSubTask, ChangeTDOTitle
+    ProjectAssigneeList, DeleteSubTask, ChangeTDOTitle, TdoList
 
 urlpatterns = [
+    path('tdo/list/', TdoList.as_view()),
     path('create/', CreateProject.as_view()),
     path('details/<str:pk>/', ProjectDetails.as_view()),
     path('update/<str:pk>/', UpdateProject.as_view()),

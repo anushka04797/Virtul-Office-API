@@ -1,21 +1,12 @@
 import datetime
-import json
-from datetime import date
-from django.contrib.auth.models import Group
-from django.http import Http404
 import sys
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer, \
-    ProjectAssigneeSerializer, CreateTdoSerializer, CreateProjectAssigneeSerializer, UpdateSubTaskSerializer
+from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer, ProjectAssigneeSerializer, TdoSerializer, CreateProjectAssigneeSerializer, UpdateSubTaskSerializer
 from users.models import CustomUser
 from projects.models import Projects, ProjectAssignee, Tdo
-from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework import generics
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 
 # create project
@@ -23,7 +14,7 @@ from users.serializers import UserDetailSerializer
 
 
 class CreateProject(APIView):
-    serializer_class = CreateTdoSerializer
+    serializer_class = TdoSerializer
     serializer_class2 = CreateProjectSerializer
     serializer_class3 = CreateProjectAssigneeSerializer
     permission_classes = (IsAuthenticated,)
@@ -297,6 +288,21 @@ class ChangeTDOTitle(APIView):
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
                         'message': 'Task Delivery order name has been changed'}
             return Response(response)
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
+
+
+class TdoList(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self,request):
+
+        try:
+            tdo_list = Tdo.objects.all()
+            serialized_data = TdoSerializer(tdo_list, many=True)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'data': serialized_data.data}
+            return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
             return Response(response)
