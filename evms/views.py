@@ -25,6 +25,10 @@ class CreateEvms(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        planned_hours = request.data.pop('planned_hours')
+        planned_value = request.data.pop('planned_value')
+        project_id = request.data.get('project')
+        Projects.objects.filter(id=project_id).update(planned_hours=planned_hours,planned_value=planned_value)
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
