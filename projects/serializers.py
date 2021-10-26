@@ -38,7 +38,6 @@ class CreateProjectSerializer(serializers.ModelSerializer):
 
 
 class ProjectDetailsSerializer(serializers.ModelSerializer):
-
     task_delivery_order = TdoSerializer()
 
     # assignee = UserDetailSerializer()
@@ -68,8 +67,50 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
         )
 
 
-class CreateProjectAssigneeSerializer(serializers.ModelSerializer):
+class TaskSerializer(serializers.ModelSerializer):
+    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
 
+    class Meta:
+        model = Projects
+        fields = (
+            'task_title',
+            'estimated_person',
+            'status',
+            'date_created',
+            'date_updated',
+        )
+
+
+class SubTaskSerializer(serializers.ModelSerializer):
+    task_delivery_order = TdoSerializer()
+
+    # assignee = UserDetailSerializer()
+    pm = UserDetailSerializer()
+    planned_delivery_date = serializers.DateField(format="%d-%m-%Y")
+    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+
+    class Meta:
+        model = Projects
+        fields = (
+            'id',
+            'task_delivery_order',
+            'sub_task',
+            'work_package_number',
+            'estimated_person',
+            'planned_delivery_date',
+            'pm',
+            'planned_hours',
+            'planned_value',
+            'remaining_hours',
+            'status',
+            'date_created',
+            'date_updated',
+        )
+
+
+class CreateProjectAssigneeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectAssignee
         fields = (

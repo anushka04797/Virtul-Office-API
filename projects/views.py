@@ -3,7 +3,9 @@ import sys
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from projects.serializers import CreateProjectSerializer, ProjectDetailsSerializer, UpdateProjectSerializer, ProjectAssigneeSerializer, TdoSerializer, CreateProjectAssigneeSerializer, UpdateSubTaskSerializer
+from projects.serializers import SubTaskSerializer, CreateProjectSerializer, ProjectDetailsSerializer, \
+    UpdateProjectSerializer, ProjectAssigneeSerializer, TdoSerializer, CreateProjectAssigneeSerializer, \
+    UpdateSubTaskSerializer, TaskSerializer
 from users.models import CustomUser
 from projects.models import Projects, ProjectAssignee, Tdo
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -60,6 +62,28 @@ class CreateProject(APIView):
                             }
             status_code = status.HTTP_200_OK
         return Response(response, status=status_code)
+
+#new project details
+class NewProjectDetails(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self,request, pk):
+        try:
+            projects = Projects.objects.filter(work_package_number=pk)
+            subtask = SubTaskSerializer(projects[0]).data
+            tasks = TaskSerializer(projects, many=True).data
+            response_data = {
+                #"tdo": subtask["task_delivery_order"],
+                "project": subtask,
+                "tasks": tasks,
+                "assignees": []
+            }
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Project Details',
+                        'data': response_data}
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+        return Response(response)
+
 
 
 # project details
