@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import CreateProject, ProjectDetails, UpdateProject, PmProjectList, AssignedProjectList, \
-    ProjectAssigneeList, DeleteSubTask, ChangeTDOTitle, TdoList, NewProjectDetails
+    ProjectAssigneeList, DeleteSubTask, ChangeTDOTitle, TdoList, NewProjectDetails, ChangeProjectStatus
 
 urlpatterns = [
     path('tdo/list/', TdoList.as_view()),
@@ -12,6 +12,7 @@ urlpatterns = [
     path('assignee/list/<str:pk>/', ProjectAssigneeList.as_view()),
     path('subtask/delete/<str:work_package_index>/', DeleteSubTask.as_view()),
     path('change-tdo-title/<str:pk>/', ChangeTDOTitle.as_view()),
+    path('mark-completed/<str:pk>/', ChangeProjectStatus.as_view()),
     # path('add/assignee/', AddProjectAssignee.as_view()),
     # path('remove/assignee/', RemoveProjectAssignee.as_view()),
 ]

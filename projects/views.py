@@ -36,6 +36,8 @@ class CreateProject(APIView):
 
             # create project block #####################
             request.data['task_delivery_order'] = serializer_tdo.data['id']
+            # request.data['date_created'] = datetime.datetime.now()
+            # request.data['date_updated'] = datetime.datetime.now()
             serializer = self.serializer_class2(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -64,19 +66,43 @@ class CreateProject(APIView):
         return Response(response, status=status_code)
 
 #new project details
+
+
+def unique(list1):
+    # initialize a null list
+    unique_list = []
+
+    # traverse for all elements
+    for x in list1:
+        # check if exists in unique_list or not
+        if x not in unique_list:
+            unique_list.append(x)
+    # print list
+    return unique_list
+
+
 class NewProjectDetails(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self,request, pk):
         try:
             projects = Projects.objects.filter(work_package_number=pk)
-            subtask = SubTaskSerializer(projects[0]).data
+            serialized_subtask = SubTaskSerializer(projects[0]).data
             tasks = TaskSerializer(projects, many=True).data
+            assignees=[]
+            for task in tasks:
+                # temp_assignees= ProjectAssignee.objects.filter(project_id=task['id'])
+                task_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project_id=task['id']),many=True).data
+                task['assignees']=task_assignees
+                for task_assignee in task_assignees:
+                    assignees.append(task_assignee)
+
+            assignees=unique(assignees)
             response_data = {
                 #"tdo": subtask["task_delivery_order"],
-                "project": subtask,
-                "tasks": tasks,
-                "assignees": []
+                "project": serialized_subtask,
+                "subtasks": tasks,
+                "assignees": assignees
             }
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Project Details',
                         'data': response_data}
@@ -179,32 +205,36 @@ class AssignedProjectList(APIView):
     def get(self, request, pk):
         try:
             projects_data = []
+            traversed_projects = []
             assigned_projects = ProjectAssignee.objects.filter(assignee=pk).select_related('project')
             for project in assigned_projects:
                 temp_project = Projects.objects.get(pk=project.project_id)
-                assignees_query_set = ProjectAssignee.objects.filter(project=temp_project.id).values()
-                subtask_query_set = Projects.objects.filter(work_package_number=temp_project.work_package_number)
-                #print('subtasks',subtask_query_set)
-                subtasks=[]
-                if len(subtask_query_set) > 0:
-                    for task in subtask_query_set:
-                        serialized_task = ProjectDetailsSerializer(task)
-                        subtasks.append(serialized_task.data)
-                assignees=[]
-                if len(assignees_query_set) > 0 :
-                    for assignee in assignees_query_set:
-                        temp = CustomUser.objects.get(pk=assignee['assignee_id'])
-                        #print('assignee', UserDetailSerializer(temp).data)
-                        assignees.append(UserDetailSerializer(temp).data)
+                if temp_project.work_package_number not in traversed_projects:
+                    traversed_projects.append(temp_project.work_package_number)
+                    subtask_query_set = Projects.objects.filter(work_package_number=temp_project.work_package_number)
+                    # print('subtasks',subtask_query_set)
+                    subtasks = []
+                    assignees = []
+                    if len(subtask_query_set) > 0:
+                        for task in subtask_query_set:
+                            serialized_task = TaskSerializer(task).data
+                            temp_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=task.id),
+                                                                       many=True).data
+                            serialized_task['assignees'] = temp_assignees
+                            subtasks.append(serialized_task)
+                            for assignee in temp_assignees:
+                                assignees.append(
+                                    UserDetailSerializer(CustomUser.objects.get(pk=assignee['assignee']['id'])).data)
 
-                serializer = ProjectDetailsSerializer(temp_project)
-                #print(assignees)
-                temp_data = {
-                    'assignees': assignees,
-                    'project': serializer.data,
-                    'subtasks': subtasks
-                }
-                projects_data.append(temp_data)
+                    unique_assignees = unique(assignees)
+                    serializer = ProjectDetailsSerializer(temp_project)
+                    # print(assignees)
+                    temp_data = {
+                        'assignees': unique_assignees,
+                        'project': serializer.data,
+                        'subtasks': subtasks
+                    }
+                    projects_data.append(temp_data)
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
                         'message': 'Assigned Project List for an employee',
                         'data': projects_data}
@@ -212,6 +242,13 @@ class AssignedProjectList(APIView):
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
+
+
+class ChangeProjectStatus(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def put(self,request,pk):
+        projects = Projects.objects.filter(work_package_number=pk)
 
 
 # assignee list of a project

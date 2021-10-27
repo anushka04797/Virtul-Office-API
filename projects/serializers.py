@@ -5,6 +5,9 @@ from users.serializers import UserDetailSerializer
 
 
 class TdoSerializer(serializers.ModelSerializer):
+    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p",read_only=True)
+    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p",read_only=True)
+
     class Meta:
         model = Tdo
         fields = (
@@ -74,7 +77,9 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projects
         fields = (
+            'id',
             'task_title',
+            'work_package_index',
             'estimated_person',
             'status',
             'date_created',

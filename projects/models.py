@@ -36,7 +36,7 @@ class Projects(models.Model):
     planned_delivery_date = models.DateField(blank=False)
     pm = models.ForeignKey(CustomUser, related_name="project_manager", blank=False, null=True, on_delete=models.CASCADE)
     planned_hours = models.DecimalField(_('planned hours'), max_digits=6, decimal_places=1, blank=False)
-    planned_value = models.IntegerField(_('planned value'), blank=True)
+    planned_value = models.BigIntegerField(_('planned value'), blank=True)
     remaining_hours = models.DecimalField(_('remaining hours'), max_digits=6, decimal_places=1, blank=False)
     status = models.IntegerField(_('status'), choices=ProjectStatus.choices, default=ProjectStatus.GOING)
     date_created = models.DateTimeField(_('date created'), default=timezone.now)
