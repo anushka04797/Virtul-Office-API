@@ -45,9 +45,9 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
 
     # assignee = UserDetailSerializer()
     pm = UserDetailSerializer()
-    planned_delivery_date = serializers.DateField(format="%d-%m-%Y")
-    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
-    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+    planned_delivery_date = serializers.DateField(format="%d-%m-%Y",read_only=True)
+    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p",read_only=True)
+    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p",read_only=True)
 
     class Meta:
         model = Projects
