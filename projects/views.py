@@ -136,7 +136,7 @@ class ProjectDetails(APIView):
                         'data': results}
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
-        return Response(response)
+        return Response(response,status=status.HTTP_404_NOT_FOUND)
 
 
 # update project
@@ -248,7 +248,33 @@ class ChangeProjectStatus(APIView):
     permission_classes = (IsAuthenticated,)
 
     def put(self,request,pk):
-        projects = Projects.objects.filter(work_package_number=pk)
+        try:
+            Projects.objects.filter(work_package_number=pk).update(status=request.data['status'])
+            response = {'success': 'True', 'status code': status.HTTP_200_OK,
+                        'message': 'Project Status updated',
+                        }
+            return Response(response)
+
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
+
+
+class RemoveAssignee(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def delete(self,request,pk):
+        try:
+            print(request.data)
+            # print(ProjectAssignee.objects.filter(assignee=request.data['assignee'], project=request.data['project']))
+            ProjectAssignee.objects.filter(assignee=request.data['assignee'], project=request.data['project']).delete()
+            response = {'success': 'True', 'status code': status.HTTP_200_OK,
+                        'message': 'Assignee removed',
+                        }
+            return Response(response)
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
 
 
 # assignee list of a project
