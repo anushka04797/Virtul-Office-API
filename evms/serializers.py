@@ -28,6 +28,7 @@ class EvmsDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evms
         fields = (
+            'id',
             'project',
             'work_package_number',
             'earned_value',
