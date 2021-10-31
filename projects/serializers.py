@@ -71,6 +71,7 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    task_delivery_order = TdoSerializer()
     date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
     date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
 
@@ -78,6 +79,9 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Projects
         fields = (
             'id',
+            'task_delivery_order',
+            'sub_task',
+            'work_package_number',
             'task_title',
             'work_package_index',
             'estimated_person',
