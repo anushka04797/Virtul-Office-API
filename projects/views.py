@@ -26,16 +26,20 @@ class CreateProject(APIView):
         work_package_index = request.data['work_package_number'] + '.' + str(len(count_project_wp) + 1)
         request.data['work_package_index'] = float(work_package_index)
 
-        # create tdo block #####################
-        tdo_data = {
-            'title': request.data['task_delivery_order']
-        }
-        serializer_tdo = self.serializer_class(data=tdo_data)
-        if serializer_tdo.is_valid(raise_exception=True):
-            serializer_tdo.save()
+        if not Tdo.objects.filter(title=request.data['task_delivery_order']).exists():
+            # create tdo block #####################
+            tdo_data = {
+                'title': request.data['task_delivery_order']
+            }
+            serializer_tdo = self.serializer_class(data=tdo_data)
+            if serializer_tdo.is_valid(raise_exception=True):
+                serializer_tdo.save()
+                request.data['task_delivery_order'] = serializer_tdo.data['id']
+        else:
+            request.data['task_delivery_order'] = TdoSerializer(Tdo.objects.filter(title=request.data['task_delivery_order'])[0]).data['id']
 
+        if request.data['task_delivery_order'] is not None:
             # create project block #####################
-            request.data['task_delivery_order'] = serializer_tdo.data['id']
             # request.data['date_created'] = datetime.datetime.now()
             # request.data['date_updated'] = datetime.datetime.now()
             serializer = self.serializer_class2(data=request.data)

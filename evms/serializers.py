@@ -62,6 +62,6 @@ class EvmsUpdateSerializer(serializers.ModelSerializer):
         instance.estimate_to_completion = validated_data.get('estimate_to_completion', instance.estimate_to_completion)
         instance.variance_at_completion = validated_data.get('variance_at_completion', instance.variance_at_completion)
         instance.budget_at_completion = validated_data.get('budget_at_completion', instance.budget_at_completion)
-        instance.date_updated = validated_data.get('date_updated', timezone.now)
+        instance.date_updated = timezone.now()
         instance.save()
         return instance
