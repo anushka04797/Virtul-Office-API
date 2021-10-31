@@ -58,13 +58,15 @@ class LoginSerializer(serializers.Serializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    profile_pic = serializers.ImageField(required=False)
+
     class Meta:
         model = CustomUser
         fields = ('first_name', 'last_name', 'password', 'email', 'phone', 'profile_pic')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        print(validated_data['profile_pic'])
+        print(validated_data)
         user = CustomUser.objects.create_user(**validated_data)
         return user
 
