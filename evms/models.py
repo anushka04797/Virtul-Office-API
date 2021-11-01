@@ -16,7 +16,7 @@ class Evms(models.Model):
     estimate_to_completion = models.DecimalField(_('estimate to completion'), max_digits=20, decimal_places=4,
                                                  blank=False)
     variance_at_completion = models.DecimalField(_('variance at completion'), max_digits=20, decimal_places=4,
-                                                 blank=False)
+                                                 blank=True, null=True)
     budget_at_completion = models.DecimalField(_('budget at completion'), max_digits=20, decimal_places=4, blank=False)
     date_created = models.DateField(_('date created'), default=timezone.now)
     date_updated = models.DateField(_('date updated'), default=timezone.now)

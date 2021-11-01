@@ -30,10 +30,13 @@ class CreateWbs(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        print(request.data)
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        print(request.data['assignee'])
+        assignee_list = request.data['assignee']
+        for assignee in assignee_list:
+            request.data['assignee'] = assignee
+            serializer = self.serializer_class(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
         response = {
             'success': 'True',
             'status code': status.HTTP_200_OK,
@@ -51,7 +54,7 @@ class WbsDetails(APIView):
     def get(self, request, pk):
         try:
             wbs = Wbs.objects.get(id=pk)
-            serializer = WbsDetailsSerializer(wbs, many=True)
+            serializer = WbsDetailsSerializer(wbs)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'WBS Details',
                         'data': serializer.data}
         except Exception as e:
