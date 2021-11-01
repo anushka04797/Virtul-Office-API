@@ -149,6 +149,7 @@ class UpdateProject(APIView):
 
     def put(self, request, pk, format=None):
         try:
+            print(request.data)
             projects = Projects.objects.get(work_package_index=pk)
             serializer = UpdateProjectSerializer(projects, data=request.data)
             if serializer.is_valid():
@@ -166,13 +167,17 @@ class UpdateProject(APIView):
                         serializer2 = CreateProjectAssigneeSerializer(data=temp_data)
                         if serializer2.is_valid(raise_exception=True):
                             serializer2.save()
-                if request.data['sub_task_updated']:
-                    work_package_number = pk.split('.')[0]
-                    sub_task_to_update = Projects.objects.filter(work_package_number=work_package_number)
-                    for sub_task in sub_task_to_update:
-                        serializer3 = UpdateSubTaskSerializer(sub_task, request.data)
-                        if serializer3.is_valid():
-                            serializer3.save()
+                all_assignees= ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=serializer.data['id'])).data
+                for assignee in all_assignees:
+                    if assignee['assignee']['id'] not in assignees:
+                        ProjectAssignee.objects.filter(assignee=assignee['assignee']['id'],project=serializer.data['id']).delete()
+                # if request.data['sub_task_updated']:
+                work_package_number = pk.split('.')[0]
+                sub_task_to_update = Projects.objects.filter(work_package_number=work_package_number)
+                for sub_task in sub_task_to_update:
+                    serializer3 = UpdateSubTaskSerializer(sub_task, request.data)
+                    if serializer3.is_valid():
+                        serializer3.save()
                 response = {
                     'success': 'True',
                     'status code': status.HTTP_200_OK,

@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework import serializers
 from django.utils import timezone
 from .models import Projects, ProjectAssignee, Tdo
@@ -5,8 +7,8 @@ from users.serializers import UserDetailSerializer
 
 
 class TdoSerializer(serializers.ModelSerializer):
-    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p",read_only=True)
-    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p",read_only=True)
+    date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p",read_only=True)
+    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p",read_only=True)
 
     class Meta:
         model = Tdo
@@ -45,9 +47,9 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
 
     # assignee = UserDetailSerializer()
     pm = UserDetailSerializer()
-    planned_delivery_date = serializers.DateField(format="%d-%m-%Y",read_only=True)
-    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p",read_only=True)
-    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p",read_only=True)
+    planned_delivery_date = serializers.DateField(format="%Y-%m-%d",read_only=True)
+    date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p",read_only=True)
+    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p",read_only=True)
 
     class Meta:
         model = Projects
@@ -72,8 +74,8 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     task_delivery_order = TdoSerializer()
-    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
-    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+    date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p")
+    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p")
 
     class Meta:
         model = Projects
@@ -96,9 +98,9 @@ class SubTaskSerializer(serializers.ModelSerializer):
 
     # assignee = UserDetailSerializer()
     pm = UserDetailSerializer()
-    planned_delivery_date = serializers.DateField(format="%d-%m-%Y")
-    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
-    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+    planned_delivery_date = serializers.DateField(format="%Y-%m-%d")
+    date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p")
+    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p")
 
     class Meta:
         model = Projects
@@ -135,8 +137,8 @@ class CreateProjectAssigneeSerializer(serializers.ModelSerializer):
 class ProjectAssigneeSerializer(serializers.ModelSerializer):
     assignee = UserDetailSerializer(read_only=True)
     project = ProjectDetailsSerializer(read_only=True)
-    date_created = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
-    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+    date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", read_only=True)
+    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", read_only=True)
 
     class Meta:
         model = ProjectAssignee
@@ -151,8 +153,8 @@ class ProjectAssigneeSerializer(serializers.ModelSerializer):
 
 
 class UpdateProjectSerializer(serializers.ModelSerializer):
-    # planned_delivery_date = serializers.DateField(format="%Y-%m-%d")
-    date_updated = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+    planned_delivery_date = serializers.DateField(format="%Y-%m-%d")
+    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p",required=False)
 
     class Meta:
         model = Projects
@@ -176,7 +178,7 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
         instance.planned_value = validated_data.get('planned_value', instance.planned_value)
         instance.remaining_hours = validated_data.get('remaining_hours', instance.remaining_hours)
         instance.status = validated_data.get('status', instance.status)
-        instance.date_updated = validated_data.get('date_updated', timezone.now)
+        instance.date_updated = timezone.now()
         instance.save()
         return instance
 
