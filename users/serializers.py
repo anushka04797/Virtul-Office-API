@@ -72,7 +72,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    date_joined = serializers.DateTimeField(format="%d-%m-%Y %I:%M:%S %p")
+    date_joined = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p")
 
     class Meta:
         model = CustomUser
