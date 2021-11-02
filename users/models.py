@@ -58,24 +58,24 @@ def pre_save_activate_user(sender, instance, **kwargs):
             message = "Your registered account with the email address " + instance.email + "has been activated. You " \
                                                                                            "can now login and update " \
                                                                                            "your profile. "
-            sms_api.SmsGateway.post(
-                {
-                    'number': instance.phone,
-                    'message': message
-                }
-            )
-            send_mail('User account activation', message, EMAIL_HOST_USER, [instance.email], fail_silently=False, )
+            # sms_api.SmsGateway.post(
+            #     {
+            #         'number': instance.phone,
+            #         'message': message
+            #     }
+            # )
+            # send_mail('User account activation', message, EMAIL_HOST_USER, [instance.email], fail_silently=False, )
         if previous_data.is_active == 1 and previous_data.is_active != instance.is_active:
             message = "Your registered account with the email address " + instance.email + "has been deactivated. " \
                                                                                            "Please " \
                                                                                            "contact with the concern. "
-            sms_api.SmsGateway.post(
-                {
-                    'number': instance.phone,
-                    'message': message
-                }
-            )
-            send_mail('User account deactivation', message, EMAIL_HOST_USER, [instance.email],
-                      fail_silently=False, )
+            # sms_api.SmsGateway.post(
+            #     {
+            #         'number': instance.phone,
+            #         'message': message
+            #     }
+            # )
+            # send_mail('User account deactivation', message, EMAIL_HOST_USER, [instance.email],
+            #           fail_silently=False, )
     except ObjectDoesNotExist:
         pass

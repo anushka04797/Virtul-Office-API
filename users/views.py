@@ -48,14 +48,14 @@ class Register(APIView):
             }
             message = "Your account has been created successfully. Please wait until your account being activated. " \
                       "you will be notified soon once it is get activated. "
-            sms_api.SmsGateway.post(
-                {
-                    'number': request.data['phone'],
-                    'message': message
-                }
-            )
-            send_mail('New user registration', message, 'awronno.adhar@gmail.com', [request.data['email']],
-                      fail_silently=False, )
+            # sms_api.SmsGateway.post(
+            #     {
+            #         'number': request.data['phone'],
+            #         'message': message
+            #     }
+            # )
+            # send_mail('New user registration', message, 'awronno.adhar@gmail.com', [request.data['email']],
+            #           fail_silently=False, )
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
@@ -222,7 +222,6 @@ class ChangeProfileImage(APIView):
         response['message'] = 'Something went wrong'
         response['data'] = serializer.errors
         return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
 
 class ChangePassword(generics.UpdateAPIView):
     permission_classes = (IsAuthenticated,)
