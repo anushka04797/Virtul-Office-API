@@ -11,13 +11,14 @@ class CreateMeetingsSerializer(serializers.ModelSerializer):
             'room_id',
             'participant',
             'project',
+            'type',
             'agenda',
             'comments',
             'start_time',
             'end_time',
             'duration',
-            'date_created',
-            'date_updated'
+            # 'date_created',
+            # 'date_updated'
         )
 
 
