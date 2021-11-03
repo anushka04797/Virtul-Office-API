@@ -6,10 +6,21 @@ from users.models import CustomUser
 
 
 class Meetings(models.Model):
-    room_id = models.CharField(max_length=12, blank=False, null=False)
-    participant = models.ForeignKey(CustomUser, related_name="meeting_participant", blank=False, null=False, on_delete=models.CASCADE)
-    project = models.ForeignKey(Projects, related_name="meeting_project_details", blank=False, null=False,
+    class MediumType(models.IntegerChoices):
+        PHYSICAL = '0', _('PHYSICAL')
+        VIRTUAL = '1', _('VIRTUAL')
+
+    class MeetingType(models.IntegerChoices):
+        PROJECT = '0', _('PROJECT')
+        GENERAL = '1', _('GENERAL')
+
+    room_id = models.CharField(max_length=12, blank=True, null=True)
+    participant = models.ForeignKey(CustomUser, related_name="meeting_participant", blank=True, null=True, on_delete=models.CASCADE)
+    project = models.ForeignKey(Projects, related_name="meeting_project_details", blank=True, null=True,
                                  on_delete=models.CASCADE)
+    room_name= models.CharField(_('room name'), max_length=50, blank=True)
+    medium_type = models.IntegerField(_('meeting medium'), choices=MediumType.choices, default=MediumType.PHYSICAL)
+    type = models.IntegerField(_('meeting type'), choices=MeetingType.choices, default=MeetingType.PROJECT)
     agenda = models.TextField(_('meeting agenda'), max_length=150, blank=True)
     comments =  models.TextField(_('meeting comments'), max_length=150, blank=True)
     start_time = models.DateTimeField(_('meeting start time'), blank=False)
