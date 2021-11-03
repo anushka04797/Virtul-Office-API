@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from projects.serializers import SubTaskSerializer, CreateProjectSerializer, ProjectDetailsSerializer, \
     UpdateProjectSerializer, ProjectAssigneeSerializer, TdoSerializer, CreateProjectAssigneeSerializer, \
-    UpdateSubTaskSerializer, TaskSerializer
+    UpdateSubTaskSerializer, TaskSerializer, ProjectWiseFileListSerializer, ProjectFileSerializer
 from users.models import CustomUser
-from projects.models import Projects, ProjectAssignee, Tdo
+from projects.models import Projects, ProjectAssignee, Tdo, ProjectSharedFiles
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
@@ -290,6 +290,64 @@ class AssignedProjectList(APIView):
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
+
+
+# assigned project list for employee
+class ProjectWiseFileList(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, pk):
+        try:
+            serializerData = []
+            pmprojectserilizerData = []
+            user_info = CustomUser.objects.get(id=pk)
+            group = user_info.groups.get()
+            if(str(group) == 'employee'):
+                projectAssigneeInfo = ProjectAssignee.objects.filter(assignee=pk)
+
+                for project_info in projectAssigneeInfo:
+                    project_ids = project_info.project_id
+                    projectInfo = Projects.objects.get(id=project_ids)
+                    serilizer = ProjectWiseFileListSerializer(projectInfo)
+                    serializerData.append(serilizer.data)
+            if (str(group) == 'pm'):
+                pmproject = Projects.objects.filter(pm=pk)
+                pmprojectserilizer = ProjectWiseFileListSerializer(pmproject, many=True)
+                pmprojectserilizerData = pmprojectserilizer.data
+                projectAssigneeInfo = ProjectAssignee.objects.filter(assignee=pk)
+                serializerData = []
+                for project_info in projectAssigneeInfo:
+                    project_ids = project_info.project_id
+                    assignee_ids = project_info.assignee_id
+                    pmprojectcheck = Projects.objects.filter(pm=assignee_ids, id=project_ids)
+                    if not pmprojectcheck:
+                        projectInfo = Projects.objects.get(id=project_ids)
+                        serilizer = ProjectWiseFileListSerializer(projectInfo)
+                        serializerData.append(serilizer.data)
+            serializerData.append(pmprojectserilizerData)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK,
+                        'message': 'Shared Document List For Each Project',
+                        'data': serializerData}
+            return Response(response)
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+        return Response(response)
+
+class ProjectWiseFileInsert(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        serializer = ProjectFileSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response = {
+                'success': 'True',
+                'status code': status.HTTP_200_OK,
+                'message': 'Document Insert Successful',
+                'data': [serializer.data]
+            }
+            return Response(response)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChangeProjectStatus(APIView):

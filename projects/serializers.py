@@ -2,7 +2,7 @@ import datetime
 
 from rest_framework import serializers
 from django.utils import timezone
-from .models import Projects, ProjectAssignee, Tdo
+from .models import Projects, ProjectAssignee, Tdo, ProjectSharedFiles
 from users.serializers import UserDetailSerializer
 
 
@@ -235,3 +235,40 @@ class ProjectDetailsForWbsSerializer(serializers.ModelSerializer):
 #         instance.remaining_hours = validated_data.get('remaining_hours', instance.remaining_hours)
 #         instance.save()
 #         return instance
+
+
+class DocumentListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectSharedFiles
+        fields = (
+            'id',
+            'file',
+            'date_created'
+        )
+
+class ProjectFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectSharedFiles
+        fields = (
+            'id',
+            'project',
+            'file',
+        )
+class ProjectWiseFileListSerializer(serializers.ModelSerializer):
+    project_file = DocumentListSerializer(many=True)
+    class Meta:
+        model = Projects
+        fields = (
+            'id',
+            'task_delivery_order',
+            'sub_task',
+            'work_package_number',
+            'work_package_index',
+            'task_title',
+            'planned_delivery_date',
+            'pm',
+            'planned_hours',
+            'remaining_hours',
+            'status',
+            'project_file',
+        )
