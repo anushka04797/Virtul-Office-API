@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from wbs.models import TimeCard, Wbs
 from users.serializers import UserDetailSerializer
-from projects.serializers import ProjectDetailsForWbsSerializer
+from projects.serializers import ProjectDetailsForWbsSerializer, ProjectDetailsSerializer
 from django.utils import timezone
 
 
@@ -58,6 +58,9 @@ class WbsUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wbs
         fields = (
+            'id',
+            'project',
+            'assignee',
             'title',
             'description',
             'start_date',
@@ -81,7 +84,23 @@ class WbsUpdateSerializer(serializers.ModelSerializer):
         instance.date_updated = validated_data.get('date_updated', timezone.now)
         instance.save()
         return instance
-        
+
+
+class WbsStatusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Wbs
+        fields = (
+            'id',
+            'status',
+            'date_updated'
+        )
+
+    def update(self, instance, validated_data):
+        instance.status = validated_data.get('status', instance.status)
+        instance.date_updated = validated_data.get('date_updated', timezone.now)
+        instance.save()
+        return instance
+
 
 class CreateTimeCardSerializer(serializers.ModelSerializer):
     class Meta:
@@ -109,6 +128,21 @@ class TimeCardDetailsSerializer(serializers.ModelSerializer):
             'id',
             'project',
             'wbs',
+            'time_card_assignee',
+            'actual_work_done',
+            'hours_today',
+            'date_created',
+            'date_updated'
+        )
+
+
+class WbsWiseTimeCardListSerializer(serializers.ModelSerializer):
+    time_card_assignee = UserDetailSerializer()
+
+    class Meta:
+        model = TimeCard
+        fields = (
+            'id',
             'time_card_assignee',
             'actual_work_done',
             'hours_today',

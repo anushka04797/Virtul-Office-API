@@ -6,10 +6,10 @@ from users.models import CustomUser
 
 
 class Wbs(models.Model):
-    project = models.ForeignKey(Projects, related_name="wbs_pro_details", blank=False, null=False,
+    project = models.ForeignKey(Projects, related_name="wbs_pro_details", blank=True, null=False,
                                 on_delete=models.CASCADE)
-    work_package_number = models.IntegerField(null=True, blank=False)
-    assignee = models.ForeignKey(CustomUser, related_name="employee_assigned", blank=False, null=False,
+    work_package_number = models.TextField(null=True, blank=False)
+    assignee = models.ForeignKey(CustomUser, related_name="employee_assigned", blank=True, null=False,
                                  on_delete=models.CASCADE)
     reporter = models.ForeignKey(CustomUser, related_name="wbs_reporter", blank=False, null=False,
                                  on_delete=models.CASCADE)
