@@ -69,6 +69,10 @@ class UpdateEvms(APIView):
 
     def put(self, request, pk, format=None):
         try:
+            planned_hours = request.data.pop('planned_hours')
+            planned_value = request.data.pop('planned_value')
+            project_id = request.data.get('project')
+            Projects.objects.filter(id=project_id).update(planned_hours=planned_hours, planned_value=planned_value)
             evms = Evms.objects.get(id=pk)
             serializer = EvmsUpdateSerializer(evms, data=request.data)
             # print(serializer.is_valid())

@@ -25,7 +25,7 @@ class CreateMeetingsSerializer(serializers.ModelSerializer):
 
 class MeetingsDetailsSerializer(serializers.ModelSerializer):
     # project = ProjectDetailsSerializer()
-
+    start_time = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", read_only=True)
     class Meta:
         model = Meetings
         fields = (
