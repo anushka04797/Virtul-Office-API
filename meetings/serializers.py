@@ -5,17 +5,18 @@ from django.utils import timezone
 
 
 class CreateMeetingsSerializer(serializers.ModelSerializer):
+    start_time = serializers.DateTimeField()
+    duration = serializers.IntegerField(required=False)
     class Meta:
         model = Meetings
         fields = (
             'room_id',
             'participant',
-            'project',
             'type',
             'agenda',
+            'project',
             'comments',
             'start_time',
-            'end_time',
             'duration',
             # 'date_created',
             # 'date_updated'
@@ -23,7 +24,7 @@ class CreateMeetingsSerializer(serializers.ModelSerializer):
 
 
 class MeetingsDetailsSerializer(serializers.ModelSerializer):
-    project = ProjectDetailsSerializer()
+    # project = ProjectDetailsSerializer()
 
     class Meta:
         model = Meetings

@@ -21,22 +21,26 @@ class CreateMeetings(APIView):
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            user_mail = CustomUser.objects.get(id=request.data['participant'])
-            print(user_mail)
+            # user_mail = CustomUser.objects.get(id=request.data['participant'])
+            # print(user_mail)
             response = {
                 'success': 'True',
                 'status code': status.HTTP_200_OK,
                 'message': 'Meeting created successfully',
                 'data': []
             }
-            sms_api.SmsGateway.post({'number': "01915245171", 'message': "A meeting has been called at " + str(datetime.strptime(request.data['start_time'],"%Y-%m-%d %H:%M:%S.%f"))})
-            send_mail(
-                'Meeting initiated',
-                'A meeting has been called at ' + str(datetime.strptime(request.data['start_time'],"%Y-%m-%d %H:%M:%S.%f")),
-                'awronno.adhar@gmail.com',
-                [user_mail],
-                fail_silently=False,
-            )
+            participants = request.data['participant'].split(',')
+            # for participant in participants:
+            #     print(participant)
+            #     user_mail = CustomUser.objects.get(pk=participant)
+            #     sms_api.SmsGateway.post({'number': "01915245171", 'message': "A meeting has been called at " + str(datetime.strptime(request.data['start_time'],"%Y-%m-%d %H:%M:%S.%f"))})
+            #     send_mail(
+            #         'Meeting initiated',
+            #         'A meeting has been called at ' + str(datetime.strptime(request.data['start_time'],"%Y-%m-%d %H:%M:%S.%f")),
+            #         'awronno.adhar@gmail.com',
+            #         [user_mail],
+            #         fail_silently=False,
+            #     )
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
@@ -97,7 +101,7 @@ class MeetingsList(APIView):
     def get(self, request, pk):
         meeting_list = []
         try:
-            meetings = Meetings.objects.filter(participant=pk)
+            meetings = Meetings.objects.filter(participant__icontains=pk)
             serializer = MeetingsDetailsSerializer(meetings, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Meetings list',
                         'data': serializer.data}
