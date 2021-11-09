@@ -80,11 +80,11 @@ class ProjectSharedFiles(models.Model):
     file = models.FileField(upload_to='uploads/project/files/', blank=True, null=True)
     date_created = models.DateTimeField(_('date created'), default=timezone.now)
     date_updated = models.DateTimeField(_('date updated'), default=timezone.now)
-
+    upload_by = models.ForeignKey(CustomUser, related_name="file_upload_by", blank=False, null=False, on_delete=models.CASCADE)
     class Meta:
         db_table = 'project_shared_file'
         verbose_name = _('shared_file')
         verbose_name_plural = _('shared_file')
 
     def __str__(self):
-        return self.assignee
+        return self.project
