@@ -303,16 +303,14 @@ class ProjectWiseFileList(APIView):
             serializerData = []
             pmprojectserilizerData = []
             user_info = CustomUser.objects.get(id=pk)
-            group = user_info.groups.get()
-            if(str(group) == 'employee'):
+            if user_info.groups.filter(name='employee').exists():
                 projectAssigneeInfo = ProjectAssignee.objects.filter(assignee=pk)
-
                 for project_info in projectAssigneeInfo:
                     project_ids = project_info.project_id
                     projectInfo = Projects.objects.get(id=project_ids)
                     serilizer = ProjectWiseFileListSerializer(projectInfo)
                     serializerData.append(serilizer.data)
-            if (str(group) == 'pm'):
+            if user_info.groups.filter(name='pm').exists():
                 pmproject = Projects.objects.filter(pm=pk)
                 pmprojectserilizer = ProjectWiseFileListSerializer(pmproject, many=True)
                 pmprojectserilizerData = pmprojectserilizer.data
