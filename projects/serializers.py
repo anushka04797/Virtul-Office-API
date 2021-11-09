@@ -183,6 +183,23 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
         return instance
 
 
+class UpdateProjectRemainingHrsSerializer(serializers.ModelSerializer):
+    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", required=False)
+
+    class Meta:
+        model = Projects
+        fields = (
+            'remaining_hours',
+            'date_updated'
+        )
+
+    def update(self, instance, validated_data):
+        instance.remaining_hours = validated_data.get('remaining_hours', instance.remaining_hours)
+        instance.date_updated = timezone.now()
+        instance.save()
+        return instance
+
+
 class UpdateSubTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projects
@@ -198,6 +215,8 @@ class UpdateSubTaskSerializer(serializers.ModelSerializer):
 
 
 class ProjectDetailsForWbsSerializer(serializers.ModelSerializer):
+    task_delivery_order = TdoSerializer()
+
     class Meta:
         model = Projects
         fields = (
