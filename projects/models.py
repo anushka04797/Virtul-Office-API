@@ -25,18 +25,18 @@ class Projects(models.Model):
         HOLD = '2', _('Hold')
         CANCELLED = '3', _('Cancelled')
 
-    task_delivery_order = models.ForeignKey(Tdo, related_name="tdo_title", blank=False, null=False,
+    task_delivery_order = models.ForeignKey(Tdo, related_name="tdo_title", blank=False, null=True,
                                             on_delete=models.CASCADE)
     sub_task = models.CharField(_('subtask name'), max_length=50, blank=True)
     work_package_number = models.TextField(_('work package number'), blank=True)
     work_package_index = models.DecimalField(_('work package index'), max_digits=7, decimal_places=1, blank=True,
                                              null=True)
     task_title = models.CharField(_('task title'), max_length=150, blank=True)
-    estimated_person = models.DecimalField(_('estimated person'), max_digits=4, decimal_places=2, blank=True)
-    planned_delivery_date = models.DateField(blank=False)
+    estimated_person = models.DecimalField(_('estimated person'), max_digits=4, decimal_places=2, blank=True, default=1)
+    planned_delivery_date = models.DateField(blank=False, null=True)
     pm = models.ForeignKey(CustomUser, related_name="project_manager", blank=False, null=True, on_delete=models.CASCADE)
-    planned_hours = models.DecimalField(_('planned hours'), max_digits=6, decimal_places=1, blank=False)
-    planned_value = models.BigIntegerField(_('planned value'), blank=True)
+    planned_hours = models.DecimalField(_('planned hours'), max_digits=6, decimal_places=1, blank=False, null=True)
+    planned_value = models.BigIntegerField(_('planned value'), blank=True, null=True)
     remaining_hours = models.DecimalField(_('remaining hours'), max_digits=6, decimal_places=1, blank=False)
     status = models.IntegerField(_('status'), choices=ProjectStatus.choices, default=ProjectStatus.GOING)
     date_created = models.DateTimeField(_('date created'), default=timezone.now)

@@ -9,7 +9,7 @@ from rest_framework import status
 import sys
 import os
 
-from projects.serializers import CreateProjectAssigneeSerializer
+from projects.serializers import CreateProjectAssigneeSerializer, UpdateProjectRemainingHrsSerializer
 from wbs.serializers import CreateTimeCardSerializer, CreateWbsSerializer, WbsDetailsSerializer, WbsUpdateSerializer, \
     TimeCardDetailsSerializer, WbsStatusUpdateSerializer, WbsWiseTimeCardListSerializer
 from wbs.models import TimeCard, Wbs
@@ -84,20 +84,43 @@ class UpdateWbs(APIView):
                 print(request.data)
                 if serializer.data:
                     temp = {
-                        "project": serializer.data['project'],
+                        "project": request.data['project'],
                         "wbs": serializer.data['id'],
-                        "time_card_assignee": serializer.data['assignee'],
+                        "time_card_assignee": request.data['assignee'],
                         "actual_work_done": request.data['actual_work_done'],
                         "hours_today": request.data['hours_worked'],
                     }
                     serializer2 = CreateTimeCardSerializer(data=temp)
+                    serializer2.is_valid()
+                    print(serializer2.errors)
                     if serializer2.is_valid():
                         serializer2.save()
+                        temp2 = {
+                            "remaining_hours": request.data['remaining_hours']
+                        }
+                        project = Projects.objects.get(id=request.data['project'])
+                        serializer3 = UpdateProjectRemainingHrsSerializer(project, data=temp2)
+                        if serializer3.is_valid():
+                            serializer3.save()
+                            response = {
+                                'success': 'True',
+                                'status code': status.HTTP_200_OK,
+                                'message': 'wbs Updated Successful',
+                                'data': serializer.data
+                            }
+                            return Response(response, status=status.HTTP_200_OK)
+                        else:
+                            response = {
+                                'success': 'False',
+                                'status code': status.HTTP_400_BAD_REQUEST,
+                                'message': 'failed to update remaining hours'
+                            }
+                            return Response(response, status=status.HTTP_200_OK)
+                    else:
                         response = {
-                            'success': 'True',
-                            'status code': status.HTTP_200_OK,
-                            'message': 'wbs Updated Successful',
-                            'data': serializer.data
+                            'success': 'False',
+                            'status code': status.HTTP_400_BAD_REQUEST,
+                            'message': 'failed to insert in time card'
                         }
                 return Response(response, status=status.HTTP_200_OK)
             else:

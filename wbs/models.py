@@ -53,7 +53,7 @@ class TimeCard(models.Model):
                                 on_delete=models.CASCADE)
     time_card_assignee = models.ForeignKey(CustomUser, related_name="time_card_employee_assigned", blank=False, null=False,
                                  on_delete=models.CASCADE)
-    actual_work_done = models.CharField(_('actual work done'), max_length=50, blank=False)
+    actual_work_done = models.CharField(_('actual work done'), max_length=250, blank=True, null=True)
     hours_today = models.DecimalField(_('hours today'), max_digits=6, decimal_places=1, blank=False)
     date_created = models.DateField(_('date created'), default=timezone.now)
     date_updated = models.DateField(_('date updated'), default=timezone.now)
