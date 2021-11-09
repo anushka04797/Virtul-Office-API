@@ -340,13 +340,14 @@ class ProjectWiseFileInsert(APIView):
 
     def post(self, request):
         project_id = request.data.get('project')
+        upload_by = request.data.get('upload_by')
         files = int(request.data.get('files')) + 1
 
         for i in range(1, files):
             indexval = str(i)
             attribute_name = str('file' + indexval)
             file = request.data.get(attribute_name)
-            requested_data = {"project": project_id, "file": file}
+            requested_data = {"project": project_id, "file": file, "upload_by": upload_by}
             serializer = ProjectFileSerializer(data=requested_data)
             if serializer.is_valid():
                 serializer.save()
