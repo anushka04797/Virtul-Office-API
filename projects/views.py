@@ -339,17 +339,25 @@ class ProjectWiseFileInsert(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        serializer = ProjectFileSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            response = {
-                'success': 'True',
-                'status code': status.HTTP_200_OK,
-                'message': 'Document Insert Successful',
-                'data': [serializer.data]
-            }
-            return Response(response)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        project_id = request.data.get('project')
+        files = int(request.data.get('files')) + 1
+
+        for i in range(1, files):
+            indexval = str(i)
+            attribute_name = str('file' + indexval)
+            file = request.data.get(attribute_name)
+            requested_data = {"project": project_id, "file": file}
+            serializer = ProjectFileSerializer(data=requested_data)
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                serializer.errors()
+        response = {
+            'success': 'True',
+            'status code': status.HTTP_200_OK,
+            'message': 'Document Insert Successful'
+        }
+        return Response(response)
 
 
 class ChangeProjectStatus(APIView):

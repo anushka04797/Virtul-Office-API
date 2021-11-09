@@ -269,7 +269,6 @@ class ProjectFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectSharedFiles
         fields = (
-            'id',
             'project',
             'file',
         )
