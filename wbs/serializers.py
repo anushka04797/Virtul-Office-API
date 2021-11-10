@@ -138,11 +138,13 @@ class TimeCardDetailsSerializer(serializers.ModelSerializer):
 
 class WbsWiseTimeCardListSerializer(serializers.ModelSerializer):
     time_card_assignee = UserDetailSerializer()
+    project = ProjectDetailsForWbsSerializer()
 
     class Meta:
         model = TimeCard
         fields = (
             'id',
+            'project',
             'time_card_assignee',
             'actual_work_done',
             'hours_today',
