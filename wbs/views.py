@@ -295,3 +295,19 @@ class WbsWiseTimeCardList(APIView):
             response = 'on line {}'.format(
                 sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
+
+
+# user wise time card list
+class UserWiseTimeCardList(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request, pk):
+        try:
+            time_card = TimeCard.objects.filter(time_card_assignee=pk)
+            serializer = WbsWiseTimeCardListSerializer(time_card, many=True)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'time card for a user',
+                        'data': serializer.data}
+        except Exception as e:
+            response = 'on line {}'.format(
+                sys.exc_info()[-1].tb_lineno), str(e)
+        return Response(response)
