@@ -194,6 +194,31 @@ class UpdateProject(APIView):
             return Response(response)
 
 
+class PmProjectAllAssigneeList(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, pk):
+        try:
+            tasks = Projects.objects.filter(pm=pk)
+            assignees = []
+            for task in tasks:
+                temp_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=task.id),
+                                                           many=True).data
+                for item in temp_assignees:
+                    assignees.append(UserDetailSerializer(item['assignee']).data)
+            assignees = unique(assignees)
+            response = {
+                'success': 'True',
+                'status code': status.HTTP_200_OK,
+                'message': 'My Heroes',
+                'data': assignees
+            }
+            return Response(response, status=status.HTTP_200_OK)
+            return Response(assignees)
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
+
 # pm wise project list
 class PmProjectList(APIView):
     permission_classes = (IsAuthenticated,)
