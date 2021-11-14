@@ -27,6 +27,7 @@ class Meetings(models.Model):
     start_time = models.DateTimeField(_('meeting start time'), blank=False)
     end_time = models.DateTimeField(_('meeting end time'), blank=True, null=True)
     duration = models.IntegerField(_('planned value'), blank=True, null=True)
+    host = models.ForeignKey(CustomUser, related_name="host", blank=True, null=True, on_delete=models.CASCADE)
     date_created = models.DateField(_('date created'), default=timezone.now)
     date_updated = models.DateField(_('date updated'), default=timezone.now)
 

@@ -2,7 +2,7 @@ import requests
 
 class SmsGateway():
     def post(request):
-        url = "http://103.123.8.69:8080/send/sms"
+        url = "http://dma.com.bd:8888/send/sms"
         
         r = requests.post(url, request)
         # print(r)
