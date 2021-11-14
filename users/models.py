@@ -11,6 +11,8 @@ from virtual_office_API.settings import EMAIL_HOST_USER
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
 from rest_framework import status
+from organizations.models import Designation
+
 
 class CustomUser(AbstractUser):
     username = None
@@ -21,6 +23,7 @@ class CustomUser(AbstractUser):
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
     profile_pic = models.ImageField(upload_to='uploads/users/images/', blank=True, null=True)
+    designation = models.ForeignKey(Designation, blank=True, null=True, on_delete=models.PROTECT)
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
