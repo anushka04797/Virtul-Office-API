@@ -7,6 +7,8 @@ from users.models import CustomUser
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_jwt.settings import api_settings
 
+from organizations.serializers import DesignationSerializer
+
 JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
 JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 
@@ -73,10 +75,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class UserDetailSerializer(serializers.ModelSerializer):
     date_joined = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p")
+    designation = DesignationSerializer()
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'profile_pic']
+        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'profile_pic', 'designation']
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
