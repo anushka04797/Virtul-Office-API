@@ -71,8 +71,8 @@ class ProjectAssignee(models.Model):
         verbose_name = _('project_assignee')
         verbose_name_plural = _('project_assignees')
 
-    def __str__(self):
-        return self.assignee
+    # def __str__(self):
+    #     return self.assignee
 
 
 class ProjectSharedFiles(models.Model):

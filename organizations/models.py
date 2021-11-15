@@ -42,8 +42,8 @@ class Designation(models.Model):
         verbose_name = _('designation')
         verbose_name_plural = _('designations')
 
-    def __str__(self):
-        return self.name
+    # def __str__(self):
+    #     return self.name
 
 
 class HolidayPlan(models.Model):
@@ -124,5 +124,5 @@ class Slc(models.Model):
         verbose_name = _('slc')
         verbose_name_plural = _('slcs')
 
-    def __str__(self):
-        return self.employee.first_name + " " + self.employee.last_name
+    # def __str__(self):
+    #     return self.employee.first_name + " " + self.employee.last_name
