@@ -271,25 +271,7 @@ class ProjectFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectSharedFiles
         fields = (
-            'project',
+            'work_package_number',
             'file',
             'upload_by'
-        )
-class ProjectWiseFileListSerializer(serializers.ModelSerializer):
-    project_file = DocumentListSerializer(many=True)
-    class Meta:
-        model = Projects
-        fields = (
-            'id',
-            'task_delivery_order',
-            'sub_task',
-            'work_package_number',
-            'work_package_index',
-            'task_title',
-            'planned_delivery_date',
-            'pm',
-            'planned_hours',
-            'remaining_hours',
-            'status',
-            'project_file',
         )
