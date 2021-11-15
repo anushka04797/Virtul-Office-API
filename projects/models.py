@@ -76,7 +76,7 @@ class ProjectAssignee(models.Model):
 
 
 class ProjectSharedFiles(models.Model):
-    project = models.ForeignKey(Projects, related_name="project_file", blank=False, null=False, on_delete=models.CASCADE)
+    work_package_number = models.CharField(max_length=200, blank=True, null=True)
     file = models.FileField(upload_to='uploads/project/files/', blank=True, null=True)
     date_created = models.DateTimeField(_('date created'), default=timezone.now)
     date_updated = models.DateTimeField(_('date updated'), default=timezone.now)

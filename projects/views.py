@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from projects.serializers import SubTaskSerializer, CreateProjectSerializer, ProjectDetailsSerializer, \
     UpdateProjectSerializer, ProjectAssigneeSerializer, TdoSerializer, CreateProjectAssigneeSerializer, \
-    UpdateSubTaskSerializer, TaskSerializer, ProjectWiseFileListSerializer, ProjectFileSerializer
+    UpdateSubTaskSerializer, TaskSerializer, ProjectFileSerializer, DocumentListSerializer
 from users.models import CustomUser
 from projects.models import Projects, ProjectAssignee, Tdo, ProjectSharedFiles
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -301,30 +301,73 @@ class ProjectWiseFileList(APIView):
     def get(self, request, pk):
         try:
             serializerData = []
-            pmprojectserilizerData = []
             user_info = CustomUser.objects.get(id=pk)
             if user_info.groups.filter(name='employee').exists():
-                projectAssigneeInfo = ProjectAssignee.objects.filter(assignee=pk)
-                for project_info in projectAssigneeInfo:
-                    project_ids = project_info.project_id
-                    projectInfo = Projects.objects.get(id=project_ids)
-                    serilizer = ProjectWiseFileListSerializer(projectInfo)
-                    serializerData.append(serilizer.data)
-            if user_info.groups.filter(name='pm').exists():
-                pmproject = Projects.objects.filter(pm=pk)
-                pmprojectserilizer = ProjectWiseFileListSerializer(pmproject, many=True)
-                pmprojectserilizerData = pmprojectserilizer.data
-                projectAssigneeInfo = ProjectAssignee.objects.filter(assignee=pk)
-                serializerData = []
-                for project_info in projectAssigneeInfo:
-                    project_ids = project_info.project_id
-                    assignee_ids = project_info.assignee_id
-                    pmprojectcheck = Projects.objects.filter(pm=assignee_ids, id=project_ids)
-                    if not pmprojectcheck:
+                project_list = Projects.objects.values('work_package_number').distinct()
+                for project_info in project_list:
+                    project_details = Projects.objects.filter(work_package_number=project_info['work_package_number']).first()
+                    projectAssigneeInfo = ProjectAssignee.objects.get(assignee=pk, project=project_details.id)
+                    if projectAssigneeInfo:
+                        project_ids = projectAssigneeInfo.project_id
                         projectInfo = Projects.objects.get(id=project_ids)
-                        serilizer = ProjectWiseFileListSerializer(projectInfo)
-                        serializerData.append(serilizer.data)
-            serializerData.append(pmprojectserilizerData)
+                        file_info = ProjectSharedFiles.objects.filter(work_package_number=projectInfo.work_package_number)
+                        file_serializer = DocumentListSerializer(file_info, many=True)
+                        serilizer = ProjectDetailsSerializer(projectInfo)
+                        total_serializer = {"project": serilizer.data, "files": file_serializer.data}
+                        serializerData.append(total_serializer)
+
+            if user_info.groups.filter(name='pm').exists():
+                project_list = Projects.objects.values('work_package_number').distinct()
+
+                for project_info in project_list:
+                    project_details = Projects.objects.filter(work_package_number=project_info['work_package_number']).first()
+                    projectAssigneeInfo = ProjectAssignee.objects.get(assignee=pk, project=project_details.id)
+                    if projectAssigneeInfo:
+                        project_ids = projectAssigneeInfo.project_id
+                        projectInfo = Projects.objects.get(id=project_ids)
+                        file_info = ProjectSharedFiles.objects.filter(work_package_number=projectInfo.work_package_number)
+                        file_serializer = DocumentListSerializer(file_info, many=True)
+                        serilizer = ProjectDetailsSerializer(projectInfo)
+
+                        assignee_serilizer = {"project": serilizer.data, "files": file_serializer.data}
+                    pm_project_list = Projects.objects.filter(id=projectAssigneeInfo.project_id, pm=pk).first()
+                    if projectAssigneeInfo.assignee != pm_project_list.pm:
+                        projectInfo = Projects.objects.get(id=pm_project_list.id)
+                        file_info = ProjectSharedFiles.objects.filter(
+                            work_package_number=projectInfo.work_package_number)
+                        pmfile_serializer = DocumentListSerializer(file_info, many=True)
+                        pmserilizer = ProjectDetailsSerializer(projectInfo)
+                        serializerData = {"project": pmserilizer.data, "files": pmfile_serializer.data}
+                    serializerData.append(assignee_serilizer)
+                        #
+                        # for pm_project in pm_project_list:
+                        #     project_details = Projects.objects.filter(work_package_number=pm_project['work_package_number']).first()
+                        #     assinee_check_exist = ProjectAssignee.objects.get(assignee=project_details.pm, project=project_details.id)
+                        #     if not assinee_check_exist:
+                        #         projectInfo = Projects.objects.get(id=project_details.id)
+                        #         print(projectInfo)
+                        #         file_info = ProjectSharedFiles.objects.filter(
+                        #             work_package_number=projectInfo.work_package_number)
+                        #         pmfile_serializer = DocumentListSerializer(file_info, many=True)
+                        #         pmserilizer = ProjectDetailsSerializer(projectInfo)
+                        #         total_pm_serializer = {"project": pmserilizer.data, "files": pmfile_serializer.data}
+                        #         serializerData.append(total_pm_serializer)
+
+
+                    # pmproject = Projects.objects.filter(pm=pk)
+                    # pmprojectserilizer = ProjectWiseFileListSerializer(pmproject, many=True)
+                    # pmprojectserilizerData = pmprojectserilizer.data
+                    # projectAssigneeInfo = ProjectAssignee.objects.filter(assignee=pk)
+                    # serializerData = []
+                    # for project_info in projectAssigneeInfo:
+                    #     project_ids = project_info.project_id
+                    #     assignee_ids = project_info.assignee_id
+                    #     pmprojectcheck = Projects.objects.filter(pm=assignee_ids, id=project_ids)
+                    #     if not pmprojectcheck:
+                    #         projectInfo = Projects.objects.get(id=project_ids)
+                    #         serilizer = ProjectWiseFileListSerializer(projectInfo)
+                    #         serializerData.append(serilizer.data)
+                # print(pmprojectserilizerData)
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
                         'message': 'Shared Document List For Each Project',
                         'data': serializerData}
@@ -334,10 +377,10 @@ class ProjectWiseFileList(APIView):
         return Response(response)
 
 class ProjectWiseFileInsert(APIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AllowAny, )
 
     def post(self, request):
-        project_id = request.data.get('project')
+        work_package_number = request.data.get('work_package_number')
         upload_by = request.data.get('upload_by')
         files = int(request.data.get('files')) + 1
 
@@ -345,7 +388,7 @@ class ProjectWiseFileInsert(APIView):
             indexval = str(i)
             attribute_name = str('file' + indexval)
             file = request.data.get(attribute_name)
-            requested_data = {"project": project_id, "file": file, "upload_by": upload_by}
+            requested_data = {"work_package_number": work_package_number, "file": file, "upload_by": upload_by}
             serializer = ProjectFileSerializer(data=requested_data)
             if serializer.is_valid():
                 serializer.save()
