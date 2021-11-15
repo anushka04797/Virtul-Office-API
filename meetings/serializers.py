@@ -6,7 +6,7 @@ from django.utils import timezone
 
 
 class CreateMeetingsSerializer(serializers.ModelSerializer):
-    start_time = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p")
+    # start_time = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p")
     duration = serializers.IntegerField(required=False)
     class Meta:
         model = Meetings
