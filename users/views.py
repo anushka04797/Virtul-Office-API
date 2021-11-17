@@ -54,11 +54,17 @@ class Register(APIView):
                     'message': message
                 }
             )
+            return Response(response, status=status.HTTP_201_CREATED)
             # send_mail('New user registration', message, 'awronno.adhar@gmail.com', [request.data['email']],
             #           fail_silently=False, )
         except Exception as e:
-            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
-        return Response(response)
+            response = {
+                'success': 'False',
+                'status code': status.HTTP_400_BAD_REQUEST,
+                'message': 'User registration failed',
+                'errors': serializer.errors
+            }
+            return Response(response,status=status.HTTP_201_CREATED)
 
 
 # possible assignees for a new project
