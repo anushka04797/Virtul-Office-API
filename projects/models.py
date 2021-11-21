@@ -50,9 +50,6 @@ class Projects(models.Model):
             models.Index(fields=['work_package_index', ])
         ]
 
-    def __str__(self):
-        return self.task_delivery_order
-
     def is_ongoing(self):
         return self.status in {
             self.ProjectStatus.GOING
@@ -81,6 +78,7 @@ class ProjectSharedFiles(models.Model):
     date_created = models.DateTimeField(_('date created'), default=timezone.now)
     date_updated = models.DateTimeField(_('date updated'), default=timezone.now)
     upload_by = models.ForeignKey(CustomUser, related_name="file_upload_by", blank=False, null=False, on_delete=models.CASCADE)
+
     class Meta:
         db_table = 'project_shared_file'
         verbose_name = _('shared_file')
