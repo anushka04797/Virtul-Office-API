@@ -18,7 +18,7 @@ class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(_('email address'), unique=True)
 
-    phone = models.CharField(_('phone number'), max_length=15, blank=True)
+    phone = models.CharField(_('phone number'), max_length=15, blank=True, unique=True)
     date_of_birth = models.DateField(blank=True, null=True)
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
