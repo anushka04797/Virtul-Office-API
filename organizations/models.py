@@ -113,7 +113,7 @@ class Calender(models.Model):
 
 
 class Slc(models.Model):
-    employee = models.ForeignKey(to='users.CustomUser', blank=False, null=False, on_delete=models.PROTECT)
+    employee = models.ForeignKey(to='users.CustomUser', related_name="employee_slc", blank=False, null=False, on_delete=models.PROTECT)
     department = models.ForeignKey(Department, blank=False, null=False, on_delete=models.PROTECT)
     designation = models.ForeignKey(Designation, blank=False, null=False, on_delete=models.PROTECT)
     salary = models.IntegerField(_('salary'), blank=False, null=False)

@@ -12,3 +12,16 @@ class DesignationSerializer(serializers.ModelSerializer):
             'department',
             'parent',
         )
+
+
+class SlcSerializer(serializers.ModelSerializer):
+    designation = DesignationSerializer()
+
+    class Meta:
+        model = Designation
+        fields = (
+            'id',
+            'salary',
+            'department',
+            'designation',
+        )
