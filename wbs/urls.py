@@ -1,7 +1,7 @@
 from django.urls import path
 from wbs.views import CreateWbs, WbsDetails, UpdateWbs, WbsListForEmployee, CreateTimeCard, TimeCardDetails, \
     CompletedWbsVsTotalCount, WbsListForProject, AllUserWbsListOfProject, UpdateWbsStatus, WbsWiseTimeCardList, \
-    UserWiseTimeCardList, AllTimeCards
+    UserWiseTimeCardList, PmWiseAllTimeCardList
 
 urlpatterns = [
     path('create/', CreateWbs.as_view()),
@@ -16,5 +16,5 @@ urlpatterns = [
     path('time-card/details/<str:pk>/', TimeCardDetails.as_view()),
     path('time-card/list/<str:pk>/', WbsWiseTimeCardList.as_view()),
     path('user/time-card/list/<str:pk>/', UserWiseTimeCardList.as_view()),
-    path('time-cards/all/<str:pk>/', AllTimeCards.as_view())
+    path('pm-wise/all-time-card/list/<str:pk>/', PmWiseAllTimeCardList.as_view()),
 ]

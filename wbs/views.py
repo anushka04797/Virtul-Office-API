@@ -9,7 +9,8 @@ from rest_framework import status
 import sys
 import os
 
-from projects.serializers import CreateProjectAssigneeSerializer, UpdateProjectRemainingHrsSerializer
+from projects.serializers import CreateProjectAssigneeSerializer, UpdateProjectRemainingHrsSerializer, \
+    ProjectDetailsSerializer
 from wbs.serializers import CreateTimeCardSerializer, CreateWbsSerializer, WbsDetailsSerializer, WbsUpdateSerializer, \
     TimeCardDetailsSerializer, WbsStatusUpdateSerializer, WbsWiseTimeCardListSerializer
 from wbs.models import TimeCard, Wbs
@@ -314,6 +315,34 @@ class UserWiseTimeCardList(APIView):
             serializer = WbsWiseTimeCardListSerializer(time_card, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'time card for a user',
                         'data': serializer.data}
+        except Exception as e:
+            response = 'on line {}'.format(
+                sys.exc_info()[-1].tb_lineno), str(e)
+        return Response(response)
+
+
+# PM wise all time card list
+class PmWiseAllTimeCardList(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request, pk):
+        try:
+            pm_projects = Projects.objects.filter(pm=pk)
+            serializer = ProjectDetailsSerializer(pm_projects, many=True)
+            # print(serializer.data)
+            # print(serializer.is_valid())
+            # # print(serializer.initial_data)
+            # print(serializer.errors)
+            # if serializer.is_valid():
+                # print(serializer.data)
+            timecard_serializer = []
+            for project_id in serializer.data:
+                time_card = TimeCard.objects.filter(project=project_id['id'])
+                serializer2 = WbsWiseTimeCardListSerializer(time_card, many=True)
+                temp_data = serializer2
+                timecard_serializer.append(serializer2.data)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'time card for a user',
+                        'data': timecard_serializer}
         except Exception as e:
             response = 'on line {}'.format(
                 sys.exc_info()[-1].tb_lineno), str(e)
