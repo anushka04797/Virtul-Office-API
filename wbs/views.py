@@ -281,6 +281,13 @@ class TimeCardDetails(APIView):
                 sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
 
+class AllTimeCards(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    # def get(self,request,pk):
+        # try:
+            # time_cards = TimeCard.objects.filter()
+
 
 # wbs wise time card list
 class WbsWiseTimeCardList(APIView):

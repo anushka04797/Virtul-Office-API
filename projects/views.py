@@ -91,7 +91,9 @@ class NewProjectDetails(APIView):
     def get(self,request, pk):
         try:
             projects = Projects.objects.filter(work_package_number=pk)
-            serialized_subtask = SubTaskSerializer(projects[0]).data
+            serialized_subtask=''
+            if len(projects)>0:
+                serialized_subtask = SubTaskSerializer(projects[0]).data
             tasks = TaskSerializer(projects, many=True).data
             assignees=[]
             for task in tasks:
@@ -110,6 +112,7 @@ class NewProjectDetails(APIView):
             }
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Project Details',
                         'data': response_data}
+
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)

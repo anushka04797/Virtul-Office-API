@@ -96,6 +96,7 @@ class Login(RetrieveAPIView):
             # 'exp': serializer.data['token'],
         }
         user_data = CustomUser.objects.filter(email=request.data.get('email')).first()
+        # is_phone_unique = CustomUser.objects.filter(phone=request.data.get('phone')).first()
         if user_data is None:
             response['success'] = 'False'
             response['status code'] = status.HTTP_404_NOT_FOUND
@@ -133,7 +134,7 @@ class Login(RetrieveAPIView):
         else:
             response['success'] = 'False'
             response['status code'] = status.HTTP_403_FORBIDDEN
-            response['message'] = 'Forbidden for this user!!'
+            response['message'] = 'User is not approved yet. Please wait for admin approval.'
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
 
