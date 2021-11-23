@@ -14,7 +14,7 @@ class Wbs(models.Model):
     reporter = models.ForeignKey(CustomUser, related_name="wbs_reporter", blank=False, null=False,
                                  on_delete=models.CASCADE)
     title = models.CharField(_('title'), max_length=50, blank=False)
-    description = models.TextField(_('description'), max_length=150, blank=True)
+    description = models.TextField(_('description'), max_length=1050, blank=True)
     start_date = models.DateField(_('start date'), blank=False)
     end_date = models.DateField(_('end date'), blank=False)
     hours_worked = models.DecimalField(_('hours worked'), max_digits=6, decimal_places=1, blank=False)
