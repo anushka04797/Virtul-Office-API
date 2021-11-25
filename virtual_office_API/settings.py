@@ -138,6 +138,7 @@ DATABASES = {
 #MEDIA_ROOT = '/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+LOGOUT_REDIRECT_URL = 'http://192.168.0.225:8000'
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 

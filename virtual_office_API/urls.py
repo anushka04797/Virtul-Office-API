@@ -21,8 +21,10 @@ from virtual_office_API import settings
 from django.conf.urls.static import static
 from rest_framework.documentation import include_docs_urls
 from rest_framework.permissions import AllowAny
+from .views import redirect_view
 
 urlpatterns = [
+    path('', redirect_view),
     path('admin/', admin.site.urls),
     path('auth/', include("users.urls")),
     path('project/', include("projects.urls")),
