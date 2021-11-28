@@ -14,8 +14,8 @@ class UsersAdmin(UserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        (_('Profile info'), {'fields': ('first_name', 'last_name', 'phone', 'profile_pic')}),
+        (None, {'fields': ('username', 'password')}),
+        (_('Profile info'), {'fields': ('first_name', 'last_name', 'email', 'phone', 'profile_pic')}),
         (_('Permissions'),
          {'fields': ('groups', 'is_active', 'is_staff', 'is_superuser',)}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
@@ -23,7 +23,7 @@ class UsersAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2')}
+            'fields': ('username', 'password1', 'password2')}
          ),
     )
 
@@ -34,12 +34,12 @@ class UsersAdmin(UserAdmin):
         return ','.join([g.name for g in obj.groups.all()]) if obj.groups.count() else ''
 
     list_display = (
-        'email', 'last_name', 'is_staff',
+        'email', 'username', 'last_name', 'is_active'
     )
-    list_display_links = ('email',)
-    list_filter = ['groups', ]
+    list_display_links = ('username',)
+    list_filter = ['groups', 'is_active', 'is_staff', 'is_superuser']
     search_fields = ('email', 'first_name', 'last_name')
-    ordering = ('email',)
+    ordering = ('date_joined',)
     readonly_fields = ('date_joined', 'last_login')
 
 
