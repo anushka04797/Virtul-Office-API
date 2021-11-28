@@ -23,6 +23,10 @@ from rest_framework.documentation import include_docs_urls
 from rest_framework.permissions import AllowAny
 from .views import redirect_view
 
+admin.site.site_header = 'Virtual Office'
+admin.site.site_title = 'Virtual Office'
+admin.site.index_title = 'Virtual Office Administration'
+
 urlpatterns = [
     path('', redirect_view),
     path('admin/', admin.site.urls),

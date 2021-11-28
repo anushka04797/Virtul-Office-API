@@ -15,8 +15,18 @@ from organizations.models import Designation
 
 
 class CustomUser(AbstractUser):
-    username = None
-    email = models.EmailField(_('email address'), unique=True)
+    username = models.CharField(
+        _('username'),
+        max_length=150,
+        unique=True,
+        help_text=('Required. 150 characters or fewer. Letters, digits and @/./+/-/ only.'),
+        error_messages={
+            'unique': _("A user with that username already exists."),
+        },
+        null=True,
+        blank=True
+    )
+    email = models.EmailField(_('email address'), unique=False, null=True, blank=True)
 
     phone = models.CharField(_('phone number'), max_length=15, blank=True, unique=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
@@ -39,7 +49,7 @@ class CustomUser(AbstractUser):
     )
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
-    USERNAME_FIELD = 'email'
+    # USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = CustomUserManager()
 
@@ -56,7 +66,7 @@ class CustomUser(AbstractUser):
 def pre_save_activate_user(sender, instance, **kwargs):
     try:
         previous_data = CustomUser.objects.get(id=instance.id)
-        print(instance, previous_data.is_active, instance.is_active)
+        # print(instance, previous_data.is_active, instance.is_active)
         if previous_data.is_active == 0 and previous_data.is_active != instance.is_active:
             message = "Your registered account with the email address " + instance.email + "has been activated. You " \
                                                                                            "can now login and update " \
