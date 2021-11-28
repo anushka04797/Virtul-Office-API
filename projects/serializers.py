@@ -87,6 +87,7 @@ class TaskSerializer(serializers.ModelSerializer):
             'task_title',
             'work_package_index',
             'estimated_person',
+            'remaining_hours',
             'status',
             'date_created',
             'date_updated',
