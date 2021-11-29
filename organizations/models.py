@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 class Company(models.Model):
     name = models.CharField(_('company name'), max_length=150, blank=False)
     details = models.TextField(_('company details'), max_length=350, blank=True)
-    license_number = models.CharField(_('license number'), max_length=150, blank=True)
+    trade_license_number = models.CharField(_('trade license number'), max_length=150, blank=True)
 
     class Meta:
         db_table = 'company'
@@ -20,7 +20,7 @@ class Department(models.Model):
     company = models.ForeignKey(Company, blank=False, null=False, on_delete=models.PROTECT)
     name = models.CharField(_('department name'), max_length=150, blank=False)
     details = models.TextField(_('department details'), max_length=350, blank=True)
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.PROTECT)
+    parent = models.ForeignKey('self', verbose_name='Select a department parent', null=True, blank=True, related_name='children', on_delete=models.PROTECT)
 
     class Meta:
         db_table = 'department'
@@ -35,7 +35,7 @@ class Designation(models.Model):
     department = models.ForeignKey(Department, blank=False, null=False, on_delete=models.PROTECT)
     name = models.CharField(_('designation name'), max_length=150, blank=False)
     details = models.TextField(_('designation details'), max_length=350, blank=True)
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.PROTECT)
+    parent = models.ForeignKey('self', verbose_name='Select a designation parent', null=True, blank=True, related_name='children', on_delete=models.PROTECT)
 
     class Meta:
         db_table = 'designation'
@@ -68,8 +68,8 @@ class HolidayPlan(models.Model):
 
     class Meta:
         db_table = 'holiday_and_vacation_plan'
-        verbose_name = _('holiday_and_vacation_plan')
-        verbose_name_plural = _('holiday_and_vacation_plans')
+        verbose_name = _('Holiday and Vacation Plan')
+        verbose_name_plural = _('Holiday and Vacation Plan')
 
     def __str__(self):
         return self.week_start_day
@@ -121,8 +121,8 @@ class Slc(models.Model):
 
     class Meta:
         db_table = 'slc'
-        verbose_name = _('slc')
-        verbose_name_plural = _('slcs')
+        verbose_name = _('Standard Labor Code')
+        verbose_name_plural = _('Standard Labor Code (SLC)')
 
     def __str__(self):
         return self.employee.first_name + " " + self.employee.last_name

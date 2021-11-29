@@ -4,9 +4,9 @@ from organizations.models import Company, Department, Designation, HolidayPlan, 
 
 class CompanyAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'license_number',
+        'name', 'trade_license_number',
     )
-    search_fields = ('name', 'license_number')
+    search_fields = ('name', 'trade_license_number')
     ordering = ('name',)
 
 

@@ -231,6 +231,7 @@ class ChangeProfileImage(APIView):
         response['data'] = serializer.errors
         return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ChangePassword(generics.UpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ChangePasswordSerializer
