@@ -20,7 +20,7 @@ from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
-from django.contrib.auth import authenticate
+from .auth import EmailOrUsernameModelBackend
 from django.core.mail import send_mail
 import sms_api
 import sys
@@ -104,7 +104,7 @@ class Login(RetrieveAPIView):
             response['message'] = "User Not Found"
             return Response(response, status=status.HTTP_404_NOT_FOUND)
         elif user_data.is_active == 1 and user_data.groups.count() > 0:
-            auth_user = authenticate(email=request.data.get('email'), password=request.data.get('password'))
+            auth_user = EmailOrUsernameModelBackend.authenticate(user_data,username=request.data.get('email'), password=request.data.get('password'))
             if auth_user is None:
                 response['success'] = "False"
                 response['status code'] = status.HTTP_400_BAD_REQUEST

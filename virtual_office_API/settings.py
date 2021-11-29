@@ -229,6 +229,10 @@ JWT_AUTH = {
     'JWT_AUTH_COOKIE': None,
 }
 
+AUTHENTICATION_BACKENDS = (
+    "users.auth.EmailOrUsernameModelBackend",
+    "django.contrib.auth.backends.ModelBackend",
+)
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
