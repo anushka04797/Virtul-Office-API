@@ -24,6 +24,7 @@ from .auth import EmailOrUsernameModelBackend
 from django.core.mail import send_mail
 import sms_api
 import sys
+from django.contrib.auth.models import Permission
 from rest_framework.parsers import MultiPartParser
 
 
@@ -259,3 +260,22 @@ class ChangePassword(generics.UpdateAPIView):
             }
             return Response(response)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AllPermissions(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        try:
+            user = CustomUser.objects.get(email=request.user)
+            permissions = Permission.objects.filter(user=user)
+            response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'Permission List',
+                'data': request.user.get_group_permissions()
+            }
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response, status=status.HTTP_200_OK)

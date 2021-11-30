@@ -606,3 +606,35 @@ class ProjectManagerList(APIView):
             'data': all_pm
         }
         return Response(response)
+
+class WPList(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self,request):
+        try:
+            work_package_numbers = Projects.objects.values_list('work_package_number',flat=True)
+            sub_tasks = Projects.objects.values_list('sub_task',flat=True)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'wp': unique(work_package_numbers),'sub_tasks':unique(sub_tasks)}
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
+
+
+class CheckWPandSubTask(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self,request,sub_task,wp):
+        try:
+            wp_exists=False
+            sub_task_exixts=False
+            if Projects.objects.filter(work_package_number=wp).exists():
+                wp_exists=True
+
+            if Projects.objects.filter(sub_task=sub_task).exists():
+                sub_task_exixts=True
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'wp_found': wp_exists, 'sub_task_found':sub_task_exixts}
+            return Response(response)
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
