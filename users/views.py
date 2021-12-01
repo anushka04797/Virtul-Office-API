@@ -133,6 +133,11 @@ class Login(RetrieveAPIView):
                     response['message'] = 'Internal Server Error'
                     return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+        elif user_data.groups.count() < 1:
+            response['success'] = 'False'
+            response['status code'] = status.HTTP_403_FORBIDDEN
+            response['message'] = 'This user has no role in virtual office'
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
         else:
             response['success'] = 'False'
             response['status code'] = status.HTTP_403_FORBIDDEN
@@ -268,12 +273,13 @@ class AllPermissions(APIView):
     def get(self, request):
         try:
             user = CustomUser.objects.get(email=request.user)
-            permissions = Permission.objects.filter(user=user)
+            group_permissions = request.user.get_group_permissions()
+            all_permissions = request.user.get_all_permissions()
             response = {
                 'status': 'success',
                 'code': status.HTTP_200_OK,
                 'message': 'Permission List',
-                'data': request.user.get_group_permissions()
+                'data': group_permissions,
             }
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
