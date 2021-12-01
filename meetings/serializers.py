@@ -12,6 +12,7 @@ class CreateMeetingsSerializer(serializers.ModelSerializer):
         model = Meetings
         fields = (
             'room_id',
+            'room_name',
             'participant',
             'type',
             'agenda',
@@ -34,6 +35,7 @@ class MeetingsDetailsSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'room_id',
+            'room_name',
             'participant',
             'project',
             'type',
@@ -54,6 +56,7 @@ class MeetingsUpdateSerializer(serializers.ModelSerializer):
         model = Meetings
         fields = (
             'room_id',
+            'room_name',
             'participant',
             'project',
             'agenda',
