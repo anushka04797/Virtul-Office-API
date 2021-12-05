@@ -1,12 +1,14 @@
 from django.contrib import admin
-from organizations.models import Company, Department, Designation, HolidayPlan, Calender, Slc
+from django.contrib.admin.helpers import Fieldset
+
+from organizations.models import Company, Department, Designation, DmaCalender, HolidayCalender, Slc
 
 
 class CompanyAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'trade_license_number',
+        'name', 'website', 'vat_certificate'
     )
-    search_fields = ('name', 'trade_license_number')
+    search_fields = ('name', 'website')
     ordering = ('name',)
 
 
@@ -30,22 +32,27 @@ class DesignationAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
 
-class HolidayPlanAdmin(admin.ModelAdmin):
-    list_display = (
-        'week_start_day', 'week_holiday_1', 'week_holiday_2'
+class DmaCalenderAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (Fieldset, {'fields': ('Year', 'Month', 'Working_days')}),
     )
-    list_display_links = ('week_start_day',)
-    search_fields = ['week_start_day']
-    ordering = ('week_start_day',)
+    # readonly_fields = ('Calculated_hours',)
+    list_display = (
+        'Year', 'Month', 'Working_days', 'Calculated_hours'
+    )
+    list_filter = ['Month']
+    list_display_links = ('Year',)
+    search_fields = ['Year']
+    ordering = ('Year',)
 
 
-class CalenderAdmin(admin.ModelAdmin):
+class HolidayCalenderAdmin(admin.ModelAdmin):
     list_display = (
-        'vacation_title', 'vacation_type', 'start_data', 'end_date', 'duration'
+        'Year', 'holiday_title', 'start_date', 'end_date'
     )
-    list_display_links = ('vacation_title',)
-    search_fields = ['vacation_title']
-    ordering = ('vacation_title',)
+    list_display_links = ('holiday_title',)
+    search_fields = ['holiday_title']
+    ordering = ('Year',)
 
 
 class SlcAdmin(admin.ModelAdmin):
@@ -60,6 +67,6 @@ class SlcAdmin(admin.ModelAdmin):
 admin.site.register(Company, CompanyAdmin)
 admin.site.register(Department, DepartmentAdmin)
 admin.site.register(Designation, DesignationAdmin)
-admin.site.register(HolidayPlan, HolidayPlanAdmin)
-admin.site.register(Calender, CalenderAdmin)
+admin.site.register(DmaCalender, DmaCalenderAdmin)
+admin.site.register(HolidayCalender, HolidayCalenderAdmin)
 admin.site.register(Slc, SlcAdmin)
