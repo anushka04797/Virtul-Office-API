@@ -49,23 +49,23 @@ class Register(APIView):
             }
             message = "Your account has been created successfully. Please wait until your account being activated. " \
                       "you will be notified soon once it is get activated. "
-            sms_api.SmsGateway.post(
-                {
-                    'number': request.data['phone'],
-                    'message': message
-                }
-            )
+            # sms_api.SmsGateway.post(
+            #     {
+            #         'number': request.data['phone'],
+            #         'message': message
+            #     }
+            # )
             return Response(response, status=status.HTTP_201_CREATED)
             # send_mail('New user registration', message, 'awronno.adhar@gmail.com', [request.data['email']],
             #           fail_silently=False, )
         except Exception as e:
-            # response = {
-            #     'success': 'False',
-            #     'status code': status.HTTP_400_BAD_REQUEST,
-            #     'message': 'User registration failed',
-            #     'errors': serializer.errors
-            # }
-            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+            response = {
+                'success': 'False',
+                'status code': status.HTTP_400_BAD_REQUEST,
+                'message': 'User registration failed',
+                'errors': serializer.errors
+            }
+            # response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
             return Response(response, status=status.HTTP_201_CREATED)
 
 
@@ -75,7 +75,7 @@ class PossibleAssigneeList(APIView):
 
     def get(self, request):
         try:
-            users = CustomUser.objects.all().exclude(is_superuser=1)
+            users = CustomUser.objects.all().exclude(is_superuser=1).order_by('first_name')
             serializer = UserDetailSerializer(users, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Possible assignee list',
                         'data': serializer.data}

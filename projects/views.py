@@ -205,8 +205,7 @@ class PmProjectAllAssigneeList(APIView):
             tasks = Projects.objects.filter(pm=pk)
             assignees = []
             for task in tasks:
-                temp_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=task.id),
-                                                           many=True).data
+                temp_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=task.id), many=True).data
                 for item in temp_assignees:
                     assignees.append(UserDetailSerializer(item['assignee']).data)
             assignees = unique(assignees)
