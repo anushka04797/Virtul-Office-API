@@ -111,6 +111,7 @@ class SubTaskSerializer(serializers.ModelSerializer):
             'task_delivery_order',
             'sub_task',
             'work_package_number',
+            'work_package_index',
             'estimated_person',
             'planned_delivery_date',
             'pm',
