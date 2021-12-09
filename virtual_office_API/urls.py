@@ -36,6 +36,7 @@ urlpatterns = [
     path('wbs/', include("wbs.urls")),
     path('evms/', include("evms.urls")),
     path('meetings/', include("meetings.urls")),
+    path('organizations/', include("organizations.urls")),
 
     # static folder for debug false
     url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),

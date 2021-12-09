@@ -11,7 +11,7 @@ from virtual_office_API.settings import EMAIL_HOST_USER
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
 from rest_framework import status
-from organizations.models import Designation
+# from organizations.models import Designation, Slc
 
 
 class CustomUser(AbstractUser):
@@ -33,7 +33,8 @@ class CustomUser(AbstractUser):
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
     profile_pic = models.ImageField(upload_to='uploads/users/images/', blank=True, null=True)
-    designation = models.ForeignKey(Designation, blank=True, null=True, on_delete=models.PROTECT)
+    designation = models.ForeignKey(to='organizations.Designation', blank=True, null=True, on_delete=models.PROTECT)
+    slc_details = models.ForeignKey(to='organizations.Slc', related_name="user_slc_details", blank=True, null=True, on_delete=models.PROTECT)
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
@@ -77,7 +78,7 @@ def pre_save_activate_user(sender, instance, **kwargs):
             #         'message': message
             #     }
             # )
-            # send_mail('User account activation', message, EMAIL_HOST_USER, [instance.email], fail_silently=False, )
+            send_mail('User account activation', message, EMAIL_HOST_USER, [instance.email], fail_silently=False, )
         if previous_data.is_active == 1 and previous_data.is_active != instance.is_active:
             message = "Your registered account with the email address " + instance.email + "has been deactivated. " \
                                                                                            "Please " \
@@ -88,7 +89,7 @@ def pre_save_activate_user(sender, instance, **kwargs):
             #         'message': message
             #     }
             # )
-            # send_mail('User account deactivation', message, EMAIL_HOST_USER, [instance.email],
-            #           fail_silently=False, )
+            send_mail('User account deactivation', message, EMAIL_HOST_USER, [instance.email],
+                      fail_silently=False, )
     except ObjectDoesNotExist:
         pass
