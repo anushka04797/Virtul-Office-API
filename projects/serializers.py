@@ -15,6 +15,7 @@ class TdoSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
+            'description',
             'date_created',
             'date_updated'
         )
@@ -30,7 +31,7 @@ class CreateProjectSerializer(serializers.ModelSerializer):
             'work_package_number',
             'work_package_index',
             'task_title',
-            'estimated_person',
+            'start_date',
             'planned_delivery_date',
             'pm',
             'planned_hours',
@@ -61,6 +62,7 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
             'work_package_index',
             'task_title',
             'estimated_person',
+            'start_date',
             'planned_delivery_date',
             'pm',
             'planned_hours',
@@ -130,6 +132,7 @@ class CreateProjectAssigneeSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'assignee',
+            'estimated_person',
             'is_assignee_active',
             'project',
             'date_created',
@@ -165,6 +168,7 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
             'id',
             'task_title',
             'estimated_person',
+            'start_date',
             'planned_delivery_date',
             'planned_hours',
             'planned_value',
@@ -176,6 +180,7 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.task_title = validated_data.get('task_title', instance.task_title)
         instance.estimated_person = validated_data.get('estimated_person', instance.estimated_person)
+        instance.start_date = validated_data.get('start_date', instance.start_date)
         instance.planned_delivery_date = validated_data.get('planned_delivery_date', instance.planned_delivery_date)
         instance.planned_hours = validated_data.get('planned_hours', instance.planned_hours)
         instance.planned_value = validated_data.get('planned_value', instance.planned_value)

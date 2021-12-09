@@ -3,11 +3,12 @@ from django.contrib.auth.models import Group, update_last_login
 import json
 from rest_framework import serializers
 
+from organizations.serializers import SlcSerializer, DesignationSerializer
 from users.models import CustomUser
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_jwt.settings import api_settings
 
-from organizations.serializers import DesignationSerializer
+# from organizations.serializers import DesignationSerializer, SlcSerializer
 
 JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
 JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
@@ -78,10 +79,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserDetailSerializer(serializers.ModelSerializer):
     date_joined = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p")
     designation = DesignationSerializer()
+    slc_details = SlcSerializer()
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'profile_pic', 'designation']
+        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'profile_pic', 'slc_details', 'designation']
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

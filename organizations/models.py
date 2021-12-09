@@ -1,9 +1,14 @@
 import calendar
 from datetime import datetime
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.functions import ExtractMonth
+from django.db.models.signals import pre_save, post_save
+from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
+
+from users.models import CustomUser
 
 
 class Company(models.Model):
@@ -25,7 +30,7 @@ class Company(models.Model):
 
 
 class Department(models.Model):
-    company = models.ForeignKey(Company, blank=False, null=False, on_delete=models.PROTECT)
+    company = models.ForeignKey(to='organizations.Company', blank=False, null=False, on_delete=models.PROTECT)
     name = models.CharField(_('department name'), max_length=150, blank=False)
     details = models.TextField(_('department details'), max_length=350, blank=True)
     parent = models.ForeignKey('self', verbose_name='Select a department parent', null=True, blank=True, related_name='children', on_delete=models.PROTECT)
@@ -40,7 +45,7 @@ class Department(models.Model):
 
 
 class Designation(models.Model):
-    department = models.ForeignKey(Department, blank=False, null=False, on_delete=models.PROTECT)
+    department = models.ForeignKey(to='organizations.Department', blank=False, null=False, on_delete=models.PROTECT)
     name = models.CharField(_('designation name'), max_length=150, blank=False)
     details = models.TextField(_('designation details'), max_length=350, blank=True)
     parent = models.ForeignKey('self', verbose_name='Select a designation parent', null=True, blank=True, related_name='children', on_delete=models.PROTECT)
@@ -94,13 +99,25 @@ class DmaCalender(models.Model):
     # company_reserved_holidays = models.IntegerField(_('company\'s reserved holidays'), blank=True, null=True)
     # allocated_leave_per_year = models.IntegerField(_('allocated leave per head in a year'), blank=True, null=True)
 
+    Company = models.ForeignKey(to='organizations.Company', blank=False, null=False, on_delete=models.CASCADE)
     Year = models.IntegerField(_('Year'), choices=YEAR_CHOICES, default=datetime.now().year, blank=False, null=False)
-    Month = models.CharField(_('Month'), max_length=20, choices=MONTHS, default='Select', blank=False, null=False)
-    Working_days = models.IntegerField(_('Working Days'), blank=False, null=True)
-    Calculated_hours = models.IntegerField(_('Calculated Hours'), blank=True, null=True, editable=False)
+    January = models.IntegerField(_('January'), default=0, blank=True, null=False)
+    February = models.IntegerField(_('February'), default=0, blank=True, null=False)
+    March = models.IntegerField(_('March'), default=0, blank=True, null=False)
+    April = models.IntegerField(_('April'), default=0, blank=True, null=False)
+    May = models.IntegerField(_('May'), default=0, blank=True, null=False)
+    June = models.IntegerField(_('June'), default=0, blank=True, null=False)
+    July = models.IntegerField(_('July'), default=0, blank=True, null=False)
+    August = models.IntegerField(_('August'), default=0, blank=True, null=False)
+    September = models.IntegerField(_('September'), default=0, blank=True, null=False)
+    October = models.IntegerField(_('October'), default=0, blank=True, null=False)
+    November = models.IntegerField(_('November'), default=0, blank=True, null=False)
+    December = models.IntegerField(_('December'), default=0, blank=True, null=False)
+    # Working_days = models.IntegerField(_('Working Days'), blank=False, null=True)
+    Total = models.IntegerField(_('Total working days'), default=0, blank=True, null=True, editable=False)
 
     def save(self, *args, **kwargs):
-        self.Calculated_hours = self.Working_days * 8
+        self.Total = self.January + self.February + self.March + self.April + self.May + self.June + self.July + self.August + self.September + self.October + self.November + self.December
         super().save(*args, **kwargs)
 
     class Meta:
@@ -162,7 +179,7 @@ SLC = (
 
 
 class Slc(models.Model):
-    employee = models.ForeignKey(to='users.CustomUser', blank=False, null=False, on_delete=models.PROTECT)
+    employee = models.ForeignKey(to='users.CustomUser', blank=False, null=False, on_delete=models.CASCADE)
     slc = models.CharField(_('Standard Labor Code(SLC)'), max_length=20, choices=SLC, blank=True, null=True)
     # designation = models.ForeignKey(Designation, blank=False, null=False, on_delete=models.PROTECT)
     monthly_rate = models.IntegerField(_('Monthly Rate'), blank=True, null=True)
@@ -179,3 +196,15 @@ class Slc(models.Model):
 
     def __str__(self):
         return self.employee.first_name + " " + self.employee.last_name
+
+
+@receiver(post_save, sender=Slc)
+def post_save_slc(sender, instance, **kwargs):
+    try:
+        slc = Slc.objects.get(id=instance.id)
+        if slc is not None:
+            obj = CustomUser.objects.get(id=slc.employee.id)
+            obj.slc_details_id = slc.id
+            obj.save()
+    except ObjectDoesNotExist:
+        pass

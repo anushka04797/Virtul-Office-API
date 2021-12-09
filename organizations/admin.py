@@ -34,13 +34,12 @@ class DesignationAdmin(admin.ModelAdmin):
 
 class DmaCalenderAdmin(admin.ModelAdmin):
     fieldsets = (
-        (Fieldset, {'fields': ('Year', 'Month', 'Working_days')}),
+        (Fieldset, {'fields': ('Company', 'Year', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December')}),
     )
     # readonly_fields = ('Calculated_hours',)
     list_display = (
-        'Year', 'Month', 'Working_days', 'Calculated_hours'
+        'Company', 'Year', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Total'
     )
-    list_filter = ['Month']
     list_display_links = ('Year',)
     search_fields = ['Year']
     ordering = ('Year',)

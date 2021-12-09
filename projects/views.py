@@ -22,6 +22,7 @@ class CreateProject(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        print(request.data)
         count_project_wp = Projects.objects.filter(work_package_number=request.data['work_package_number'])
         work_package_index = request.data['work_package_number'] + '.' + str(len(count_project_wp) + 1)
         request.data['work_package_index'] = float(work_package_index)
@@ -29,7 +30,8 @@ class CreateProject(APIView):
         if not Tdo.objects.filter(title=request.data['task_delivery_order']).exists():
             # create tdo block #####################
             tdo_data = {
-                'title': request.data['task_delivery_order']
+                'title': request.data['task_delivery_order'],
+                'description': request.data['tdo_details']
             }
             serializer_tdo = self.serializer_class(data=tdo_data)
             if serializer_tdo.is_valid(raise_exception=True):
@@ -45,14 +47,17 @@ class CreateProject(APIView):
             serializer = self.serializer_class2(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
+                count = 0;
                 for item in request.data['assignee']:
+                    print(request.data['estimated_person'][0])
                     if serializer.data is not None:
 
                         # create assignee block #####################
                         print('project ', serializer.data)
                         temp_data = {
                             'assignee': item,
-                            'is_assignee_active': 1,
+                            'estimated_person': '1',
+                            'is_assignee_active': request.data['estimated_person'][count],
                             'project': serializer.data['id'],
                             'date_created': datetime.datetime.now(),
                             'date_updated': datetime.datetime.now()
@@ -66,6 +71,7 @@ class CreateProject(APIView):
                                 'message': 'Project created successfully',
                                 'data': serializer.data
                             }
+                    count = count + 1
             status_code = status.HTTP_200_OK
         return Response(response, status=status_code)
 

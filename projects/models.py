@@ -6,6 +6,7 @@ from users.models import CustomUser
 
 class Tdo(models.Model):
     title = models.CharField(_('task delivery order'), max_length=50, blank=False, null=True, default=1)
+    description = models.CharField(_('task delivery order details'), max_length=550, blank=True, null=True)
     date_created = models.DateTimeField(_('date created'), default=timezone.now)
     date_updated = models.DateTimeField(_('date updated'), default=timezone.now)
 
@@ -33,6 +34,7 @@ class Projects(models.Model):
                                              null=True)
     task_title = models.CharField(_('task title'), max_length=150, blank=True)
     estimated_person = models.DecimalField(_('estimated person'), max_digits=4, decimal_places=2, blank=True, default=1)
+    start_date = models.DateField(blank=False, null=True)
     planned_delivery_date = models.DateField(blank=False, null=True)
     pm = models.ForeignKey(CustomUser, related_name="project_manager", blank=False, null=True, on_delete=models.CASCADE)
     planned_hours = models.DecimalField(_('planned hours'), max_digits=6, decimal_places=1, blank=False, null=True)
@@ -59,6 +61,7 @@ class Projects(models.Model):
 class ProjectAssignee(models.Model):
     project = models.ForeignKey(Projects, related_name="project_assignee", blank=False, null=False, on_delete=models.CASCADE)
     assignee = models.ForeignKey(CustomUser, related_name="project_assignee", blank=False, null=False, on_delete=models.CASCADE)
+    estimated_person = models.CharField(_('remaining hours'), max_length=10, blank=False)
     is_assignee_active = models.BooleanField(_('assignee status'), default=True, blank=False)
     date_created = models.DateTimeField(_('date created'), default=timezone.now)
     date_updated = models.DateTimeField(_('date updated'), default=timezone.now)
