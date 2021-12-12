@@ -30,10 +30,10 @@ class Projects(models.Model):
                                             on_delete=models.CASCADE)
     sub_task = models.CharField(_('subtask name'), max_length=50, blank=True)
     work_package_number = models.TextField(_('work package number'), blank=True)
-    work_package_index = models.DecimalField(_('work package index'), max_digits=7, decimal_places=1, blank=True,
+    work_package_index = models.DecimalField(_('work package index'), max_digits=7, decimal_places=2, blank=True,
                                              null=True)
     task_title = models.CharField(_('task title'), max_length=150, blank=True)
-    estimated_person = models.DecimalField(_('estimated person'), max_digits=4, decimal_places=2, blank=True, default=1)
+    # estimated_person = models.DecimalField(_('estimated person'), max_digits=4, decimal_places=2, blank=True, default=1)
     start_date = models.DateField(blank=False, null=True)
     planned_delivery_date = models.DateField(blank=False, null=True)
     pm = models.ForeignKey(CustomUser, related_name="project_manager", blank=False, null=True, on_delete=models.CASCADE)

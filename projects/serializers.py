@@ -61,7 +61,6 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
             'work_package_number',
             'work_package_index',
             'task_title',
-            'estimated_person',
             'start_date',
             'planned_delivery_date',
             'pm',
@@ -88,7 +87,6 @@ class TaskSerializer(serializers.ModelSerializer):
             'work_package_number',
             'task_title',
             'work_package_index',
-            'estimated_person',
             'remaining_hours',
             'pm',
             'status',
@@ -114,7 +112,6 @@ class SubTaskSerializer(serializers.ModelSerializer):
             'sub_task',
             'work_package_number',
             'work_package_index',
-            'estimated_person',
             'planned_delivery_date',
             'pm',
             'planned_hours',
@@ -153,6 +150,7 @@ class ProjectAssigneeSerializer(serializers.ModelSerializer):
             'assignee',
             'is_assignee_active',
             'project',
+            'estimated_person',
             'date_created',
             'date_updated'
         )
@@ -167,7 +165,6 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'task_title',
-            'estimated_person',
             'start_date',
             'planned_delivery_date',
             'planned_hours',
@@ -179,7 +176,6 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.task_title = validated_data.get('task_title', instance.task_title)
-        instance.estimated_person = validated_data.get('estimated_person', instance.estimated_person)
         instance.start_date = validated_data.get('start_date', instance.start_date)
         instance.planned_delivery_date = validated_data.get('planned_delivery_date', instance.planned_delivery_date)
         instance.planned_hours = validated_data.get('planned_hours', instance.planned_hours)

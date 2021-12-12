@@ -47,7 +47,7 @@ class CreateProject(APIView):
             serializer = self.serializer_class2(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                count = 0;
+                count = 0
                 for item in request.data['assignee']:
                     print(request.data['estimated_person'][0])
                     if serializer.data is not None:
@@ -56,8 +56,8 @@ class CreateProject(APIView):
                         print('project ', serializer.data)
                         temp_data = {
                             'assignee': item,
-                            'estimated_person': '1',
-                            'is_assignee_active': request.data['estimated_person'][count],
+                            'estimated_person': request.data['estimated_person'][count],
+                            'is_assignee_active': 1,
                             'project': serializer.data['id'],
                             'date_created': datetime.datetime.now(),
                             'date_updated': datetime.datetime.now()
@@ -164,11 +164,13 @@ class UpdateProject(APIView):
 
             if serializer.is_valid():
                 serializer.save()
+                count = 0
                 assignees = request.data['assignee']
                 for assignee in assignees:
                     if not ProjectAssignee.objects.filter(assignee=assignee, project=serializer.data['id']).exists():
                         temp_data = {
                             'assignee': assignee,
+                            'estimated_person': request.data['estimated_person'][count],
                             'is_assignee_active': 1,
                             'project': serializer.data['id'],
                             'date_created': datetime.datetime.now(),
@@ -177,6 +179,7 @@ class UpdateProject(APIView):
                         serializer2 = CreateProjectAssigneeSerializer(data=temp_data)
                         if serializer2.is_valid(raise_exception=True):
                             serializer2.save()
+                    count = count + 1
                 all_assignees= ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=serializer.data['id']), many=True).data
                 for assignee in all_assignees:
                     if int(assignee['assignee']['id']) not in assignees:
