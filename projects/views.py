@@ -1,5 +1,7 @@
 import datetime
 import sys
+
+from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -107,7 +109,7 @@ class NewProjectDetails(APIView):
                 task_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project_id=task['id']),many=True).data
                 task['assignees']=task_assignees
                 for task_assignee in task_assignees:
-                    assignees.append(UserDetailSerializer(task_assignee['assignee']).data)
+                    assignees.append(UserDetailSerializer(CustomUser.objects.get(pk=task_assignee['assignee']['id'])).data)
 
             assignees=unique(assignees)
             response_data = {
@@ -214,10 +216,9 @@ class PmProjectAllAssigneeList(APIView):
             tasks = Projects.objects.filter(pm=pk)
             assignees = []
             for task in tasks:
-                temp_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=task.id),
-                                                           many=True).data
+                temp_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=task.id), many=True).data
                 for item in temp_assignees:
-                    assignees.append(UserDetailSerializer(item['assignee']).data)
+                    assignees.append(UserDetailSerializer(CustomUser.objects.get(pk=item['assignee']['id'])).data)
             assignees = unique(assignees)
             response = {
                 'success': 'True',
@@ -230,6 +231,7 @@ class PmProjectAllAssigneeList(APIView):
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
             return Response(response)
+
 
 # pm wise project list
 class PmProjectList(APIView):

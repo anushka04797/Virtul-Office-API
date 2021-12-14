@@ -136,6 +136,23 @@ class CreateProjectAssigneeSerializer(serializers.ModelSerializer):
             'date_updated'
         )
 
+class ProjectAssigneeSerializerNew(serializers.ModelSerializer):
+    assignee = UserDetailSerializer(read_only=True)
+    # project = ProjectDetailsSerializer(read_only=True)
+    date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", read_only=True)
+    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", read_only=True)
+
+    class Meta:
+        model = ProjectAssignee
+        fields = (
+            'id',
+            'assignee',
+            'is_assignee_active',
+            'project',
+            'estimated_person',
+            'date_created',
+            'date_updated'
+        )
 
 class ProjectAssigneeSerializer(serializers.ModelSerializer):
     assignee = UserDetailSerializer(read_only=True)
