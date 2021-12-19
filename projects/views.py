@@ -54,7 +54,7 @@ class CreateProject(APIView):
                 serializer.save()
                 count = 0
                 for item in request.data['assignee']:
-                    print(request.data['estimated_person'][0])
+                    print(item)
                     if serializer.data is not None:
 
                         # create assignee block #####################
@@ -70,6 +70,7 @@ class CreateProject(APIView):
                         serializer2 = self.serializer_class3(data=temp_data)
                         if serializer2.is_valid(raise_exception=True):
                             serializer2.save()
+                            print("serializer2", serializer2.data)
                             response = {
                                 'success': 'True',
                                 'status code': status.HTTP_200_OK,

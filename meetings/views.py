@@ -30,17 +30,15 @@ class CreateMeetings(APIView):
                 'data': []
             }
             participants = request.data['participant'].split(',')
-            # for participant in participants:
-            #     print(participant)
-            #     user_mail = CustomUser.objects.get(pk=participant)
-            #     sms_api.SmsGateway.post({'number': "01915245171", 'message': "A meeting has been called at " + str(datetime.strptime(request.data['start_time'],"%Y-%m-%d %H:%M:%S.%f"))})
-            #     send_mail(
-            #         'Meeting initiated',
-            #         'A meeting has been called at ' + str(datetime.strptime(request.data['start_time'],"%Y-%m-%d %H:%M:%S.%f")),
-            #         'awronno.adhar@gmail.com',
-            #         [user_mail],
-            #         fail_silently=False,
-            #     )
+            for participant in participants:
+                user_mail = CustomUser.objects.get(pk=participant)
+                send_mail(
+                    'New Meeting!!!',
+                    'In order to discuss the work plan and highlight each team memebers role a meeting has been scheduled on ' + str(datetime.strptime(request.data['start_time'], "%Y-%m-%d %H:%M:%S.%f")),
+                    'dmavirtualoffice21@gmail.com',
+                    [user_mail],
+                    fail_silently=False,
+                )
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)

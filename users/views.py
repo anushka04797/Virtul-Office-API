@@ -49,15 +49,15 @@ class Register(APIView):
             }
             message = "Your account has been created successfully. Please wait until your account being activated. " \
                       "you will be notified soon once it is get activated. "
-            sms_api.SmsGateway.post(
-                {
-                    'number': request.data['phone'],
-                    'message': message
-                }
-            )
+            # sms_api.SmsGateway.post(
+            #     {
+            #         'number': request.data['phone'],
+            #         'message': message
+            #     }
+            # )
+            send_mail('New user registration', message, 'dmavirtualoffice21@gmail.com', [request.data['email']],
+                      fail_silently=False, )
             return Response(response, status=status.HTTP_201_CREATED)
-            # send_mail('New user registration', message, 'awronno.adhar@gmail.com', [request.data['email']],
-            #           fail_silently=False, )
         except Exception as e:
             # response = {
             #     'success': 'False',
