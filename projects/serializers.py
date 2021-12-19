@@ -278,12 +278,14 @@ class ProjectDetailsForWbsSerializer(serializers.ModelSerializer):
 
 
 class DocumentListSerializer(serializers.ModelSerializer):
+
     upload_by = UserDetailSerializer(read_only=True)
     class Meta:
         model = ProjectSharedFiles
         fields = (
             'id',
             'file',
+            'work_package_number',
             'date_created',
             'upload_by'
         )

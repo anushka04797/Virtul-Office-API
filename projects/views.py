@@ -392,35 +392,7 @@ class ProjectWiseFileList(APIView):
                         pmserilizer = ProjectDetailsSerializer(projectInfo)
                         serializerData = {"project": pmserilizer.data, "files": pmfile_serializer.data}
                     serializerData.append(assignee_serilizer)
-                        #
-                        # for pm_project in pm_project_list:
-                        #     project_details = Projects.objects.filter(work_package_number=pm_project['work_package_number']).first()
-                        #     assinee_check_exist = ProjectAssignee.objects.get(assignee=project_details.pm, project=project_details.id)
-                        #     if not assinee_check_exist:
-                        #         projectInfo = Projects.objects.get(id=project_details.id)
-                        #         print(projectInfo)
-                        #         file_info = ProjectSharedFiles.objects.filter(
-                        #             work_package_number=projectInfo.work_package_number)
-                        #         pmfile_serializer = DocumentListSerializer(file_info, many=True)
-                        #         pmserilizer = ProjectDetailsSerializer(projectInfo)
-                        #         total_pm_serializer = {"project": pmserilizer.data, "files": pmfile_serializer.data}
-                        #         serializerData.append(total_pm_serializer)
 
-
-                    # pmproject = Projects.objects.filter(pm=pk)
-                    # pmprojectserilizer = ProjectWiseFileListSerializer(pmproject, many=True)
-                    # pmprojectserilizerData = pmprojectserilizer.data
-                    # projectAssigneeInfo = ProjectAssignee.objects.filter(assignee=pk)
-                    # serializerData = []
-                    # for project_info in projectAssigneeInfo:
-                    #     project_ids = project_info.project_id
-                    #     assignee_ids = project_info.assignee_id
-                    #     pmprojectcheck = Projects.objects.filter(pm=assignee_ids, id=project_ids)
-                    #     if not pmprojectcheck:
-                    #         projectInfo = Projects.objects.get(id=project_ids)
-                    #         serilizer = ProjectWiseFileListSerializer(projectInfo)
-                    #         serializerData.append(serilizer.data)
-                # print(pmprojectserilizerData)
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
                         'message': 'Shared Document List For Each Project',
                         'data': serializerData}
@@ -645,6 +617,23 @@ class CheckWPandSubTask(APIView):
             if Projects.objects.filter(sub_task=sub_task).exists():
                 sub_task_exixts=True
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'wp_found': wp_exists, 'sub_task_found':sub_task_exixts}
+            return Response(response)
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
+
+
+class AllProjectFiles(APIView):
+    permission_classes = (AllowAny,)
+    def get(self, request):
+        try:
+            files = DocumentListSerializer(ProjectSharedFiles.objects.all(),many=True).data
+            response = {
+                'success': 'True',
+                'status code': status.HTTP_200_OK,
+                'message': 'Project Manager List',
+                'data': files
+            }
             return Response(response)
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
