@@ -33,7 +33,7 @@ class Projects(models.Model):
     work_package_index = models.DecimalField(_('work package index'), max_digits=7, decimal_places=2, blank=True,
                                              null=True)
     task_title = models.CharField(_('task title'), max_length=150, blank=True)
-    # estimated_person = models.DecimalField(_('estimated person'), max_digits=4, decimal_places=2, blank=True, default=1)
+    estimated_person = models.DecimalField(_('estimated person'), max_digits=4, decimal_places=2, blank=True)
     start_date = models.DateField(blank=False, null=True)
     planned_delivery_date = models.DateField(blank=False, null=True)
     pm = models.ForeignKey(CustomUser, related_name="project_manager", blank=False, null=True, on_delete=models.CASCADE)
