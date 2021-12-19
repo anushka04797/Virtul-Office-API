@@ -278,7 +278,7 @@ class ProjectDetailsForWbsSerializer(serializers.ModelSerializer):
 
 
 class DocumentListSerializer(serializers.ModelSerializer):
-
+    date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", required=False)
     upload_by = UserDetailSerializer(read_only=True)
     class Meta:
         model = ProjectSharedFiles
