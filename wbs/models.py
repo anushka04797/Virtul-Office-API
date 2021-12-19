@@ -21,7 +21,7 @@ class Wbs(models.Model):
     status = models.IntegerField(_('wbs status'), default=True, blank=False)
     progress = models.IntegerField(_('progress percentage'), blank=False)
     comments = models.TextField(_('comments'), max_length=150, blank=True)
-    deliverable = models.CharField(_('deliverable'), max_length=50, blank=True)
+    deliverable = models.CharField(_('deliverable'), max_length=550, blank=True)
     date_created = models.DateField(_('date created'), default=timezone.now)
     date_updated = models.DateField(_('date updated'), default=timezone.now)
 
