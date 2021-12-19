@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from organizations.models import Designation, Slc, DmaCalender
+from organizations.models import Designation, Slc, DmaCalender, HolidayCalender
 
 
 class DesignationSerializer(serializers.ModelSerializer):
@@ -37,4 +37,14 @@ class DmaCalenderSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'Company', 'Year', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+        )
+
+
+class HolidayCalenderSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = HolidayCalender
+        fields = (
+            'id',
+            'Year', 'Month', 'holiday_title', 'start_date', 'end_date'
         )

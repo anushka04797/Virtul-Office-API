@@ -40,7 +40,10 @@ class CreateProject(APIView):
                 serializer_tdo.save()
                 request.data['task_delivery_order'] = serializer_tdo.data['id']
         else:
-            request.data['task_delivery_order'] = TdoSerializer(Tdo.objects.filter(title=request.data['task_delivery_order'])[0]).data['id']
+            tdo = Tdo.objects.filter(title=request.data['task_delivery_order'])[0]
+            tdo.description = request.data['tdo_details']
+            tdo.save()
+            request.data['task_delivery_order'] = TdoSerializer(tdo).data['id']
 
         if request.data['task_delivery_order'] is not None:
             # create project block #####################
