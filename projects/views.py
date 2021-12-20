@@ -170,13 +170,13 @@ class UpdateProject(APIView):
 
             if serializer.is_valid():
                 serializer.save()
-                count = 0
+
                 assignees = request.data['assignee']
                 for assignee in assignees:
                     if not ProjectAssignee.objects.filter(assignee=assignee, project=serializer.data['id']).exists():
                         temp_data = {
                             'assignee': assignee,
-                            'estimated_person': request.data['estimated_person'][count],
+                            # 'estimated_person': request.data['estimated_person'][count],
                             'is_assignee_active': 1,
                             'project': serializer.data['id'],
                             'date_created': datetime.datetime.now(),
@@ -185,10 +185,11 @@ class UpdateProject(APIView):
                         serializer2 = CreateProjectAssigneeSerializer(data=temp_data)
                         if serializer2.is_valid(raise_exception=True):
                             serializer2.save()
-                    count = count + 1
+                            print(serializer2.data)
+
                 all_assignees= ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=serializer.data['id']), many=True).data
                 for assignee in all_assignees:
-                    if int(assignee['assignee']['id']) not in assignees:
+                    if str(assignee['assignee']['id']) not in assignees:
                         ProjectAssignee.objects.filter(assignee=assignee['assignee']['id'],project=serializer.data['id']).delete()
                 # if request.data['sub_task_updated']:
                 work_package_number = pk.split('.')[0]
