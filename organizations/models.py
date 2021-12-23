@@ -1,4 +1,5 @@
 import calendar
+from hashlib import md5
 from datetime import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -180,7 +181,7 @@ SLC = (
 
 class Slc(models.Model):
     employee = models.ForeignKey(to='users.CustomUser', blank=False, null=False, on_delete=models.CASCADE)
-    slc = models.CharField(_('Standard Labor Code(SLC)'), max_length=20, choices=SLC, blank=True, null=True)
+    slc = models.ForeignKey(to='organizations.Designation', blank=False, null=False, on_delete=models.CASCADE, verbose_name="Standard Labor Code(SLC)")
     # designation = models.ForeignKey(Designation, blank=False, null=False, on_delete=models.PROTECT)
     monthly_rate = models.IntegerField(_('Monthly Rate'), blank=True, null=True)
     hourly_rate = models.IntegerField(_('Hourly Rate'), blank=True, null=True)
@@ -193,6 +194,11 @@ class Slc(models.Model):
         db_table = 'slc'
         verbose_name = _('Role')
         verbose_name_plural = _('Role')
+
+    # def save(self, *args, **kwargs):
+    #     self.monthly_rate = md5.new(self.monthly_rate).hexdigest()
+    #     self.hourly_rate = md5.new(self.hourly_rate).hexdigest()
+    #     super(Slc, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.employee.first_name + " " + self.employee.last_name

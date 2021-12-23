@@ -2,6 +2,7 @@ import datetime
 import sys
 
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -12,9 +13,9 @@ from users.models import CustomUser
 from projects.models import Projects, ProjectAssignee, Tdo, ProjectSharedFiles
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-
 # create project
 from users.serializers import UserDetailSerializer
+from virtual_office_API.settings import EMAIL_HOST_USER
 
 
 class CreateProject(APIView):
@@ -52,7 +53,6 @@ class CreateProject(APIView):
             serializer = self.serializer_class2(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                count = 0
                 for item in request.data['assignee']:
                     print(item)
                     if serializer.data is not None:
@@ -61,7 +61,6 @@ class CreateProject(APIView):
                         print('project ', serializer.data)
                         temp_data = {
                             'assignee': item,
-                            'estimated_person': request.data['estimated_person'][count],
                             'is_assignee_active': 1,
                             'project': serializer.data['id'],
                             'date_created': datetime.datetime.now(),
@@ -70,18 +69,19 @@ class CreateProject(APIView):
                         serializer2 = self.serializer_class3(data=temp_data)
                         if serializer2.is_valid(raise_exception=True):
                             serializer2.save()
-                            print("serializer2", serializer2.data)
+                            user_email = CustomUser.objects.get(id=item)
+                            message = "A project named '" + serializer.data['sub_task'] + "' -> '" + serializer.data[
+                                'task_title'] + "' has been assigned to you. Please check the Virtual Office for details."
+                            send_mail('Project Assigned', message, EMAIL_HOST_USER, [user_email],
+                                      fail_silently=False, )
                             response = {
                                 'success': 'True',
                                 'status code': status.HTTP_200_OK,
                                 'message': 'Project created successfully',
                                 'data': serializer.data
                             }
-                    count = count + 1
             status_code = status.HTTP_200_OK
         return Response(response, status=status_code)
-
-#new project details
 
 
 def unique(list1):
@@ -100,24 +100,26 @@ def unique(list1):
 class NewProjectDetails(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def get(self,request, pk):
+    def get(self, request, pk):
         try:
             projects = Projects.objects.filter(work_package_number=pk)
-            serialized_subtask=''
-            if len(projects)>0:
+            serialized_subtask = ''
+            if len(projects) > 0:
                 serialized_subtask = SubTaskSerializer(projects[0]).data
             tasks = TaskSerializer(projects, many=True).data
-            assignees=[]
+            assignees = []
             for task in tasks:
                 # temp_assignees= ProjectAssignee.objects.filter(project_id=task['id'])
-                task_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project_id=task['id']),many=True).data
-                task['assignees']=task_assignees
+                task_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project_id=task['id']),
+                                                           many=True).data
+                task['assignees'] = task_assignees
                 for task_assignee in task_assignees:
-                    assignees.append(UserDetailSerializer(CustomUser.objects.get(pk=task_assignee['assignee']['id'])).data)
+                    assignees.append(
+                        UserDetailSerializer(CustomUser.objects.get(pk=task_assignee['assignee']['id'])).data)
 
-            assignees=unique(assignees)
+            assignees = unique(assignees)
             response_data = {
-                #"tdo": subtask["task_delivery_order"],
+                # "tdo": subtask["task_delivery_order"],
                 "project": serialized_subtask,
                 "subtasks": tasks,
                 "assignees": assignees
@@ -128,7 +130,6 @@ class NewProjectDetails(APIView):
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
-
 
 
 # project details
@@ -155,7 +156,7 @@ class ProjectDetails(APIView):
                         'data': results}
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
-        return Response(response,status=status.HTTP_404_NOT_FOUND)
+        return Response(response, status=status.HTTP_404_NOT_FOUND)
 
 
 # update project
@@ -185,15 +186,22 @@ class UpdateProject(APIView):
                         serializer2 = CreateProjectAssigneeSerializer(data=temp_data)
                         if serializer2.is_valid(raise_exception=True):
                             serializer2.save()
-                            print(serializer2.data)
+                            user_email = CustomUser.objects.get(id=assignee)
+                            message = "A project named '" + serializer.data['sub_task'] + "' -> '" + serializer.data[
+                                'task_title'] + "' is updated that has been assigned to you. Please check the Virtual Office for details."
+                            send_mail('Project Updated', message, EMAIL_HOST_USER, [user_email],
+                                      fail_silently=False, )
 
-                all_assignees= ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=serializer.data['id']), many=True).data
+                all_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=serializer.data['id']),
+                                                          many=True).data
                 for assignee in all_assignees:
                     if str(assignee['assignee']['id']) not in assignees:
-                        ProjectAssignee.objects.filter(assignee=assignee['assignee']['id'],project=serializer.data['id']).delete()
+                        ProjectAssignee.objects.filter(assignee=assignee['assignee']['id'],
+                                                       project=serializer.data['id']).delete()
                 # if request.data['sub_task_updated']:
                 work_package_number = pk.split('.')[0]
-                Projects.objects.filter(work_package_number=work_package_number).update(sub_task=request.data['sub_task'])
+                Projects.objects.filter(work_package_number=work_package_number).update(
+                    sub_task=request.data['sub_task'])
                 # sub_task_to_update = Projects.objects.filter(work_package_number=work_package_number)
                 # for sub_task in sub_task_to_update:
                 #     serializer3 = UpdateSubTaskSerializer(sub_task, request.data)
@@ -221,7 +229,8 @@ class PmProjectAllAssigneeList(APIView):
             tasks = Projects.objects.filter(pm=pk)
             assignees = []
             for task in tasks:
-                temp_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=task.id), many=True).data
+                temp_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=task.id),
+                                                           many=True).data
                 for item in temp_assignees:
                     assignees.append(UserDetailSerializer(CustomUser.objects.get(pk=item['assignee']['id'])).data)
             assignees = unique(assignees)
@@ -341,7 +350,7 @@ class AssignedProjectList(APIView):
 class ChangePM(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def put(self,request):
+    def put(self, request):
         try:
             Projects.objects.filter(work_package_number=request.data['wp']).update(pm=request.data['pm'])
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
@@ -363,12 +372,14 @@ class ProjectWiseFileList(APIView):
             if user_info.groups.filter(name='employee').exists():
                 project_list = Projects.objects.values('work_package_number').distinct()
                 for project_info in project_list:
-                    project_details = Projects.objects.filter(work_package_number=project_info['work_package_number']).first()
+                    project_details = Projects.objects.filter(
+                        work_package_number=project_info['work_package_number']).first()
                     projectAssigneeInfo = ProjectAssignee.objects.get(assignee=pk, project=project_details.id)
                     if projectAssigneeInfo:
                         project_ids = projectAssigneeInfo.project_id
                         projectInfo = Projects.objects.get(id=project_ids)
-                        file_info = ProjectSharedFiles.objects.filter(work_package_number=projectInfo.work_package_number)
+                        file_info = ProjectSharedFiles.objects.filter(
+                            work_package_number=projectInfo.work_package_number)
                         file_serializer = DocumentListSerializer(file_info, many=True)
                         serilizer = ProjectDetailsSerializer(projectInfo)
                         total_serializer = {"project": serilizer.data, "files": file_serializer.data}
@@ -378,12 +389,14 @@ class ProjectWiseFileList(APIView):
                 project_list = Projects.objects.values('work_package_number').distinct()
 
                 for project_info in project_list:
-                    project_details = Projects.objects.filter(work_package_number=project_info['work_package_number']).first()
+                    project_details = Projects.objects.filter(
+                        work_package_number=project_info['work_package_number']).first()
                     projectAssigneeInfo = ProjectAssignee.objects.get(assignee=pk, project=project_details.id)
                     if projectAssigneeInfo:
                         project_ids = projectAssigneeInfo.project_id
                         projectInfo = Projects.objects.get(id=project_ids)
-                        file_info = ProjectSharedFiles.objects.filter(work_package_number=projectInfo.work_package_number)
+                        file_info = ProjectSharedFiles.objects.filter(
+                            work_package_number=projectInfo.work_package_number)
                         file_serializer = DocumentListSerializer(file_info, many=True)
                         serilizer = ProjectDetailsSerializer(projectInfo)
 
@@ -406,8 +419,9 @@ class ProjectWiseFileList(APIView):
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
 
+
 class ProjectWiseFileInsert(APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def post(self, request):
         work_package_number = request.data.get('work_package_number')
@@ -435,7 +449,7 @@ class ProjectWiseFileInsert(APIView):
 class ChangeProjectStatus(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def put(self,request,pk):
+    def put(self, request, pk):
         try:
             Projects.objects.filter(work_package_number=pk).update(status=request.data['status'])
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
@@ -451,7 +465,7 @@ class ChangeProjectStatus(APIView):
 class RemoveAssignee(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def delete(self,request,pk):
+    def delete(self, request, pk):
         try:
             print(request.data)
             # print(ProjectAssignee.objects.filter(assignee=request.data['assignee'], project=request.data['project']))
@@ -478,6 +492,7 @@ class ProjectAssigneeList(APIView):
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
+
 
 # update project
 # class AddProjectAssignee(APIView):
@@ -541,7 +556,7 @@ class ProjectAssigneeList(APIView):
 class DeleteSubTask(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def delete(self,request,work_package_index):
+    def delete(self, request, work_package_index):
         try:
             Projects.objects.filter(work_package_index=work_package_index).delete()
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
@@ -571,7 +586,7 @@ class ChangeTDOTitle(APIView):
 class TdoList(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def get(self,request):
+    def get(self, request):
 
         try:
             tdo_list = Tdo.objects.all()
@@ -581,6 +596,7 @@ class TdoList(APIView):
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
             return Response(response)
+
 
 class ProjectManagerList(APIView):
     permission_classes = (AllowAny,)
@@ -595,14 +611,16 @@ class ProjectManagerList(APIView):
         }
         return Response(response)
 
+
 class WPList(APIView):
     permission_classes = (AllowAny,)
 
-    def get(self,request):
+    def get(self, request):
         try:
-            work_package_numbers = Projects.objects.values_list('work_package_number',flat=True)
-            sub_tasks = Projects.objects.values_list('sub_task',flat=True)
-            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'wp': unique(work_package_numbers),'sub_tasks':unique(sub_tasks)}
+            work_package_numbers = Projects.objects.values_list('work_package_number', flat=True)
+            sub_tasks = Projects.objects.values_list('sub_task', flat=True)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'wp': unique(work_package_numbers),
+                        'sub_tasks': unique(sub_tasks)}
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
@@ -612,16 +630,17 @@ class WPList(APIView):
 class CheckWPandSubTask(APIView):
     permission_classes = (AllowAny,)
 
-    def get(self,request,sub_task,wp):
+    def get(self, request, sub_task, wp):
         try:
-            wp_exists=False
-            sub_task_exixts=False
+            wp_exists = False
+            sub_task_exixts = False
             if Projects.objects.filter(work_package_number=wp).exists():
-                wp_exists=True
+                wp_exists = True
 
             if Projects.objects.filter(sub_task=sub_task).exists():
-                sub_task_exixts=True
-            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'wp_found': wp_exists, 'sub_task_found':sub_task_exixts}
+                sub_task_exixts = True
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'wp_found': wp_exists,
+                        'sub_task_found': sub_task_exixts}
             return Response(response)
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
@@ -630,9 +649,10 @@ class CheckWPandSubTask(APIView):
 
 class AllProjectFiles(APIView):
     permission_classes = (AllowAny,)
+
     def get(self, request):
         try:
-            files = DocumentListSerializer(ProjectSharedFiles.objects.all(),many=True).data
+            files = DocumentListSerializer(ProjectSharedFiles.objects.all(), many=True).data
             response = {
                 'success': 'True',
                 'status code': status.HTTP_200_OK,
