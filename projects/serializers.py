@@ -141,6 +141,7 @@ class CreateProjectAssigneeSerializer(serializers.ModelSerializer):
             'date_updated'
         )
 
+
 class ProjectAssigneeSerializerNew(serializers.ModelSerializer):
     assignee = UserDetailSerializer(read_only=True)
     # project = ProjectDetailsSerializer(read_only=True)
@@ -158,6 +159,7 @@ class ProjectAssigneeSerializerNew(serializers.ModelSerializer):
             'date_created',
             'date_updated'
         )
+
 
 class ProjectAssigneeSerializer(serializers.ModelSerializer):
     assignee = UserDetailSerializer(read_only=True)

@@ -1,5 +1,6 @@
 from datetime import date
 from django.contrib.auth.models import Group
+from django.core.mail import send_mail
 from django.utils import timezone, dateformat
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.serializers import Serializer
@@ -11,6 +12,8 @@ import os
 
 from projects.serializers import CreateProjectAssigneeSerializer, UpdateProjectRemainingHrsSerializer, \
     ProjectDetailsSerializer
+from users.models import CustomUser
+from virtual_office_API.settings import EMAIL_HOST_USER
 from wbs.serializers import CreateTimeCardSerializer, CreateWbsSerializer, WbsDetailsSerializer, WbsUpdateSerializer, \
     TimeCardDetailsSerializer, WbsStatusUpdateSerializer, WbsWiseTimeCardListSerializer
 from wbs.models import TimeCard, Wbs
@@ -34,18 +37,22 @@ class CreateWbs(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        print(request.data['assignee'])
+        print(request.data)
         assignee_list = request.data['assignee']
         for assignee in assignee_list:
-            request.data['assignee'] = assignee
+            request.data['assignee'] = int(assignee)
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            user_email = CustomUser.objects.get(id=assignee)
+            message = "A WBS titled '" + serializer.data['title'] + "' has been assigned to you. Please check the Virtual Office for details."
+            send_mail('WBS Created', message, EMAIL_HOST_USER, [user_email],
+                      fail_silently=False, )
         response = {
             'success': 'True',
             'status code': status.HTTP_200_OK,
             'message': 'WBS created  successfully',
-            'data': []
+            'data': [serializer.data]
         }
         status_code = status.HTTP_200_OK
         return Response(response, status=status_code)
@@ -103,6 +110,11 @@ class UpdateWbs(APIView):
                         serializer3 = UpdateProjectRemainingHrsSerializer(project, data=temp2)
                         if serializer3.is_valid():
                             serializer3.save()
+                            print(serializer.data)
+                            user_email = CustomUser.objects.get(id=serializer.data['assignee'])
+                            message = "A WBS titled '" + serializer.data['title'] + "' has been updated. Please check the Virtual Office for details."
+                            send_mail('WBS Updated', message, EMAIL_HOST_USER, [user_email],
+                                      fail_silently=False, )
                             response = {
                                 'success': 'True',
                                 'status code': status.HTTP_200_OK,

@@ -6,6 +6,9 @@ from django.utils import timezone
 
 
 class CreateWbsSerializer(serializers.ModelSerializer):
+    date_created = serializers.DateTimeField(format="%Y-%m-%d", read_only=True)
+    date_updated = serializers.DateTimeField(format="%Y-%m-%d", read_only=True)
+
     class Meta:
         model = Wbs
         fields = (
