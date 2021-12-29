@@ -45,7 +45,8 @@ class CreateWbs(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             user_email = CustomUser.objects.get(id=assignee)
-            message = "A WBS titled '" + serializer.data['title'] + "' has been assigned to you. Please check the Virtual Office for details."
+            message = "A WBS titled '" + serializer.data[
+                'title'] + "' has been assigned to you. Please check the Virtual Office for details."
             send_mail('WBS Created', message, EMAIL_HOST_USER, [user_email],
                       fail_silently=False, )
         response = {
@@ -112,7 +113,8 @@ class UpdateWbs(APIView):
                             serializer3.save()
                             print(serializer.data)
                             user_email = CustomUser.objects.get(id=serializer.data['assignee'])
-                            message = "A WBS titled '" + serializer.data['title'] + "' has been updated. Please check the Virtual Office for details."
+                            message = "A WBS titled '" + serializer.data[
+                                'title'] + "' has been updated. Please check the Virtual Office for details."
                             send_mail('WBS Updated', message, EMAIL_HOST_USER, [user_email],
                                       fail_silently=False, )
                             response = {
@@ -180,9 +182,10 @@ class WbsListForEmployee(APIView):
 
     def get(self, request, pk):
         try:
-            wbsList = Wbs.objects.filter(assignee=pk)
+            wbsList = Wbs.objects.filter(assignee=pk).order_by('-date_updated')
             Serializer = WbsDetailsSerializer(wbsList, many=True)
-            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Assigned WBS List for an employee',
+            response = {'success': 'True', 'status code': status.HTTP_200_OK,
+                        'message': 'Assigned WBS List for an employee',
                         'data': Serializer.data}
             return Response(response)
         except Exception as e:
@@ -197,10 +200,38 @@ class WbsListForProject(APIView):
 
     def get(self, request, pk):
         try:
-            wbsList = Wbs.objects.filter(work_package_number=pk)
+            wbsList = Wbs.objects.filter(work_package_number=pk).order_by('-date_updated')
             Serializer = WbsDetailsSerializer(wbsList, many=True)
-            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Assigned WBS List for a project',
-                            'data': Serializer.data}
+            response = {'success': 'True', 'status code': status.HTTP_200_OK,
+                        'message': 'Assigned WBS List for a project',
+                        'data': Serializer.data}
+        except Exception as e:
+            response = 'on line {}'.format(
+                sys.exc_info()[-1].tb_lineno), str(e)
+        return Response(response)
+
+
+# Pm wise WBS list
+class AllWbsListForPm(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, pk):
+        try:
+            pm_project_list = Projects.objects.filter(pm=pk).order_by('date_updated')
+            serializer = ProjectDetailsSerializer(data=pm_project_list, many=True)
+            serializer.is_valid()
+            temp_data = []
+            for project in serializer.data:
+                print(project['sub_task'])
+                pm_wbs_list = Wbs.objects.filter(project=project['id']).order_by('-id')
+                print(pm_wbs_list)
+                serializer2 = WbsDetailsSerializer(data=pm_wbs_list, many=True)
+                serializer2.is_valid()
+                for wbs in serializer2.data:
+                    temp_data.append(wbs)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'PM wise WBS List',
+                        'data': temp_data}
+            return Response(response)
         except Exception as e:
             response = 'on line {}'.format(
                 sys.exc_info()[-1].tb_lineno), str(e)
@@ -215,10 +246,10 @@ class AllUserWbsListOfProject(APIView):
         try:
             wbs_project_list = []
             temp = []
-            assigned_projects = ProjectAssignee.objects.filter(assignee=pk)
+            assigned_projects = ProjectAssignee.objects.filter(assignee=pk).order_by('-date_updated')
             serializer = CreateProjectAssigneeSerializer(assigned_projects, many=True)
             for AssignedProject in serializer.data:
-                assigned_wbs_list = Wbs.objects.filter(project=AssignedProject['project'])
+                assigned_wbs_list = Wbs.objects.filter(project=AssignedProject['project']).order_by('-id')
                 wbs_project_list.append(assigned_wbs_list)
             for wbs_list in wbs_project_list:
                 serializer2 = WbsDetailsSerializer(wbs_list, many=True)
@@ -245,8 +276,8 @@ class CompletedWbsVsTotalCount(APIView):
             total_wbs_count = Wbs.objects.filter(
                 work_package_number=pk).count()
             response = {
-                'success': 'True', 
-                'status code': status.HTTP_200_OK, 
+                'success': 'True',
+                'status code': status.HTTP_200_OK,
                 'message': 'Completed WBS count for a project',
                 'data': {
                     "completed_wbs": completed_wbs_count,
@@ -293,12 +324,13 @@ class TimeCardDetails(APIView):
                 sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
 
+
 class AllTimeCards(APIView):
     permission_classes = (IsAuthenticated,)
 
     # def get(self,request,pk):
-        # try:
-            # time_cards = TimeCard.objects.filter()
+    # try:
+    # time_cards = TimeCard.objects.filter()
 
 
 # wbs wise time card list
@@ -307,7 +339,7 @@ class WbsWiseTimeCardList(APIView):
 
     def get(self, request, pk):
         try:
-            time_card = TimeCard.objects.filter(wbs=pk)
+            time_card = TimeCard.objects.filter(wbs=pk).order_by('-date_updated')
             serializer = WbsWiseTimeCardListSerializer(time_card, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'time card for a WBS',
                         'data': serializer.data}
@@ -323,7 +355,7 @@ class UserWiseTimeCardList(APIView):
 
     def get(self, request, pk):
         try:
-            time_card = TimeCard.objects.filter(time_card_assignee=pk)
+            time_card = TimeCard.objects.filter(time_card_assignee=pk).order_by('-date_updated')
             serializer = WbsWiseTimeCardListSerializer(time_card, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'time card for a user',
                         'data': serializer.data}
@@ -339,17 +371,17 @@ class PmWiseAllTimeCardList(APIView):
 
     def get(self, request, pk):
         try:
-            pm_projects = Projects.objects.filter(pm=pk)
+            pm_projects = Projects.objects.filter(pm=pk).order_by('-date_updated')
             serializer = ProjectDetailsSerializer(pm_projects, many=True)
             # print(serializer.data)
             # print(serializer.is_valid())
             # # print(serializer.initial_data)
             # print(serializer.errors)
             # if serializer.is_valid():
-                # print(serializer.data)
+            # print(serializer.data)
             timecard_serializer = []
             for project_id in serializer.data:
-                time_card = TimeCard.objects.filter(project=project_id['id'])
+                time_card = TimeCard.objects.filter(project=project_id['id']).order_by('-date_updated')
                 serializer2 = WbsWiseTimeCardListSerializer(time_card, many=True)
                 temp_data = serializer2
                 timecard_serializer.append(serializer2.data)

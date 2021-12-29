@@ -187,10 +187,11 @@ class UpdateProject(APIView):
                         if serializer2.is_valid(raise_exception=True):
                             serializer2.save()
                             user_email = CustomUser.objects.get(id=assignee)
-                            message = "A project named '" + serializer.data['sub_task'] + "' -> '" + serializer.data[
-                                'task_title'] + "' is updated that has been assigned to you. Please check the Virtual Office for details."
-                            send_mail('Project Updated', message, EMAIL_HOST_USER, [user_email],
-                                      fail_silently=False, )
+                            print(serializer.data)
+                        message = "A project named '" + serializer.data['sub_task'] + "' -> '" + serializer.data[
+                            'task_title'] + "' is updated that has been assigned to you. Please check the Virtual Office for details."
+                        send_mail('Project Updated', message, EMAIL_HOST_USER, [user_email],
+                                  fail_silently=False, )
 
                 all_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=serializer.data['id']),
                                                           many=True).data
@@ -263,7 +264,7 @@ class PmProjectList(APIView):
         try:
             projects_data = []
             traversed_projects = []
-            assigned_projects = Projects.objects.filter(pm=pk)
+            assigned_projects = Projects.objects.filter(pm=pk).order_by("sub_task")
             for project in assigned_projects:
                 temp_project = project
                 if temp_project.work_package_number not in traversed_projects:
@@ -335,7 +336,8 @@ class AssignedProjectList(APIView):
                     temp_data = {
                         'assignees': unique_assignees,
                         'project': serializer.data,
-                        'subtasks': subtasks
+                        'subtasks': subtasks,
+                        'sub_task': serializer.data['sub_task']
                     }
                     projects_data.append(temp_data)
             response = {'success': 'True', 'status code': status.HTTP_200_OK,

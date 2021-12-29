@@ -188,6 +188,7 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
         model = Projects
         fields = (
             'id',
+            'sub_task',
             'task_title',
             'start_date',
             'planned_delivery_date',

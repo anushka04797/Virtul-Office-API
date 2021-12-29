@@ -127,9 +127,9 @@ WSGI_APPLICATION = 'virtual_office_API.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'virtual_office',
+        'NAME': 'virtual_office_v1',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': 'DMA@bd2021!@#',
         'PORT': '3306',
         'HOST': 'localhost'
     }
