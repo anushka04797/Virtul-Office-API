@@ -11,7 +11,7 @@ import sys
 import os
 
 from projects.serializers import CreateProjectAssigneeSerializer, UpdateProjectRemainingHrsSerializer, \
-    ProjectDetailsSerializer
+    ProjectDetailsSerializer, ProjectAssigneeSerializer
 from users.models import CustomUser
 from virtual_office_API.settings import EMAIL_HOST_USER
 from wbs.serializers import CreateTimeCardSerializer, CreateWbsSerializer, WbsDetailsSerializer, WbsUpdateSerializer, \
@@ -218,17 +218,33 @@ class AllWbsListForPm(APIView):
     def get(self, request, pk):
         try:
             pm_project_list = Projects.objects.filter(pm=pk).order_by('date_updated')
-            serializer = ProjectDetailsSerializer(data=pm_project_list, many=True)
-            serializer.is_valid()
+            pm_project_list_serializer = ProjectDetailsSerializer(data=pm_project_list, many=True)
+            pm_project_list_serializer.is_valid()
             temp_data = []
-            for project in serializer.data:
-                print(project['sub_task'])
+            temp_id = []
+            for project in pm_project_list_serializer.data:
+                # print(project['sub_task'])
                 pm_wbs_list = Wbs.objects.filter(project=project['id']).order_by('-id')
-                print(pm_wbs_list)
+                # print(pm_wbs_list)
                 serializer2 = WbsDetailsSerializer(data=pm_wbs_list, many=True)
                 serializer2.is_valid()
                 for wbs in serializer2.data:
                     temp_data.append(wbs)
+                    temp_id.append(wbs['id'])
+
+            assignee_project_list = ProjectAssignee.objects.filter(assignee=pk).order_by('date_updated')
+            assignee_project_list_serializer = ProjectAssigneeSerializer(data=assignee_project_list, many=True)
+            assignee_project_list_serializer.is_valid()
+            # print("temp_project_id_list", assignee_project_list_serializer.data)
+            for project in pm_project_list_serializer.data:
+                print("temp_project_id_list", project['sub_task'])
+                pm_wbs_list = Wbs.objects.filter(project=project['id']).order_by('-id')
+                serializer2 = WbsDetailsSerializer(data=pm_wbs_list, many=True)
+                serializer2.is_valid()
+                for wbs in serializer2.data:
+                    if wbs['id'] not in temp_id:
+                        print('true')
+                        temp_data.append(wbs)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'PM wise WBS List',
                         'data': temp_data}
             return Response(response)
