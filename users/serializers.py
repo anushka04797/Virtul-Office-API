@@ -78,12 +78,12 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class UserDetailSerializer(serializers.ModelSerializer):
     date_joined = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p")
-    designation = DesignationSerializer()
+    # designation = DesignationSerializer()
     slc_details = SlcSerializer()
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'profile_pic', 'slc_details', 'designation']
+        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'profile_pic', 'slc_details']
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

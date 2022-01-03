@@ -15,6 +15,7 @@ class DesignationSerializer(serializers.ModelSerializer):
 
 
 class SlcSerializer(serializers.ModelSerializer):
+    slc = DesignationSerializer()
 
     class Meta:
         model = Slc
