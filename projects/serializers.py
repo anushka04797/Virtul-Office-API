@@ -89,6 +89,8 @@ class TaskSerializer(serializers.ModelSerializer):
             'work_package_number',
             'task_title',
             'work_package_index',
+            'planned_delivery_date',
+            'planned_hours',
             'remaining_hours',
             'estimated_person',
             'pm',
