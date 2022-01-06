@@ -25,7 +25,7 @@ class CreateProject(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        print(request.data)
+        # print(request.data)
         count_project_wp = Projects.objects.filter(work_package_number=request.data['work_package_number'])
         work_package_index = request.data['work_package_number'] + '.' + str(len(count_project_wp) + 1)
         request.data['work_package_index'] = float(work_package_index)
@@ -53,12 +53,15 @@ class CreateProject(APIView):
             serializer = self.serializer_class2(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
+                # update subtask details
+                for project in count_project_wp:
+                    project.description = request.data['description']
+                    project.save()
                 for item in request.data['assignee']:
-                    print(item)
+                    # print(item)
                     if serializer.data is not None:
-
                         # create assignee block #####################
-                        print('project ', serializer.data)
+                        # print('project ', serializer.data)
                         temp_data = {
                             'assignee': item,
                             'is_assignee_active': 1,
@@ -202,7 +205,7 @@ class UpdateProject(APIView):
                 # if request.data['sub_task_updated']:
                 work_package_number = pk.split('.')[0]
                 Projects.objects.filter(work_package_number=work_package_number).update(
-                    sub_task=request.data['sub_task'])
+                    sub_task=request.data['sub_task'], description=request.data['description'])
                 # sub_task_to_update = Projects.objects.filter(work_package_number=work_package_number)
                 # for sub_task in sub_task_to_update:
                 #     serializer3 = UpdateSubTaskSerializer(sub_task, request.data)
