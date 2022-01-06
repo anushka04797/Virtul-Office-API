@@ -31,7 +31,7 @@ class Projects(models.Model):
     sub_task = models.CharField(_('subtask name'), max_length=50, blank=True)
     description = models.CharField(_('subtask details'), max_length=550, blank=True, null=True, default='')
     work_package_number = models.TextField(_('work package number'), blank=True)
-    work_package_index = models.DecimalField(_('work package index'), max_digits=7, decimal_places=2, blank=True,
+    work_package_index = models.CharField(_('work package index'), max_length=550, blank=True,
                                              null=True)
     task_title = models.CharField(_('task title'), max_length=150, blank=True)
     estimated_person = models.DecimalField(_('estimated person'), max_digits=4, decimal_places=2, blank=True, default=1.0)

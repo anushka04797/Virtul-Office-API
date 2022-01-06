@@ -54,9 +54,9 @@ class CreateProject(APIView):
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 # update subtask details
-                for project in count_project_wp:
-                    project.description = request.data['description']
-                    project.save()
+                # for project in count_project_wp:
+                #     project.description = request.data['description']
+                #     project.save()
                 for item in request.data['assignee']:
                     # print(item)
                     if serializer.data is not None:
@@ -168,12 +168,13 @@ class UpdateProject(APIView):
 
     def put(self, request, pk, format=None):
         try:
-            # print(request.data)
+            print(request.data)
             projects = Projects.objects.get(work_package_index=pk)
             serializer = UpdateProjectSerializer(projects, data=request.data)
 
             if serializer.is_valid():
                 serializer.save()
+                print(serializer.data)
 
                 assignees = request.data['assignee']
                 for assignee in assignees:
@@ -204,8 +205,8 @@ class UpdateProject(APIView):
                                                        project=serializer.data['id']).delete()
                 # if request.data['sub_task_updated']:
                 work_package_number = pk.split('.')[0]
-                Projects.objects.filter(work_package_number=work_package_number).update(
-                    sub_task=request.data['sub_task'], description=request.data['description'])
+                # Projects.objects.filter(work_package_number=work_package_number).update(
+                #     sub_task=request.data['sub_task'])
                 # sub_task_to_update = Projects.objects.filter(work_package_number=work_package_number)
                 # for sub_task in sub_task_to_update:
                 #     serializer3 = UpdateSubTaskSerializer(sub_task, request.data)
