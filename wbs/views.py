@@ -237,14 +237,15 @@ class AllWbsListForPm(APIView):
             assignee_project_list_serializer.is_valid()
             # print("temp_project_id_list", assignee_project_list_serializer.data)
             for project in assignee_project_list_serializer.data:
-                print("temp_project_id_list", project['project']['id'])
-                pm_wbs_list = Wbs.objects.filter(project=project['project']['id']).order_by('-id')
-                serializer2 = WbsDetailsSerializer(data=pm_wbs_list, many=True)
-                serializer2.is_valid()
-                for wbs in serializer2.data:
-                    if wbs['id'] not in temp_id:
-                        print('true')
-                        temp_data.append(wbs)
+                if project['project'] is not None:
+                    print("temp_project_id_list", project['project']['id'])
+                    pm_wbs_list = Wbs.objects.filter(project=project['project']['id']).order_by('-id')
+                    serializer2 = WbsDetailsSerializer(data=pm_wbs_list, many=True)
+                    serializer2.is_valid()
+                    for wbs in serializer2.data:
+                        if wbs['id'] not in temp_id:
+                            print('true')
+                            temp_data.append(wbs)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'PM wise WBS List',
                         'data': temp_data}
             return Response(response)
