@@ -491,7 +491,7 @@ class ProjectAssigneeList(APIView):
 
     def get(self, request, pk):
         try:
-            projects = Projects.objects.filter(work_package_number=pk)
+            projects = Projects.objects.filter(work_package_index=pk)
             serializer = ProjectDetailsSerializer(projects, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'project assignee list',
                         'data': serializer.data}
