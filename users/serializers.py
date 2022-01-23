@@ -83,13 +83,13 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'profile_pic', 'slc_details']
+        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'profile_pic', 'slc_details', 'address', 'blood_group']
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone']
+        fields = ['id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'address', 'blood_group']
 
     def update(self, instance, validated_data):
         instance.phone = validated_data.get('phone', instance.phone)
@@ -98,6 +98,8 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         # instance.address = validated_data.get('address', instance.address)
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.address = validated_data.get('address', instance.address)
+        instance.blood_group = validated_data.get('blood_group', instance.blood_group)
         instance.save()
         return instance
 

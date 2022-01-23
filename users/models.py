@@ -32,6 +32,8 @@ class CustomUser(AbstractUser):
     date_of_birth = models.DateField(blank=True, null=True)
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
+    address = models.CharField(_('address'), max_length=250, blank=True)
+    blood_group = models.CharField(_('blood group'), max_length=10, blank=True)
     profile_pic = models.ImageField(upload_to='uploads/users/images/', blank=True, null=True)
     designation = models.ForeignKey(to='organizations.Designation', blank=True, null=True, on_delete=models.PROTECT)
     slc_details = models.ForeignKey(to='organizations.Slc', related_name="user_slc_details", blank=True, null=True, on_delete=models.PROTECT)
