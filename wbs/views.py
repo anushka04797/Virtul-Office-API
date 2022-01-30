@@ -383,36 +383,57 @@ class UserWiseTimeCardList(APIView):
         return Response(response)
 
 
-# PM wise all time card list
-class PmWiseAllTimeCardList(APIView):
+# user wise time card list
+class UserWiseWeeklyTimeCardList(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request, pk):
         try:
-            pm_projects = Projects.objects.filter(pm=pk).order_by('-date_updated')
-            serializer = ProjectDetailsSerializer(pm_projects, many=True)
-            # print(serializer.data)
-            # print(serializer.is_valid())
-            # # print(serializer.initial_data)
-            # print(serializer.errors)
-            # if serializer.is_valid():
-            # print(serializer.data)
             today = pendulum.now()
             start = today.start_of('week').subtract(days=1)
             # print(start.to_datetime_string())
             end = today.end_of('week').subtract(days=1)
             # print(end.to_datetime_string())
-            timecard_serializer = []
-            for project_id in serializer.data:
-                time_card = TimeCard.objects.filter(project=project_id['id'], date_updated__gte=start, date_updated__lte=end).order_by('-date_updated')
-                serializer2 = WbsWiseTimeCardListSerializer(time_card, many=True)
-                temp_data = serializer2
-                if len(serializer2.data) is not 0:
-                    timecard_serializer.append(serializer2.data[0])
-                print(serializer2.data)
+            time_card = TimeCard.objects.filter(time_card_assignee=pk, date_updated__gte=start, date_updated__lte=end).order_by('-date_updated')
+            serializer = WbsWiseTimeCardListSerializer(time_card, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'time card for a user',
-                        'data': timecard_serializer, 'start_date': start, 'end_date': end}
+                        'data': serializer.data, 'start_date': start, 'end_date': end}
         except Exception as e:
             response = 'on line {}'.format(
                 sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
+
+
+# # PM wise all time card list
+# class PmWiseAllTimeCardList(APIView):
+#     permission_classes = (AllowAny,)
+#
+#     def get(self, request, pk):
+#         try:
+#             user_projects = ProjectAssignee.objects.filter(assignee=pk).order_by('-date_updated')
+#             serializer = ProjectAssigneeSerializer(user_projects, many=True)
+#             # print(serializer.data)
+#             # print(serializer.is_valid())
+#             # # print(serializer.initial_data)
+#             # print(serializer.errors)
+#             # if serializer.is_valid():
+#             # print(serializer.data)
+#             today = pendulum.now()
+#             start = today.start_of('week').subtract(days=1)
+#             # print(start.to_datetime_string())
+#             end = today.end_of('week').subtract(days=1)
+#             # print(end.to_datetime_string())
+#             timecard_serializer = []
+#             for project_id in serializer.data:
+#                 time_card = TimeCard.objects.filter(project=project_id['id'], date_updated__gte=start, date_updated__lte=end).order_by('-date_updated')
+#                 serializer2 = WbsWiseTimeCardListSerializer(time_card, many=True)
+#                 temp_data = serializer2
+#                 if len(serializer2.data) is not 0:
+#                     timecard_serializer.append(serializer2.data[0])
+#                 print(serializer2.data)
+#             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'time card for a user',
+#                         'data': timecard_serializer, 'start_date': start, 'end_date': end}
+#         except Exception as e:
+#             response = 'on line {}'.format(
+#                 sys.exc_info()[-1].tb_lineno), str(e)
+#         return Response(response)
