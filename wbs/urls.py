@@ -17,5 +17,5 @@ urlpatterns = [
     path('time-card/details/<str:pk>/', TimeCardDetails.as_view()),
     path('time-card/list/<str:pk>/', WbsWiseTimeCardList.as_view()),
     path('user/time-card/list/<str:pk>/', UserWiseTimeCardList.as_view()),
-    path('pm-wise/all-time-card/list/<str:pk>/', PmWiseAllTimeCardList.as_view()),
+    path('user-wise/weekly-time-card/<str:pk>/', PmWiseAllTimeCardList.as_view()),
 ]
