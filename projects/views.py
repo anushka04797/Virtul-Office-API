@@ -25,7 +25,7 @@ class CreateProject(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        # print(request.data)
+        print(enumerate(request.data['assignee']))
         count_project_wp = Projects.objects.filter(work_package_number=request.data['work_package_number'])
         work_package_index = request.data['work_package_number'] + '.' + str(len(count_project_wp) + 1)
         request.data['work_package_index'] = float(work_package_index)
@@ -57,12 +57,13 @@ class CreateProject(APIView):
                 # for project in count_project_wp:
                 #     project.description = request.data['description']
                 #     project.save()
-                for item in request.data['assignee']:
-                    # print(item)
+                for idx, item in enumerate(request.data['assignee']):
+                    print(idx, item)
                     if serializer.data is not None:
                         # create assignee block #####################
-                        # print('project ', serializer.data)
+                        print('project assignee EP', request.data['estimated_person'][idx])
                         temp_data = {
+                            'estimated_person': request.data['estimated_person'][idx],
                             'assignee': item,
                             'is_assignee_active': 1,
                             'project': serializer.data['id'],

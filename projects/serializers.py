@@ -35,7 +35,7 @@ class CreateProjectSerializer(serializers.ModelSerializer):
             'start_date',
             'planned_delivery_date',
             'pm',
-            'estimated_person',
+            # 'estimated_person',
             'planned_hours',
             'planned_value',
             'remaining_hours',
@@ -142,7 +142,7 @@ class CreateProjectAssigneeSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'assignee',
-            # 'estimated_person',
+            'estimated_person',
             'is_assignee_active',
             'project',
             'date_created',

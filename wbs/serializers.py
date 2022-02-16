@@ -112,6 +112,8 @@ class CreateTimeCardSerializer(serializers.ModelSerializer):
             'id',
             'project',
             'wbs',
+            'time_type',
+            'submitted',
             'time_card_assignee',
             'actual_work_done',
             'hours_today',
@@ -131,6 +133,8 @@ class TimeCardDetailsSerializer(serializers.ModelSerializer):
             'id',
             'project',
             'wbs',
+            'time_type',
+            'submitted',
             'time_card_assignee',
             'actual_work_done',
             'hours_today',
@@ -148,9 +152,29 @@ class WbsWiseTimeCardListSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'project',
+            'time_type',
+            'submitted',
             'time_card_assignee',
             'actual_work_done',
             'hours_today',
             'date_created',
             'date_updated'
         )
+
+
+class TimecardUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TimeCard
+        fields = (
+            'id',
+            'time_type',
+            'hours_today',
+            'date_updated'
+        )
+
+    def update(self, instance, validated_data):
+        instance.time_type = validated_data.get('time_type', instance.time_type)
+        instance.hours_today = validated_data.get('hours_today', instance.hours_today)
+        instance.date_updated = validated_data.get('date_updated', timezone.now)
+        instance.save()
+        return instance

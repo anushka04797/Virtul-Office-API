@@ -51,6 +51,8 @@ class TimeCard(models.Model):
                                 on_delete=models.CASCADE)
     wbs = models.ForeignKey(Wbs, related_name="wbs_details", blank=False, null=False,
                                 on_delete=models.CASCADE)
+    time_type = models.CharField(_('time type'), max_length=20, blank=True, null=True, default="RHR")
+    submitted = models.BooleanField(_('submitted'), blank=True, null=True, default=False)
     time_card_assignee = models.ForeignKey(CustomUser, related_name="time_card_employee_assigned", blank=False, null=False,
                                  on_delete=models.CASCADE)
     actual_work_done = models.CharField(_('actual work done'), max_length=250, blank=True, null=True)

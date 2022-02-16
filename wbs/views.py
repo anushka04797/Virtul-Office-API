@@ -16,7 +16,7 @@ from projects.serializers import CreateProjectAssigneeSerializer, UpdateProjectR
 from users.models import CustomUser
 from virtual_office_API.settings import EMAIL_HOST_USER
 from wbs.serializers import CreateTimeCardSerializer, CreateWbsSerializer, WbsDetailsSerializer, WbsUpdateSerializer, \
-    TimeCardDetailsSerializer, WbsStatusUpdateSerializer, WbsWiseTimeCardListSerializer
+    TimeCardDetailsSerializer, WbsStatusUpdateSerializer, WbsWiseTimeCardListSerializer, TimecardUpdateSerializer
 from wbs.models import TimeCard, Wbs
 from projects.models import Projects, ProjectAssignee
 from rest_framework import permissions
@@ -389,12 +389,15 @@ class UserWiseWeeklyTimeCardList(APIView):
 
     def get(self, request, pk):
         try:
+            pendulum.week_starts_at(pendulum.SUNDAY)
+            pendulum.week_ends_at(pendulum.SATURDAY)
             today = pendulum.now()
-            start = today.start_of('week').subtract(days=1)
-            # print(start.to_datetime_string())
-            end = today.end_of('week').subtract(days=1)
-            # print(end.to_datetime_string())
-            time_card = TimeCard.objects.filter(time_card_assignee=pk, date_updated__gte=start, date_updated__lte=end).order_by('-date_updated')
+            print(today.start_of('week'))
+            start = today.start_of('week')
+            print(start.to_datetime_string())
+            end = today.end_of('week')
+            print(end.to_datetime_string())
+            time_card = TimeCard.objects.filter(time_card_assignee=pk, date_updated__gte=start, date_updated__lte=end).order_by('date_updated')
             serializer = WbsWiseTimeCardListSerializer(time_card, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'time card for a user',
                         'data': serializer.data, 'start_date': start, 'end_date': end}
@@ -402,6 +405,41 @@ class UserWiseWeeklyTimeCardList(APIView):
             response = 'on line {}'.format(
                 sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
+
+
+class TimecardUpdate(APIView):
+    permission_classes = (AllowAny,)
+
+    def put(self, request, pk, format=None):
+        # print(request.data)
+        try:
+            timecard = TimeCard.objects.get(id=pk)
+            temp_data = request.data
+            temp_data['date_updated'] = dateformat.format(timezone.now(), 'Y-m-d')
+            print(temp_data)
+            serializer = TimecardUpdateSerializer(timecard, data=temp_data)
+            if serializer.is_valid():
+                print(serializer.errors)
+                serializer.save()
+                response = {
+                    'success': 'True',
+                    'status code': status.HTTP_200_OK,
+                    'message': 'timecard Updated Successful',
+                    'data': serializer.data
+                }
+                return Response(response, status=status.HTTP_200_OK)
+            else:
+                response = {
+                    'success': 'False',
+                    'status code': status.HTTP_400_BAD_REQUEST,
+                    'message': 'failed to update timecard'
+                }
+                return Response(response, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            response = 'on line {}'.format(
+                sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
 
 
 # # PM wise all time card list
