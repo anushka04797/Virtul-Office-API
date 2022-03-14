@@ -35,8 +35,8 @@ class CustomUser(AbstractUser):
     address = models.CharField(_('address'), max_length=250, blank=True)
     blood_group = models.CharField(_('blood group'), max_length=10, blank=True)
     profile_pic = models.ImageField(upload_to='uploads/users/images/', blank=True, null=True)
-    designation = models.ForeignKey(to='organizations.Designation', blank=True, null=True, on_delete=models.PROTECT)
-    slc_details = models.ForeignKey(to='organizations.Slc', related_name="user_slc_details", blank=True, null=True, on_delete=models.PROTECT)
+    designation = models.ForeignKey(to='organizations.Designation', blank=True, null=True, on_delete=models.CASCADE)
+    slc_details = models.ForeignKey(to='organizations.Slc', related_name="user_slc_details", blank=True, null=True, on_delete=models.CASCADE)
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
@@ -62,7 +62,7 @@ class CustomUser(AbstractUser):
         verbose_name_plural = _('users')
 
     def __str__(self):
-        return self.email or self.username
+        return self.first_name + " " + self.last_name or self.username or self.email
 
 
 @receiver(pre_save, sender=CustomUser)

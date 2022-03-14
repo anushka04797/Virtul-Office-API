@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.admin.helpers import Fieldset
-
 from organizations.models import Company, Department, Designation, DmaCalender, HolidayCalender, Slc
+from users.models import CustomUser
+from organizations.forms import CustomAddSLCForm, CustomEditSLCForm
 
 
 class CompanyAdmin(admin.ModelAdmin):
@@ -38,11 +39,50 @@ class DmaCalenderAdmin(admin.ModelAdmin):
     )
     # readonly_fields = ('Calculated_hours',)
     list_display = (
-        'Company', 'Year', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Total'
+        'Company', 'Year', 'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december', 'total'
     )
     list_display_links = ('Year',)
     search_fields = ['Year']
     ordering = ('Year',)
+
+    def january(self, obj):
+        return obj.January * 8
+
+    def february(self, obj):
+        return obj.February * 8
+
+    def march(self, obj):
+        return obj.March * 8
+
+    def april(self, obj):
+        return obj.April * 8
+
+    def may(self, obj):
+        return obj.May * 8
+
+    def june(self, obj):
+        return obj.June * 8
+
+    def july(self, obj):
+        return obj.July * 8
+
+    def august(self, obj):
+        return obj.August * 8
+
+    def september(self, obj):
+        return obj.September * 8
+
+    def october(self, obj):
+        return obj.October * 8
+
+    def november(self, obj):
+        return obj.November * 8
+
+    def december(self, obj):
+        return obj.December * 8
+
+    def total(self, obj):
+        return (obj.January + obj.February + obj.March + obj.April + obj.May + obj.June + obj.July + obj.August + obj.September + obj.October + obj.November + obj.December) * 8
 
 
 class HolidayCalenderAdmin(admin.ModelAdmin):
@@ -59,8 +99,19 @@ class SlcAdmin(admin.ModelAdmin):
         'employee'
     ]
     list_display_links = ('employee',)
-    search_fields = ['employee']
+    search_fields = ['hourly_rate', 'employee__first_name', 'employee__last_name', 'employee__email']
     ordering = ('employee',)
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ["employee"]
+        else:
+            return []
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "employee":
+            kwargs["queryset"] = CustomUser.objects.filter(slc_details=None)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 admin.site.register(Company, CompanyAdmin)

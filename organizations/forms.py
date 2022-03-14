@@ -1,11 +1,24 @@
 from django import forms
-from .models import HolidayCalender
+from .models import Slc
 
-class DropdownModelForm(forms.ModelForm):
 
+class CustomAddSLCForm(forms.ModelForm):
     class Meta:
-        model = DropdownModel
-        fields = ('date_range',)
-        widgets = {
-            'date_range': forms.Select(choices=DropdownModel.CHOICES)
-        }
+        model = Slc
+        fields = [
+            'employee',
+            'slc',
+            'monthly_rate',
+            'hourly_rate',
+            'hourly_rate'
+        ]
+
+class CustomEditSLCForm(forms.ModelForm):
+    class Meta:
+        model = Slc
+        fields = [
+            'slc',
+            'monthly_rate',
+            'hourly_rate',
+            'hourly_rate'
+        ]

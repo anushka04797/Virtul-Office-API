@@ -4,6 +4,7 @@ from datetime import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.db.models import Q
 from django.db.models.functions import ExtractMonth
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
@@ -102,23 +103,23 @@ class DmaCalender(models.Model):
 
     Company = models.ForeignKey(to='organizations.Company', blank=False, null=False, on_delete=models.CASCADE)
     Year = models.IntegerField(_('Year'), choices=YEAR_CHOICES, default=datetime.now().year, blank=False, null=False)
-    January = models.IntegerField(_('January'), default=0, blank=True, null=False)
-    February = models.IntegerField(_('February'), default=0, blank=True, null=False)
-    March = models.IntegerField(_('March'), default=0, blank=True, null=False)
-    April = models.IntegerField(_('April'), default=0, blank=True, null=False)
-    May = models.IntegerField(_('May'), default=0, blank=True, null=False)
-    June = models.IntegerField(_('June'), default=0, blank=True, null=False)
-    July = models.IntegerField(_('July'), default=0, blank=True, null=False)
-    August = models.IntegerField(_('August'), default=0, blank=True, null=False)
-    September = models.IntegerField(_('September'), default=0, blank=True, null=False)
-    October = models.IntegerField(_('October'), default=0, blank=True, null=False)
-    November = models.IntegerField(_('November'), default=0, blank=True, null=False)
-    December = models.IntegerField(_('December'), default=0, blank=True, null=False)
+    January = models.IntegerField(_('January (in days)'), default=0, blank=True, null=False)
+    February = models.IntegerField(_('February (in days)'), default=0, blank=True, null=False)
+    March = models.IntegerField(_('March (in days)'), default=0, blank=True, null=False)
+    April = models.IntegerField(_('April (in days)'), default=0, blank=True, null=False)
+    May = models.IntegerField(_('May (in days)'), default=0, blank=True, null=False)
+    June = models.IntegerField(_('June (in days)'), default=0, blank=True, null=False)
+    July = models.IntegerField(_('July (in days)'), default=0, blank=True, null=False)
+    August = models.IntegerField(_('August (in days)'), default=0, blank=True, null=False)
+    September = models.IntegerField(_('September (in days)'), default=0, blank=True, null=False)
+    October = models.IntegerField(_('October (in days)'), default=0, blank=True, null=False)
+    November = models.IntegerField(_('November (in days)'), default=0, blank=True, null=False)
+    December = models.IntegerField(_('December (in days)'), default=0, blank=True, null=False)
     # Working_days = models.IntegerField(_('Working Days'), blank=False, null=True)
     Total = models.IntegerField(_('Total working days'), default=0, blank=True, null=True, editable=False)
 
     def save(self, *args, **kwargs):
-        self.Total = self.January + self.February + self.March + self.April + self.May + self.June + self.July + self.August + self.September + self.October + self.November + self.December
+        self.Total = (self.January + self.February + self.March + self.April + self.May + self.June + self.July + self.August + self.September + self.October + self.November + self.December)
         super().save(*args, **kwargs)
 
     class Meta:
