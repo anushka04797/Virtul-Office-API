@@ -1,11 +1,15 @@
 import json
 from datetime import date, datetime
 from django.contrib.auth.models import Group, update_last_login
+from django.db.models import Q
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import os
+
+from projects.models import Projects
+from projects.serializers import SubTaskSerializer
 from users.serializers import ChangePasswordSerializer, LoginSerializer, RegisterSerializer, UserDetailSerializer, \
     UserUpdateSerializer, UploadProPicSerializer, JWT_PAYLOAD_HANDLER, JWT_ENCODE_HANDLER
 from users.models import CustomUser
@@ -24,8 +28,9 @@ from .auth import EmailOrUsernameModelBackend
 from django.core.mail import send_mail
 import sms_api
 import sys
-from django.contrib.auth.models import Permission
+from operator import attrgetter
 from rest_framework.parsers import MultiPartParser
+import itertools
 
 
 # user register
@@ -59,13 +64,13 @@ class Register(APIView):
                       fail_silently=False, )
             return Response(response, status=status.HTTP_201_CREATED)
         except Exception as e:
-            # response = {
-            #     'success': 'False',
-            #     'status code': status.HTTP_400_BAD_REQUEST,
-            #     'message': 'User registration failed',
-            #     'errors': serializer.errors
-            # }
-            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+            response = {
+                'success': 'False',
+                'status code': status.HTTP_400_BAD_REQUEST,
+                'message': 'User registration failed',
+                'errors': serializer.errors
+            }
+            # response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
             return Response(response, status=status.HTTP_201_CREATED)
 
 
@@ -105,7 +110,8 @@ class Login(RetrieveAPIView):
             response['message'] = "User Not Found"
             return Response(response, status=status.HTTP_404_NOT_FOUND)
         elif user_data.is_active == 1 and user_data.groups.count() > 0:
-            auth_user = EmailOrUsernameModelBackend.authenticate(user_data,username=request.data.get('email'), password=request.data.get('password'))
+            auth_user = EmailOrUsernameModelBackend.authenticate(user_data, username=request.data.get('email'),
+                                                                 password=request.data.get('password'))
             if auth_user is None:
                 response['success'] = "False"
                 response['status code'] = status.HTTP_400_BAD_REQUEST

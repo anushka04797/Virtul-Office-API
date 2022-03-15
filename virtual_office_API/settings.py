@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'rest_auth.registration',
     'users',
+    'search',
     'organizations',
     'projects',
     'wbs',
@@ -128,10 +129,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         # 'NAME': 'virtual_office_v1',
-        'NAME': 'virtual_office',
+        'NAME': 'virtual_office_v1',
         'USER': 'root',
-        # 'PASSWORD': 'Dhaka!027#',
         'PASSWORD': '',
+        # 'PASSWORD': '',
         'PORT': '3306',
         # 'HOST': 'localhost'
     }
