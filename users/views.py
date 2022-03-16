@@ -278,9 +278,9 @@ class AllPermissions(APIView):
 
     def get(self, request):
         try:
-            user = CustomUser.objects.get(email=request.user)
+            # user = CustomUser.objects.get(email=request.user)
             group_permissions = request.user.get_group_permissions()
-            all_permissions = request.user.get_all_permissions()
+            # all_permissions = request.user.get_all_permissions()
             response = {
                 'status': 'success',
                 'code': status.HTTP_200_OK,
