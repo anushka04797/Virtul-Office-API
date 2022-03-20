@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 from meetings.models import Meetings
 from meetings.serializers import MeetingsDetailsSerializer
 from projects.models import Projects
-from projects.serializers import SubTaskSerializer
+from projects.serializers import ProjectDetailsSerializer
 from users.models import CustomUser
 from users.serializers import UserDetailSerializer
 
@@ -29,14 +29,12 @@ class Search(APIView):
             }
             key = request.GET.get('key')
             users = UserDetailSerializer(CustomUser.objects.filter(Q(first_name__icontains=key) | Q(last_name__icontains=key)), many=True).data
-            projects = SubTaskSerializer(Projects.objects.filter(Q(sub_task__icontains=key) | Q(task_title__icontains=key)), many=True).data
+            projects = ProjectDetailsSerializer(Projects.objects.filter(Q(sub_task__icontains=key) | Q(task_title__icontains=key)), many=True).data
             #meetings = MeetingsDetailsSerializer(Meetings.objects.filter(Q(sub_task__icontains=key) | Q(task_title__icontains=key)), many=True).data
             result = {
                 'employees':users,
                 'projects':projects
             }
-            for user in users:
-                user['type'] = CustomUser.__name__
 
             response = {
                 'success': True,
