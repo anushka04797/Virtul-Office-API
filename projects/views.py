@@ -73,7 +73,7 @@ class CreateProject(APIView):
                         serializer2 = self.serializer_class3(data=temp_data)
                         if serializer2.is_valid(raise_exception=True):
                             serializer2.save()
-                            user_email = CustomUser.objects.get(id=item)
+                            user_email = UserDetailSerializer(CustomUser.objects.get(id=item)).data['email']
                             message = "A project named '" + serializer.data['sub_task'] + "' -> '" + serializer.data[
                                 'task_title'] + "' has been assigned to you. Please check the Virtual Office for details."
                             send_mail('Project Assigned', message, EMAIL_HOST_USER, [user_email],
