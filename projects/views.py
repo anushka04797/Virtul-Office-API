@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from projects.serializers import SubTaskSerializer, CreateProjectSerializer, ProjectDetailsSerializer, \
     UpdateProjectSerializer, ProjectAssigneeSerializer, TdoSerializer, CreateProjectAssigneeSerializer, \
-    UpdateSubTaskSerializer, TaskSerializer, ProjectFileSerializer, DocumentListSerializer
+    UpdateSubTaskSerializer, TaskSerializer, ProjectFileSerializer, DocumentListSerializer, \
+    UpdateProjectAssigneeSerializer
 from users.models import CustomUser
 from projects.models import Projects, ProjectAssignee, Tdo, ProjectSharedFiles
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -178,11 +179,13 @@ class UpdateProject(APIView):
                 print(serializer.data)
 
                 assignees = request.data['assignee']
+                count=0
                 for assignee in assignees:
                     if not ProjectAssignee.objects.filter(assignee=assignee, project=serializer.data['id']).exists():
+                        print('erfef'+request.data['estimated_person'][count])
                         temp_data = {
                             'assignee': assignee,
-                            # 'estimated_person': request.data['estimated_person'][count],
+                            'estimated_person': request.data['estimated_person'][count],
                             'is_assignee_active': 1,
                             'project': serializer.data['id'],
                             'date_created': datetime.datetime.now(),
@@ -191,19 +194,29 @@ class UpdateProject(APIView):
                         serializer2 = CreateProjectAssigneeSerializer(data=temp_data)
                         if serializer2.is_valid(raise_exception=True):
                             serializer2.save()
-                            user_email = CustomUser.objects.get(id=assignee)
+                            user_email = UserDetailSerializer(CustomUser.objects.get(id=assignee)).data['email']
                             print(serializer.data)
                         message = "A project named '" + serializer.data['sub_task'] + "' -> '" + serializer.data[
                             'task_title'] + "' is updated that has been assigned to you. Please check the Virtual Office for details."
                         send_mail('Project Updated', message, EMAIL_HOST_USER, [user_email],
                                   fail_silently=False, )
+                    count+=1
 
-                all_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=serializer.data['id']),
-                                                          many=True).data
+                all_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=serializer.data['id']),many=True).data
+                count=0
                 for assignee in all_assignees:
                     if str(assignee['assignee']['id']) not in assignees:
-                        ProjectAssignee.objects.filter(assignee=assignee['assignee']['id'],
-                                                       project=serializer.data['id']).delete()
+                        ProjectAssignee.objects.filter(assignee=assignee['assignee']['id'],project=serializer.data['id']).delete()
+                    else:
+                        ProjectAssignee.objects.filter(assignee=assignee['assignee']['id'], project=serializer.data['id']).update(estimated_person=request.data['estimated_person'][count])
+                        # updated_assignee=assignee
+                        # updated_assignee['estimated_person']=request.data['estimated_person'][count]
+                        # print(updated_assignee['estimated_person'])
+                        # assignee_update_serializer=UpdateProjectAssigneeSerializer(assignee,data=updated_assignee)
+                        # assignee_update_serializer.is_valid()
+                        # assignee_update_serializer.save()
+
+                    count+=1
                 # if request.data['sub_task_updated']:
                 work_package_number = pk.split('.')[0]
                 # Projects.objects.filter(work_package_number=work_package_number).update(

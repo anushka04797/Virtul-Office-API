@@ -7,8 +7,8 @@ from users.serializers import UserDetailSerializer
 
 
 class TdoSerializer(serializers.ModelSerializer):
-    date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p",read_only=True)
-    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p",read_only=True)
+    date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", read_only=True)
+    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", read_only=True)
 
     class Meta:
         model = Tdo
@@ -50,9 +50,9 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
 
     # assignee = UserDetailSerializer()
     pm = UserDetailSerializer()
-    planned_delivery_date = serializers.DateField(format="%Y-%m-%d",read_only=True)
-    date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p",read_only=True)
-    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p",read_only=True)
+    planned_delivery_date = serializers.DateField(format="%Y-%m-%d", read_only=True)
+    date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", read_only=True)
+    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", read_only=True)
 
     class Meta:
         model = Projects
@@ -82,6 +82,7 @@ class TaskSerializer(serializers.ModelSerializer):
     date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p")
     date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p")
     pm = UserDetailSerializer()
+
     class Meta:
         model = Projects
         fields = (
@@ -134,6 +135,22 @@ class SubTaskSerializer(serializers.ModelSerializer):
             'date_created',
             'date_updated',
         )
+
+
+class UpdateProjectAssigneeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectAssignee
+        fields = (
+            'id',
+            'estimated_person',
+        )
+
+    def update(self, instance, validated_data):
+        instance.estimated_person = validated_data.get('estimated_person', instance.estimated_person)
+        instance.is_assignee_active=1
+        instance.date_updated = timezone.now()
+        instance.save()
+        return instance
 
 
 class CreateProjectAssigneeSerializer(serializers.ModelSerializer):
@@ -190,7 +207,7 @@ class ProjectAssigneeSerializer(serializers.ModelSerializer):
 
 class UpdateProjectSerializer(serializers.ModelSerializer):
     planned_delivery_date = serializers.DateField(format="%Y-%m-%d")
-    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p",required=False)
+    date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", required=False)
 
     class Meta:
         model = Projects
@@ -201,7 +218,7 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
             'task_title',
             'start_date',
             'planned_delivery_date',
-            'estimated_person',
+            # 'estimated_person',
             'planned_hours',
             'planned_value',
             'remaining_hours',
@@ -275,6 +292,7 @@ class ProjectDetailsForWbsSerializer(serializers.ModelSerializer):
             'status',
         )
 
+
 # class AddAssigneeSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Projects
@@ -301,6 +319,7 @@ class ProjectDetailsForWbsSerializer(serializers.ModelSerializer):
 class DocumentListSerializer(serializers.ModelSerializer):
     date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", required=False)
     upload_by = UserDetailSerializer(read_only=True)
+
     class Meta:
         model = ProjectSharedFiles
         fields = (
@@ -310,6 +329,7 @@ class DocumentListSerializer(serializers.ModelSerializer):
             'date_created',
             'upload_by'
         )
+
 
 class ProjectFileSerializer(serializers.ModelSerializer):
     class Meta:
