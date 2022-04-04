@@ -1,9 +1,12 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group, update_last_login
 import json
+
+from django.db.models import Sum
 from rest_framework import serializers
 
 from organizations.serializers import SlcSerializer, DesignationSerializer
+from projects.models import ProjectAssignee
 from users.models import CustomUser
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_jwt.settings import api_settings
@@ -81,10 +84,14 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     # designation = DesignationSerializer()
     slc_details = SlcSerializer()
+    total_ep = serializers.SerializerMethodField()
+
+    def get_total_ep(self, obj):
+        return list(ProjectAssignee.objects.filter(assignee=obj.id).aggregate(Sum('estimated_person')).values())[0]
 
     class Meta:
         model = CustomUser
-        fields = ('id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'profile_pic', 'slc_details', 'address', 'blood_group')
+        fields = ('id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'profile_pic', 'slc_details', 'address', 'blood_group','total_ep')
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
