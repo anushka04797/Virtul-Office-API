@@ -14,6 +14,7 @@ import pendulum
 from projects.serializers import CreateProjectAssigneeSerializer, UpdateProjectRemainingHrsSerializer, \
     ProjectDetailsSerializer, ProjectAssigneeSerializer
 from users.models import CustomUser
+from users.serializers import UserDetailSerializer
 from virtual_office_API.settings import EMAIL_HOST_USER
 from wbs.serializers import CreateTimeCardSerializer, CreateWbsSerializer, WbsDetailsSerializer, WbsUpdateSerializer, \
     TimeCardDetailsSerializer, WbsStatusUpdateSerializer, WbsWiseTimeCardListSerializer, TimecardUpdateSerializer
@@ -45,7 +46,8 @@ class CreateWbs(APIView):
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            user_email = CustomUser.objects.get(id=assignee)
+            user_email = UserDetailSerializer(CustomUser.objects.get(id=assignee)).data['email']
+            print(user_email)
             message = "A WBS titled '" + serializer.data[
                 'title'] + "' has been assigned to you. Please check the Virtual Office for details."
             send_mail('WBS Created', message, EMAIL_HOST_USER, [user_email],
@@ -113,7 +115,7 @@ class UpdateWbs(APIView):
                         if serializer3.is_valid():
                             serializer3.save()
                             print(serializer.data)
-                            user_email = CustomUser.objects.get(id=serializer.data['assignee'])
+                            user_email = UserDetailSerializer(CustomUser.objects.get(id=serializer.data['assignee'])).data['email']
                             message = "A WBS titled '" + serializer.data[
                                 'title'] + "' has been updated. Please check the Virtual Office for details."
                             send_mail('WBS Updated', message, EMAIL_HOST_USER, [user_email],

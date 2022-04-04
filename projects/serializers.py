@@ -2,6 +2,9 @@ import datetime
 
 from rest_framework import serializers
 from django.utils import timezone
+
+from wbs.models import Wbs
+
 from .models import Projects, ProjectAssignee, Tdo, ProjectSharedFiles
 from users.serializers import UserDetailSerializer
 
@@ -53,6 +56,10 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
     planned_delivery_date = serializers.DateField(format="%Y-%m-%d", read_only=True)
     date_created = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", read_only=True)
     date_updated = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S %p", read_only=True)
+    wbs_list = serializers.SerializerMethodField()
+
+    def get_wbs_list(self, obj):
+        return Wbs.objects.prefetch_related('users').filter(work_package_number=obj.work_package_number).values()
 
     class Meta:
         model = Projects
@@ -74,6 +81,7 @@ class ProjectDetailsSerializer(serializers.ModelSerializer):
             'status',
             'date_created',
             'date_updated',
+            'wbs_list'
         )
 
 
@@ -147,7 +155,7 @@ class UpdateProjectAssigneeSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.estimated_person = validated_data.get('estimated_person', instance.estimated_person)
-        instance.is_assignee_active=1
+        instance.is_assignee_active = 1
         instance.date_updated = timezone.now()
         instance.save()
         return instance
