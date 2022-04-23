@@ -29,7 +29,7 @@ class Projects(models.Model):
     task_delivery_order = models.ForeignKey(Tdo, related_name="tdo_title", blank=False, null=True,
                                             on_delete=models.CASCADE)
     sub_task = models.CharField(_('subtask name'), max_length=50, blank=True)
-    description = models.TextField(_('subtask details'), blank=True)
+    description = models.TextField(_('subtask details'), blank=True,null=True)
     work_package_number = models.TextField(_('work package number'), blank=True)
     work_package_index = models.CharField(_('work package index'), max_length=550, blank=True,
                                              null=True)

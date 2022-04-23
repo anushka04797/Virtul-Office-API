@@ -2,6 +2,8 @@ import datetime
 import sys
 
 from django.contrib.auth.models import User
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
 from django.core.mail import send_mail
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -75,10 +77,17 @@ class CreateProject(APIView):
                         if serializer2.is_valid(raise_exception=True):
                             serializer2.save()
                             user_email = UserDetailSerializer(CustomUser.objects.get(id=item)).data['email']
-                            message = "A project named '" + serializer.data['sub_task'] + "' -> '" + serializer.data[
-                                'task_title'] + "' has been assigned to you. Please check the Virtual Office for details."
-                            send_mail('Project Assigned', message, EMAIL_HOST_USER, [user_email],
-                                      fail_silently=False, )
+
+                            html_template = 'create-project/index.html'
+                            html_message = render_to_string(html_template, {'name': UserDetailSerializer(CustomUser.objects.get(id=item)).data['first_name'],'href':'http://localhost:3000/#/login/?task_details='+serializer.data['work_package_index'] })
+                            message = EmailMessage('Project assigned', html_message, EMAIL_HOST_USER, [user_email])
+                            message.content_subtype = 'html'  # this is required because there is no plain text email message
+                            message.send()
+
+                            # message = "A project named '" + serializer.data['sub_task'] + "' -> '" + serializer.data[
+                            #     'task_title'] + "' has been assigned to you. Please check the Virtual Office for details."
+                            # send_mail('Project Assigned', message, EMAIL_HOST_USER, [user_email],
+                            #           fail_silently=False, )
                             response = {
                                 'success': 'True',
                                 'status code': status.HTTP_200_OK,
@@ -101,6 +110,19 @@ def unique(list1):
     # print list
     return unique_list
 
+class SubTaskDetails(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self,request,work_package_index):
+        try:
+            sub_task=SubTaskSerializer(Projects.objects.get(work_package_index=work_package_index)).data
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Sub Task Details',
+                        'data': sub_task}
+        except Exception as e:
+
+            response = {'success': 'False', 'status code': status.HTTP_400_BAD_REQUEST, 'message': 'on line {}'.format(sys.exc_info()[-1].tb_lineno)}
+
+        return Response(response)
 
 class NewProjectDetails(APIView):
     permission_classes = (IsAuthenticated,)
