@@ -29,7 +29,7 @@ class CreateProject(APIView):
         print(enumerate(request.data['assignee']))
         count_project_wp = Projects.objects.filter(work_package_number=request.data['work_package_number'])
         work_package_index = request.data['work_package_number'] + '.' + str(len(count_project_wp) + 1)
-        request.data['work_package_index'] = float(work_package_index)
+        request.data['work_package_index'] = work_package_index
 
         if not Tdo.objects.filter(title=request.data['task_delivery_order']).exists():
             # create tdo block #####################
@@ -182,7 +182,7 @@ class UpdateProject(APIView):
                 count=0
                 for assignee in assignees:
                     if not ProjectAssignee.objects.filter(assignee=assignee, project=serializer.data['id']).exists():
-                        print('erfef'+request.data['estimated_person'][count])
+                        # print('erfef'+request.data['estimated_person'][count])
                         temp_data = {
                             'assignee': assignee,
                             'estimated_person': request.data['estimated_person'][count],
