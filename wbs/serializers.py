@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from wbs.models import TimeCard, Wbs
+from wbs.models import TimeCard, Wbs, WbsSharedFiles
 from users.serializers import UserDetailSerializer
 from projects.serializers import ProjectDetailsForWbsSerializer, ProjectDetailsSerializer
 from django.utils import timezone
@@ -178,3 +178,13 @@ class TimecardUpdateSerializer(serializers.ModelSerializer):
         instance.date_updated = validated_data.get('date_updated', timezone.now)
         instance.save()
         return instance
+
+
+class WbsFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WbsSharedFiles
+        fields = (
+            'wbs_id',
+            'file',
+            'upload_by'
+        )

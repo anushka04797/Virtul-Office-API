@@ -162,7 +162,7 @@ class HolidayType(models.Model):
 class HolidayCalender(models.Model):
     Year = models.IntegerField(_('Year'), choices=YEAR_CHOICES, default=datetime.now().year, blank=True, null=True)
     Month = models.CharField(_('Month'), max_length=20, choices=MONTHS, default='Select', blank=True, null=True)
-    holiday_type = models.ForeignKey(to='organizations.HolidayType', blank=False, null=False, on_delete=models.PROTECT)
+    holiday_type = models.ForeignKey(to='organizations.HolidayType', blank=False, null=False, on_delete=models.PROTECT,default='')
     holiday_title = models.TextField(_('holiday title'), blank=False, null=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)

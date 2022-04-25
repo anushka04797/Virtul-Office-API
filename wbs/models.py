@@ -47,9 +47,9 @@ class Wbs(models.Model):
 
 
 class TimeCard(models.Model):
-    project = models.ForeignKey(Projects, related_name="project_details", blank=False, null=False,
+    project = models.ForeignKey(Projects, related_name="project_details", blank=True, null=True,
                                 on_delete=models.CASCADE)
-    wbs = models.ForeignKey(Wbs, related_name="wbs_details", blank=False, null=False,
+    wbs = models.ForeignKey(Wbs, related_name="wbs_details", blank=True, null=True,
                                 on_delete=models.CASCADE)
     time_type = models.CharField(_('time type'), max_length=20, blank=True, null=True, default="RHR")
     submitted = models.BooleanField(_('submitted'), blank=True, null=True, default=False)
@@ -67,3 +67,17 @@ class TimeCard(models.Model):
 
     def __str__(self):
         return self.actual_work_done
+
+
+class WbsSharedFiles(models.Model):
+    wbs = models.ForeignKey(CustomUser, related_name="wbs_id", blank=False, null=False,
+                                 on_delete=models.CASCADE)
+    file = models.FileField(upload_to='uploads/wbs/files/', blank=True, null=True)
+    date_created = models.DateTimeField(_('date created'), default=timezone.now)
+    date_updated = models.DateTimeField(_('date updated'), default=timezone.now)
+    upload_by = models.ForeignKey(CustomUser, related_name="wbs_shared_file_upload_by", blank=False, null=False, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'wbs_shared_file'
+        verbose_name = _('wbs_hared_file')
+        verbose_name_plural = _('wbs_shared_files')
