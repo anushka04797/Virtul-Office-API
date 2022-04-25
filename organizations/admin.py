@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin.helpers import Fieldset
-from organizations.models import Company, Department, Designation, DmaCalender, HolidayCalender, Slc
+from organizations.models import Company, Department, Designation, DmaCalender, HolidayCalender, Slc, HolidayType
 from users.models import CustomUser
 from organizations.forms import CustomAddSLCForm, CustomEditSLCForm
 
@@ -21,6 +21,12 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_display_links = ('name',)
     search_fields = ('name', 'details')
     ordering = ('name',)
+
+
+class HolidayTypeAdmin(admin.ModelAdmin):
+    list_display = (
+        'type_title',
+    )
 
 
 class DesignationAdmin(admin.ModelAdmin):
@@ -87,7 +93,7 @@ class DmaCalenderAdmin(admin.ModelAdmin):
 
 class HolidayCalenderAdmin(admin.ModelAdmin):
     list_display = (
-        'Year', 'holiday_title', 'start_date', 'end_date'
+        'Year', 'holiday_type', 'holiday_title', 'start_date', 'end_date', 'hours'
     )
     list_display_links = ('holiday_title',)
     search_fields = ['holiday_title']
@@ -120,3 +126,4 @@ admin.site.register(Designation, DesignationAdmin)
 admin.site.register(DmaCalender, DmaCalenderAdmin)
 admin.site.register(HolidayCalender, HolidayCalenderAdmin)
 admin.site.register(Slc, SlcAdmin)
+admin.site.register(HolidayType, HolidayTypeAdmin)

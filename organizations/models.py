@@ -153,14 +153,20 @@ HOLIDAYS = (
     ('Christmas Day', 'Christmas Day'),
 )
 
+class HolidayType(models.Model):
+    type_title = models.CharField(_('holiday type title'), max_length=200, blank=False, null=True)
+
+    def __str__(self):
+        return self.type_title
 
 class HolidayCalender(models.Model):
     Year = models.IntegerField(_('Year'), choices=YEAR_CHOICES, default=datetime.now().year, blank=True, null=True)
     Month = models.CharField(_('Month'), max_length=20, choices=MONTHS, default='Select', blank=True, null=True)
-    holiday_title = models.CharField(_('holiday title'), choices=HOLIDAYS, max_length=120, blank=False, null=True)
+    holiday_type = models.ForeignKey(to='organizations.HolidayType', blank=False, null=False, on_delete=models.PROTECT)
+    holiday_title = models.TextField(_('holiday title'), blank=False, null=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
-    # duration = models.IntegerField()
+    hours = models.IntegerField(_('Hours'), blank=True, null=True)
 
     class Meta:
         db_table = 'holiday_calender'

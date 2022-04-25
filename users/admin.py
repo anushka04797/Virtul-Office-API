@@ -15,7 +15,7 @@ class UsersAdmin(UserAdmin):
     add_form = UserCreationForm
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (_('Profile info'), {'fields': ('first_name', 'last_name', 'phone', 'profile_pic')}),
+        (_('Profile info'), {'fields': ('first_name', 'last_name', 'phone', 'id_card_mac', 'profile_pic')}),
         (_('Permissions'),
          {'fields': ('groups', 'is_active', 'is_staff', 'is_superuser',)}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
