@@ -33,6 +33,7 @@ class CustomUser(AbstractUser):
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
     address = models.CharField(_('address'), max_length=250, blank=True)
+    id_card_mac = models.CharField(_('id card mac'), max_length=250, blank=True, null=True)
     blood_group = models.CharField(_('blood group'), max_length=10, blank=True)
     profile_pic = models.ImageField(upload_to='uploads/users/images/', blank=True, null=True)
     designation = models.ForeignKey(to='organizations.Designation', blank=True, null=True, on_delete=models.CASCADE)
