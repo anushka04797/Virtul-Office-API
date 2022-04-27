@@ -418,8 +418,8 @@ class TimecardUpdate(APIView):
     permission_classes = (AllowAny,)
 
     def put(self, request, pk, format=None):
-        # print(request.data)
         try:
+            print(request.data)
             timecard = TimeCard.objects.get(id=pk)
             temp_data = request.data
             temp_data['date_updated'] = dateformat.format(timezone.now(), 'Y-m-d')
@@ -456,7 +456,7 @@ class AddTimeCard(APIView):
     def post(self, request):
         try:
             data = {
-                'time_type': request.data['time_type'],
+                'time_type': request.data['hours_type'],
                 'actual_work_done': request.data['actual_work_done'],
                 'submitted': 0,
                 'hours_today': request.data['hours'],
@@ -471,8 +471,13 @@ class AddTimeCard(APIView):
             new_time_card.is_valid(raise_exception=True)
             new_time_card.save()
 
-            response = 'rfrfr4gtg'
-            return Response(new_time_card.data)
+            response = {
+                'success': 'True',
+                'status code': status.HTTP_200_OK,
+                'message': 'Timecard added Successfully',
+                'data': new_time_card.data
+            }
+            return Response(response)
         except Exception as e:
             response = 'on line {}'.format(
                 sys.exc_info()[-1].tb_lineno), str(e)
@@ -486,5 +491,38 @@ class SubmitTimeCard(APIView):
         for item in request.data['time_cards']:
             TimeCard.objects.filter(pk=item).update(submitted=True)
 
-        response = 'Updated'
-        return Response(response)
+        response = {
+            'success': 'True',
+            'status code': status.HTTP_200_OK,
+            'message': 'Time Cards Submitted Successfully',
+            'data': 'Time Cards Submitted'
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
+
+class UploadWbsDocs(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        upload_by = request.data.get('upload_by')
+        files = int(request.data.get('files')) + 1
+
+        for i in range(1, files):
+            indexval = str(i)
+            attribute_name = str('file' + indexval)
+            file = request.data.get(attribute_name)
+            requested_data = {"wbs_id": request.data.get('wbs_id'), "file": file, "upload_by": upload_by}
+            serializer = WbsFileSerializer(data=requested_data)
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                serializer.errors()
+
+        response = {
+            'success': 'True',
+            'status code': status.HTTP_200_OK,
+            'message': 'WBS docs uploaded',
+            'data': 'Time Cards Submitted'
+        }
+        return Response(response, status=status.HTTP_200_OK)
+

@@ -167,12 +167,14 @@ class TimecardUpdateSerializer(serializers.ModelSerializer):
         model = TimeCard
         fields = (
             'id',
+            'actual_work_done',
             'time_type',
             'hours_today',
             'date_updated'
         )
 
     def update(self, instance, validated_data):
+        instance.actual_work_done = validated_data.get('actual_work_done', instance.time_type)
         instance.time_type = validated_data.get('time_type', instance.time_type)
         instance.hours_today = validated_data.get('hours_today', instance.hours_today)
         instance.date_updated = validated_data.get('date_updated', timezone.now)
