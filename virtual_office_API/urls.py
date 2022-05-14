@@ -47,3 +47,5 @@ urlpatterns = [
     path('docs/', include_docs_urls(title="Virtual Office", description="A Project management platform",
                                     permission_classes=(AllowAny,))),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# urlpatterns = [url(r'^vo-admin/', include(urlpatterns))]
