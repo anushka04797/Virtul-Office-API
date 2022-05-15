@@ -46,6 +46,24 @@ class Wbs(models.Model):
         return self.title
 
 
+class HourType(models.Model):
+    title = models.CharField(_('title'), max_length=250, blank=False)
+    description = models.TextField(_('description'), max_length=150, blank=True,null=True)
+    hours_allocated = models.IntegerField(_('hours_allocated'), default=0, blank=False,null=False)
+    added_by=models.ForeignKey(CustomUser, related_name="added_by", blank=False, null=False,
+                                 on_delete=models.CASCADE)
+    date_created = models.DateField(_('date created'), default=timezone.now)
+    date_updated = models.DateField(_('date updated'), default=timezone.now)
+
+    class Meta:
+        db_table = 'hour_types'
+        verbose_name = _('hour_type')
+        verbose_name_plural = _('hour_types')
+
+    def __str__(self):
+        return self.title
+
+
 class TimeCard(models.Model):
     project = models.ForeignKey(Projects, related_name="project_details", blank=True, null=True,
                                 on_delete=models.CASCADE)
