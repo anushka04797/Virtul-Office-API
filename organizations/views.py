@@ -3,8 +3,8 @@ import sys
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from organizations.serializers import DmaCalenderSerializer, HolidayCalenderSerializer
-from .models import DmaCalender, HolidayCalender
+from organizations.serializers import DmaCalenderSerializer, HolidayCalenderSerializer, HourTypeSerializer
+from .models import DmaCalender, HolidayCalender, HourType
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from users.serializers import UserDetailSerializer
 
@@ -39,3 +39,21 @@ class HolidayCalenderDetails(APIView):
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
 
         return Response(response)
+
+
+class HoursSpentAndLeft(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        try:
+            user = UserDetailSerializer(request.user).data
+            user_company=user['slc_details']['slc']['department']['company']['id']
+            result = []
+
+            hour_types = HourTypeSerializer(HourType.objects.filter(company=user_company), many=True).data
+            # for type in
+            return Response(hour_types, status=status.HTTP_200_OK)
+        except Exception as e:
+            response = 'on line {}'.format(
+                sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)

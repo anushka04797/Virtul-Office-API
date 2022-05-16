@@ -1,6 +1,6 @@
 from django import forms
-from .models import Slc
-
+from .models import Slc, HourType
+from datetime import datetime
 
 class CustomAddSLCForm(forms.ModelForm):
     class Meta:
@@ -21,4 +21,16 @@ class CustomEditSLCForm(forms.ModelForm):
             'monthly_rate',
             'hourly_rate',
             'hourly_rate'
+        ]
+
+
+class HourTypeForm(forms.ModelForm):
+    class Meta:
+        model = HourType
+        fields = [
+            'title',
+            'year',
+            'description',
+            'hours_allocated',
+            'added_by'
         ]

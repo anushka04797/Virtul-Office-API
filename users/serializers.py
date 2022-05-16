@@ -91,7 +91,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'profile_pic', 'slc_details', 'address', 'blood_group','total_ep')
+        fields = ('id', 'email', 'date_of_birth', 'first_name', 'last_name', 'date_joined', 'phone', 'profile_pic', 'slc_details', 'address', 'blood_group','total_ep','designation')
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

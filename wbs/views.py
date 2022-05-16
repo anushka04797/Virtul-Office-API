@@ -455,9 +455,11 @@ class AddTimeCard(APIView):
 
     def post(self, request):
         try:
+            print(request.data)
             data = {
                 'time_type': request.data['hours_type'],
                 'actual_work_done': request.data['actual_work_done'],
+                'hour_description': request.data['hour_description'],
                 'submitted': 0,
                 'hours_today': request.data['hours'],
                 'project': request.data['project'],
@@ -525,4 +527,6 @@ class UploadWbsDocs(APIView):
             'data': 'Time Cards Submitted'
         }
         return Response(response, status=status.HTTP_200_OK)
+
+
 

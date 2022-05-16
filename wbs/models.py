@@ -46,24 +46,6 @@ class Wbs(models.Model):
         return self.title
 
 
-class HourType(models.Model):
-    title = models.CharField(_('title'), max_length=250, blank=False)
-    description = models.TextField(_('description'), max_length=150, blank=True,null=True)
-    hours_allocated = models.IntegerField(_('hours_allocated'), default=0, blank=False,null=False)
-    added_by=models.ForeignKey(CustomUser, related_name="added_by", blank=False, null=False,
-                                 on_delete=models.CASCADE)
-    date_created = models.DateField(_('date created'), default=timezone.now)
-    date_updated = models.DateField(_('date updated'), default=timezone.now)
-
-    class Meta:
-        db_table = 'hour_types'
-        verbose_name = _('hour_type')
-        verbose_name_plural = _('hour_types')
-
-    def __str__(self):
-        return self.title
-
-
 class TimeCard(models.Model):
     project = models.ForeignKey(Projects, related_name="project_details", blank=True, null=True,
                                 on_delete=models.CASCADE)
@@ -74,6 +56,7 @@ class TimeCard(models.Model):
     time_card_assignee = models.ForeignKey(CustomUser, related_name="time_card_employee_assigned", blank=False, null=False,
                                  on_delete=models.CASCADE)
     actual_work_done = models.CharField(_('actual work done'), max_length=250, blank=True, null=True)
+    hour_description = models.TextField(_('hour_description'), max_length=1050, blank=True, null=True)
     hours_today = models.DecimalField(_('hours today'), max_digits=6, decimal_places=1, blank=False)
     date_created = models.DateField(_('date created'), default=timezone.now)
     date_updated = models.DateField(_('date updated'), default=timezone.now)

@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.db.models.functions import ExtractMonth
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from users.models import CustomUser
@@ -20,6 +21,7 @@ class Company(models.Model):
     e_tin = models.CharField(_('eTIN'), max_length=350, blank=True)
     vat_certificate = models.CharField(_('VAT Certificate'), max_length=350, blank=True)
     incorporation_number = models.CharField(_('Incorporartion#'), max_length=350, blank=True)
+
     # trade_license_number = models.CharField(_('trade license number'), max_length=150, blank=True)
 
     class Meta:
@@ -35,7 +37,8 @@ class Department(models.Model):
     company = models.ForeignKey(to='organizations.Company', blank=False, null=False, on_delete=models.PROTECT)
     name = models.CharField(_('department name'), max_length=150, blank=False)
     details = models.TextField(_('department details'), max_length=350, blank=True)
-    parent = models.ForeignKey('self', verbose_name='Select a department parent', null=True, blank=True, related_name='children', on_delete=models.PROTECT)
+    parent = models.ForeignKey('self', verbose_name='Select a department parent', null=True, blank=True,
+                               related_name='children', on_delete=models.PROTECT)
 
     class Meta:
         db_table = 'department'
@@ -50,7 +53,8 @@ class Designation(models.Model):
     department = models.ForeignKey(to='organizations.Department', blank=False, null=False, on_delete=models.PROTECT)
     name = models.CharField(_('designation name'), max_length=150, blank=False)
     details = models.TextField(_('designation details'), max_length=350, blank=True)
-    parent = models.ForeignKey('self', verbose_name='Select a designation parent', null=True, blank=True, related_name='children', on_delete=models.PROTECT)
+    parent = models.ForeignKey('self', verbose_name='Select a designation parent', null=True, blank=True,
+                               related_name='children', on_delete=models.PROTECT)
 
     class Meta:
         db_table = 'designation'
@@ -62,7 +66,7 @@ class Designation(models.Model):
 
 
 YEAR_CHOICES = []
-for r in range(2000, (datetime.now().year+20)):
+for r in range(2000, (datetime.now().year + 20)):
     YEAR_CHOICES.append((r, r))
 
 MONTHS = (
@@ -119,7 +123,8 @@ class DmaCalender(models.Model):
     Total = models.IntegerField(_('Total working days'), default=0, blank=True, null=True, editable=False)
 
     def save(self, *args, **kwargs):
-        self.Total = (self.January + self.February + self.March + self.April + self.May + self.June + self.July + self.August + self.September + self.October + self.November + self.December)
+        self.Total = (
+                    self.January + self.February + self.March + self.April + self.May + self.June + self.July + self.August + self.September + self.October + self.November + self.December)
         super().save(*args, **kwargs)
 
     class Meta:
@@ -153,16 +158,40 @@ HOLIDAYS = (
     ('Christmas Day', 'Christmas Day'),
 )
 
+
 class HolidayType(models.Model):
     type_title = models.CharField(_('holiday type title'), max_length=200, blank=False, null=True)
 
     def __str__(self):
         return self.type_title
 
+
+class HourType(models.Model):
+    title = models.CharField(_('title'), max_length=250, blank=False)
+    description = models.TextField(_('description'), max_length=150, blank=True, null=True)
+    hours_allocated = models.IntegerField(_('hours allocated'), default=0, blank=False, null=False)
+    year = models.IntegerField(_('year'), choices=YEAR_CHOICES, default=datetime.now().year, blank=False)
+    added_by = models.ForeignKey(CustomUser, related_name="added_by", blank=False, null=False,
+                                 on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, related_name="company", blank=False, null=False,
+                                 on_delete=models.CASCADE)
+    date_created = models.DateField(_('date created'), default=timezone.now)
+    date_updated = models.DateField(_('date updated'), default=timezone.now)
+
+    class Meta:
+        db_table = 'hour_types'
+        verbose_name = _('Work Type')
+        verbose_name_plural = _('Work Types')
+
+    def __str__(self):
+        return self.title
+
+
 class HolidayCalender(models.Model):
     Year = models.IntegerField(_('Year'), choices=YEAR_CHOICES, default=datetime.now().year, blank=True, null=True)
     Month = models.CharField(_('Month'), max_length=20, choices=MONTHS, default='Select', blank=True, null=True)
-    holiday_type = models.ForeignKey(to='organizations.HolidayType', blank=False, null=False, on_delete=models.PROTECT,default='')
+    holiday_type = models.ForeignKey(to='organizations.HolidayType', blank=False, null=False, on_delete=models.PROTECT,
+                                     default='')
     holiday_title = models.TextField(_('holiday title'), blank=False, null=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
@@ -188,7 +217,8 @@ SLC = (
 
 class Slc(models.Model):
     employee = models.ForeignKey(to='users.CustomUser', blank=False, null=False, on_delete=models.CASCADE)
-    slc = models.ForeignKey(to='organizations.Designation', blank=False, null=False, on_delete=models.CASCADE, verbose_name="Standard Labor Code(SLC)")
+    slc = models.ForeignKey(to='organizations.Designation', blank=False, null=False, on_delete=models.CASCADE,
+                            verbose_name="Standard Labor Code(SLC)")
     # designation = models.ForeignKey(Designation, blank=False, null=False, on_delete=models.PROTECT)
     monthly_rate = models.IntegerField(_('Monthly Rate'), blank=True, null=True)
     hourly_rate = models.IntegerField(_('Hourly Rate'), blank=True, null=True)

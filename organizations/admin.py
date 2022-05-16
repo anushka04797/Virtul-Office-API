@@ -1,8 +1,13 @@
 from django.contrib import admin
 from django.contrib.admin.helpers import Fieldset
-from organizations.models import Company, Department, Designation, DmaCalender, HolidayCalender, Slc, HolidayType
+from django.forms import ChoiceField
+
+from organizations import models
+from organizations.models import Company, Department, Designation, DmaCalender, HolidayCalender, Slc, HolidayType, \
+    HourType
 from users.models import CustomUser
-from organizations.forms import CustomAddSLCForm, CustomEditSLCForm
+from datetime import datetime
+from organizations.forms import CustomAddSLCForm, CustomEditSLCForm, HourTypeForm
 
 
 class CompanyAdmin(admin.ModelAdmin):
@@ -29,6 +34,13 @@ class HolidayTypeAdmin(admin.ModelAdmin):
     )
 
 
+class HourTypeAdmin(admin.ModelAdmin):
+    # fields = ['title', 'year']
+    list_display = ('company','title','hours_allocated','year')
+    ordering = ('title',)
+    search_fields = ('title', 'company')
+
+
 class DesignationAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'details', 'parent'
@@ -41,11 +53,14 @@ class DesignationAdmin(admin.ModelAdmin):
 
 class DmaCalenderAdmin(admin.ModelAdmin):
     fieldsets = (
-        (Fieldset, {'fields': ('Company', 'Year', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December')}),
+        (Fieldset, {'fields': (
+            'Company', 'Year', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+            'October', 'November', 'December')}),
     )
     # readonly_fields = ('Calculated_hours',)
     list_display = (
-        'Company', 'Year', 'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december', 'total'
+        'Company', 'Year', 'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september',
+        'october', 'november', 'december', 'total'
     )
     list_display_links = ('Year',)
     search_fields = ['Year']
@@ -88,7 +103,8 @@ class DmaCalenderAdmin(admin.ModelAdmin):
         return obj.December * 8
 
     def total(self, obj):
-        return (obj.January + obj.February + obj.March + obj.April + obj.May + obj.June + obj.July + obj.August + obj.September + obj.October + obj.November + obj.December) * 8
+        return (
+                       obj.January + obj.February + obj.March + obj.April + obj.May + obj.June + obj.July + obj.August + obj.September + obj.October + obj.November + obj.December) * 8
 
 
 class HolidayCalenderAdmin(admin.ModelAdmin):
@@ -120,6 +136,8 @@ class SlcAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+
+
 admin.site.register(Company, CompanyAdmin)
 admin.site.register(Department, DepartmentAdmin)
 admin.site.register(Designation, DesignationAdmin)
@@ -127,3 +145,4 @@ admin.site.register(DmaCalender, DmaCalenderAdmin)
 admin.site.register(HolidayCalender, HolidayCalenderAdmin)
 admin.site.register(Slc, SlcAdmin)
 admin.site.register(HolidayType, HolidayTypeAdmin)
+admin.site.register(HourType, HourTypeAdmin)
