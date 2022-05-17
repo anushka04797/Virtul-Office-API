@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from wbs.models import TimeCard, Wbs, WbsSharedFiles
+from wbs.models import TimeCard, Wbs, WbsSharedFiles, WeekTimeCard
 from users.serializers import UserDetailSerializer
 from projects.serializers import ProjectDetailsForWbsSerializer, ProjectDetailsSerializer
 from django.utils import timezone
@@ -189,4 +189,63 @@ class WbsFileSerializer(serializers.ModelSerializer):
             'wbs_id',
             'file',
             'upload_by'
+        )
+
+
+class SubmitWeeklyTimeCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WeekTimeCard
+        fields = (
+            'id',
+            'employee',
+            'week_start',
+            'week_end',
+            'total_hours',
+            'approved_by',
+            'submitted',
+            'pdf_file',
+            'date_created',
+            'date_updated'
+        )
+
+
+class UpdateWeeklyTimeCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WeekTimeCard
+        fields = (
+            'id',
+            'employee',
+            'week_start',
+            'week_end',
+            'total_hours',
+            'approved_by',
+            'submitted',
+            'pdf_file',
+            'date_created',
+            'date_updated'
+        )
+
+        def update(self, instance, validated_data):
+            instance.pdf_file = validated_data.get('pdf_file', instance.pdf_file)
+            instance.total_hours = validated_data.get('total_hours', instance.total_hours)
+            instance.date_updated = validated_data.get('date_updated', timezone.now)
+            instance.save()
+            return instance
+
+
+class UserSubmitWeeklyTimeCardSerializer(serializers.ModelSerializer):
+    employee=UserDetailSerializer()
+    class Meta:
+        model = WeekTimeCard
+        fields = (
+            'id',
+            'employee',
+            'week_start',
+            'week_end',
+            'total_hours',
+            'approved_by',
+            'submitted',
+            'pdf_file',
+            'date_created',
+            'date_updated'
         )

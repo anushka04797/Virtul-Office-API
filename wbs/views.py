@@ -19,8 +19,8 @@ from users.serializers import UserDetailSerializer
 from virtual_office_API.settings import EMAIL_HOST_USER
 from wbs.serializers import CreateTimeCardSerializer, CreateWbsSerializer, WbsDetailsSerializer, WbsUpdateSerializer, \
     TimeCardDetailsSerializer, WbsStatusUpdateSerializer, WbsWiseTimeCardListSerializer, TimecardUpdateSerializer, \
-    WbsFileSerializer
-from wbs.models import TimeCard, Wbs
+    WbsFileSerializer, SubmitWeeklyTimeCardSerializer, UpdateWeeklyTimeCardSerializer
+from wbs.models import TimeCard, Wbs, WeekTimeCard
 from projects.models import Projects, ProjectAssignee
 from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated
@@ -489,9 +489,44 @@ class AddTimeCard(APIView):
 class SubmitTimeCard(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def put(self, request):
-        for item in request.data['time_cards']:
-            TimeCard.objects.filter(pk=item).update(submitted=True)
+    def post(self, request):
+        total_hours = 0
+        print(request.data['time_cards'])
+        print(request.data['time_cards'].split(","))
+        for item in request.data['time_cards'].split(","):
+            total_hours += float(TimeCard.objects.filter(pk=item)[0].hours_today)
+            # TimeCard.objects.filter(pk=item).update(submitted=True)
+
+        new_weekly_submission = {
+            'employee': request.user.id,
+            'total_hours': total_hours,
+            'week_start': request.data['week_start'],
+            'pdf_file': request.data.get('pdf_file'),
+            'week_end': request.data['week_end'],
+            'submitted': 1,
+        }
+        print(new_weekly_submission)
+        week_timecard = WeekTimeCard.objects.filter(week_start=request.data['week_start'],week_end=request.data['week_end']).exists()
+        if week_timecard:
+            existing_tc=WeekTimeCard.objects.filter(week_start=request.data['week_start'],week_end=request.data['week_end']).first()
+            print(existing_tc)
+            # updated_timecard=UpdateWeeklyTimeCardSerializer(existing_tc,data=new_weekly_submission)
+            #
+            # if updated_timecard.is_valid():
+            #     updated_timecard.save()
+            # else:
+            #     print(updated_timecard.errors)
+            # WeekTimeCard.objects.filter(week_start=request.data['week_start'], week_end=request.data['week_end']).update(pdf_file=request.data.get('pdf_file'),total_hours=total_hours,date_updated=timezone.now())
+        else:
+            try:
+                submitted_week_timecard = SubmitWeeklyTimeCardSerializer(data=new_weekly_submission)
+                if submitted_week_timecard.is_valid(raise_exception=True):
+                    submitted_week_timecard.save()
+                else:
+                    print('else')
+                    print(submitted_week_timecard.errors)
+            except Exception as e:
+                print(e)
 
         response = {
             'success': 'True',
@@ -500,6 +535,28 @@ class SubmitTimeCard(APIView):
             'data': 'Time Cards Submitted'
         }
         return Response(response, status=status.HTTP_200_OK)
+
+
+class UserSubmittedWeeklyTimecards(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = request.user
+        try:
+            submitted_timecards = SubmitWeeklyTimeCardSerializer(WeekTimeCard.objects.filter(employee=user.id),
+                                                                 many=True).data
+
+            response = {
+                'success': 'True',
+                'status code': status.HTTP_200_OK,
+                'message': 'Submitted Weekly timecards',
+                'data': submitted_timecards
+            }
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            response = 'on line {}'.format(
+                sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
 
 
 class UploadWbsDocs(APIView):
@@ -527,6 +584,3 @@ class UploadWbsDocs(APIView):
             'data': 'Time Cards Submitted'
         }
         return Response(response, status=status.HTTP_200_OK)
-
-
-

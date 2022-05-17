@@ -73,11 +73,13 @@ class TimeCard(models.Model):
 class WeekTimeCard(models.Model):
     employee = models.ForeignKey(CustomUser, related_name="employee", blank=False, null=False,
                                  on_delete=models.CASCADE)
+    week_start = models.DateField(_('week start'), default=timezone.now)
+    week_end = models.DateField(_('week end'), default=timezone.now)
     total_hours = models.IntegerField(_('total_hours'), blank=False, null=False)
     time_type = models.CharField(_('time type'), max_length=20, blank=True, null=True, default="RHR")
     submitted = models.BooleanField(_('submitted'), blank=True, null=True, default=False)
-    pdf_file = models.FileField(upload_to='uploads/weekly_time_cards/files/pdf', blank=False, null=False)
-    approved_by=models.ForeignKey(CustomUser, related_name="approved_by", blank=False, null=False,
+    pdf_file = models.FileField(upload_to='uploads/weekly_time_cards/files/pdf', blank=True, null=True)
+    approved_by=models.ForeignKey(CustomUser, related_name="approved_by", blank=True, null=True,
                                  on_delete=models.CASCADE)
     date_created = models.DateField(_('date created'), default=timezone.now)
     date_updated = models.DateField(_('date updated'), default=timezone.now)
@@ -86,9 +88,6 @@ class WeekTimeCard(models.Model):
         db_table = 'weekly_time_cards'
         verbose_name = _('weekly_time_card')
         verbose_name_plural = _('weekly_time_cards')
-
-    def __str__(self):
-        return self.total_hours
 
 
 class WbsSharedFiles(models.Model):
