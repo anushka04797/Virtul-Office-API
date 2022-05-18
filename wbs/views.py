@@ -1,6 +1,7 @@
 from datetime import date
 from django.contrib.auth.models import Group
 from django.core.mail import send_mail
+from django.db.models import Sum
 from django.utils import timezone, dateformat
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.serializers import Serializer
@@ -10,7 +11,7 @@ from rest_framework import status
 import sys
 import os
 import pendulum
-import datetime
+from datetime import datetime
 
 from projects.serializers import CreateProjectAssigneeSerializer, UpdateProjectRemainingHrsSerializer, \
     ProjectDetailsSerializer, ProjectAssigneeSerializer
@@ -19,7 +20,8 @@ from users.serializers import UserDetailSerializer
 from virtual_office_API.settings import EMAIL_HOST_USER
 from wbs.serializers import CreateTimeCardSerializer, CreateWbsSerializer, WbsDetailsSerializer, WbsUpdateSerializer, \
     TimeCardDetailsSerializer, WbsStatusUpdateSerializer, WbsWiseTimeCardListSerializer, TimecardUpdateSerializer, \
-    WbsFileSerializer, SubmitWeeklyTimeCardSerializer, UpdateWeeklyTimeCardSerializer
+    WbsFileSerializer, SubmitWeeklyTimeCardSerializer, UpdateWeeklyTimeCardSerializer, \
+    UserSubmitWeeklyTimeCardSerializer
 from wbs.models import TimeCard, Wbs, WeekTimeCard
 from projects.models import Projects, ProjectAssignee
 from rest_framework import permissions
@@ -465,8 +467,8 @@ class AddTimeCard(APIView):
                 'project': request.data['project'],
                 'wbs': request.data['wbs'],
                 'time_card_assignee': request.data['assignee'],
-                'date_created': datetime.datetime.now().date(),
-                'date_updated': datetime.datetime.now().date()
+                'date_created': datetime.now().date(),
+                'date_updated': datetime.now().date()
             }
             print(data)
             new_time_card = self.serializer_class(data=data)
@@ -504,6 +506,7 @@ class SubmitTimeCard(APIView):
             # 'pdf_file': request.data.get('pdf_file'),
             'week_end': request.data['week_end'],
             'submitted': 1,
+            'submitted_at':datetime.now()
         }
         print(new_weekly_submission)
         week_timecard = WeekTimeCard.objects.filter(week_start=request.data['week_start'],week_end=request.data['week_end']).exists()
@@ -541,8 +544,14 @@ class UserSubmittedWeeklyTimecards(APIView):
     def get(self, request):
         user = request.user
         try:
-            submitted_timecards = SubmitWeeklyTimeCardSerializer(WeekTimeCard.objects.filter(employee=user.id),
-                                                                 many=True).data
+            submitted_timecards = UserSubmitWeeklyTimeCardSerializer(WeekTimeCard.objects.filter(employee=user.id), many=True).data
+            for tc in submitted_timecards:
+                tc['RHR']=TimeCard.objects.filter(time_type='RHR',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
+                tc['SIC'] = TimeCard.objects.filter(time_type='SIC',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
+                tc['HOL'] = TimeCard.objects.filter(time_type='HOL',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
+                tc['PB1'] = TimeCard.objects.filter(time_type='PB1',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
+                tc['WFH'] = TimeCard.objects.filter(time_type='WFH',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
+                tc['OTO'] = TimeCard.objects.filter(time_type='OTO',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
 
             response = {
                 'success': 'True',

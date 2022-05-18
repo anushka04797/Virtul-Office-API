@@ -72,7 +72,7 @@ class HolidayCalenderSerializer(serializers.ModelSerializer):
         model = HolidayCalender
         fields = (
             'id',
-            'Year', 'Month', 'holiday_title', 'start_date', 'end_date'
+            'Year', 'Month', 'holiday_title', 'start_date', 'end_date','hours'
         )
 
 

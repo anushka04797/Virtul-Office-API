@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -81,6 +82,7 @@ class WeekTimeCard(models.Model):
     pdf_file = models.FileField(upload_to='uploads/weekly_time_cards/files/pdf', blank=True, null=True)
     approved_by=models.ForeignKey(CustomUser, related_name="approved_by", blank=True, null=True,
                                  on_delete=models.CASCADE)
+    submitted_at= models.DateTimeField(_('submitted at'), default=datetime.now())
     date_created = models.DateField(_('date created'), default=timezone.now)
     date_updated = models.DateField(_('date updated'), default=timezone.now)
 

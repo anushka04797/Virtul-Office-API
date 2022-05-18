@@ -220,6 +220,7 @@ class UpdateWeeklyTimeCardSerializer(serializers.ModelSerializer):
             'total_hours',
             'approved_by',
             'submitted',
+            'submitted_at',
             'pdf_file',
             'date_created',
             'date_updated'
@@ -235,6 +236,7 @@ class UpdateWeeklyTimeCardSerializer(serializers.ModelSerializer):
 
 class UserSubmitWeeklyTimeCardSerializer(serializers.ModelSerializer):
     employee=UserDetailSerializer()
+
     class Meta:
         model = WeekTimeCard
         fields = (
@@ -245,6 +247,7 @@ class UserSubmitWeeklyTimeCardSerializer(serializers.ModelSerializer):
             'total_hours',
             'approved_by',
             'submitted',
+            'submitted_at',
             'pdf_file',
             'date_created',
             'date_updated'
