@@ -48,4 +48,4 @@ urlpatterns = [
                                     permission_classes=(AllowAny,))),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# urlpatterns = [url(r'^vo-admin/', include(urlpatterns))]
+urlpatterns = [url(r'^vo-admin/', include(urlpatterns))]

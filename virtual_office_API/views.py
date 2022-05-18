@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 
 def redirect_view(request):
-    # response = redirect('/vo-admin/admin/')
-    response = redirect('/admin/')
+    response = redirect('/vo-admin/admin/')
+    # response = redirect('/admin/')
     return response
 
 
