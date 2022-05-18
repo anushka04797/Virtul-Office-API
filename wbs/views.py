@@ -495,13 +495,13 @@ class SubmitTimeCard(APIView):
         print(request.data['time_cards'].split(","))
         for item in request.data['time_cards'].split(","):
             total_hours += float(TimeCard.objects.filter(pk=item)[0].hours_today)
-            # TimeCard.objects.filter(pk=item).update(submitted=True)
+            TimeCard.objects.filter(pk=item).update(submitted=True)
 
         new_weekly_submission = {
             'employee': request.user.id,
             'total_hours': total_hours,
             'week_start': request.data['week_start'],
-            'pdf_file': request.data.get('pdf_file'),
+            # 'pdf_file': request.data.get('pdf_file'),
             'week_end': request.data['week_end'],
             'submitted': 1,
         }
@@ -510,13 +510,11 @@ class SubmitTimeCard(APIView):
         if week_timecard:
             existing_tc=WeekTimeCard.objects.filter(week_start=request.data['week_start'],week_end=request.data['week_end']).first()
             print(existing_tc)
-            # updated_timecard=UpdateWeeklyTimeCardSerializer(existing_tc,data=new_weekly_submission)
-            #
-            # if updated_timecard.is_valid():
-            #     updated_timecard.save()
-            # else:
-            #     print(updated_timecard.errors)
-            # WeekTimeCard.objects.filter(week_start=request.data['week_start'], week_end=request.data['week_end']).update(pdf_file=request.data.get('pdf_file'),total_hours=total_hours,date_updated=timezone.now())
+            updated_timecard=UpdateWeeklyTimeCardSerializer(existing_tc,data=new_weekly_submission)
+
+            if updated_timecard.is_valid():
+                updated_timecard.save()
+
         else:
             try:
                 submitted_week_timecard = SubmitWeeklyTimeCardSerializer(data=new_weekly_submission)
