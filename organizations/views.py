@@ -47,12 +47,9 @@ class HoursSpentAndLeft(APIView):
     def get(self, request):
         try:
             user = UserDetailSerializer(request.user).data
-            user_company=user['slc_details']['slc']['department']['company']['id']
-            result = []
 
-            hour_types = HourTypeSerializer(HourType.objects.filter(company=user_company), many=True).data
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'DMA calender Details',
-                        'data': hour_types}
+                        'data': []}
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
             response = 'on line {}'.format(
@@ -67,8 +64,11 @@ class WorkTypesList(APIView):
     def get(self, request):
         try:
             user = UserDetailSerializer(request.user).data
-            user_company = user['slc_details']['slc']['department']['company']['id']
-            hour_types = HourTypeSerializer(HourType.objects.filter(company=user_company), many=True).data
+            if user['slc_details'] is None:
+                hour_types = HourTypeSerializer(HourType.objects.all(), many=True).data
+            else:
+                user_company = user['slc_details']['slc']['department']['company']['id']
+                hour_types = HourTypeSerializer(HourType.objects.filter(company=user_company), many=True).data
             print(hour_types)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'DMA calender Details',
                         'data': hour_types}
