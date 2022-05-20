@@ -90,6 +90,7 @@ class WeekTimeCard(models.Model):
         db_table = 'weekly_time_cards'
         verbose_name = _('weekly_time_card')
         verbose_name_plural = _('weekly_time_cards')
+        ordering = ('-submitted_at',)
 
 
 class WbsSharedFiles(models.Model):

@@ -14,7 +14,8 @@ import pendulum
 from datetime import datetime
 
 from projects.serializers import CreateProjectAssigneeSerializer, UpdateProjectRemainingHrsSerializer, \
-    ProjectDetailsSerializer, ProjectAssigneeSerializer
+    ProjectDetailsSerializer, ProjectAssigneeSerializer, TaskSerializer
+from projects.views import unique
 from users.models import CustomUser
 from users.serializers import UserDetailSerializer
 from virtual_office_API.settings import EMAIL_HOST_USER
@@ -506,14 +507,18 @@ class SubmitTimeCard(APIView):
             # 'pdf_file': request.data.get('pdf_file'),
             'week_end': request.data['week_end'],
             'submitted': 1,
-            'submitted_at':datetime.now()
+            'submitted_at': datetime.now()
         }
         print(new_weekly_submission)
-        week_timecard = WeekTimeCard.objects.filter(week_start=request.data['week_start'],week_end=request.data['week_end']).exists()
+        week_timecard = WeekTimeCard.objects.filter(week_start=request.data['week_start'],
+                                                    week_end=request.data['week_end'],
+                                                    employee=request.user.id).exists()
         if week_timecard:
-            existing_tc=WeekTimeCard.objects.filter(week_start=request.data['week_start'],week_end=request.data['week_end']).first()
+            existing_tc = WeekTimeCard.objects.filter(week_start=request.data['week_start'],
+                                                      week_end=request.data['week_end'],
+                                                      employee=request.user.id).first()
             print(existing_tc)
-            updated_timecard=UpdateWeeklyTimeCardSerializer(existing_tc,data=new_weekly_submission)
+            updated_timecard = UpdateWeeklyTimeCardSerializer(existing_tc, data=new_weekly_submission)
 
             if updated_timecard.is_valid():
                 updated_timecard.save()
@@ -544,14 +549,35 @@ class UserSubmittedWeeklyTimecards(APIView):
     def get(self, request):
         user = request.user
         try:
-            submitted_timecards = UserSubmitWeeklyTimeCardSerializer(WeekTimeCard.objects.filter(employee=user.id), many=True).data
+            submitted_timecards = []
+            if request.user.has_perm('projects.add_projects'):
+
+                projects = TaskSerializer(Projects.objects.filter(pm=user.id), many=True).data
+
+                assignees = []
+                for task in projects:
+                    task_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project_id=task['id']),many=True).data
+                    for task_assignee in task_assignees:
+                        assignees.append(UserDetailSerializer(CustomUser.objects.get(pk=task_assignee['assignee']['id'])).data)
+
+                assignees = unique(assignees)  #making assignees array distinct
+
+                for assignee in assignees:
+                    tc_list=UserSubmitWeeklyTimeCardSerializer(WeekTimeCard.objects.filter(employee=assignee['id']),many=True).data
+                    for tc in tc_list:
+                        submitted_timecards.append(tc)
+
+
+            else:
+                submitted_timecards = UserSubmitWeeklyTimeCardSerializer(WeekTimeCard.objects.filter(employee=user.id),many=True).data
+
             for tc in submitted_timecards:
-                tc['RHR']=TimeCard.objects.filter(time_type='RHR',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
-                tc['SIC'] = TimeCard.objects.filter(time_type='SIC',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
-                tc['HOL'] = TimeCard.objects.filter(time_type='HOL',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
-                tc['PB1'] = TimeCard.objects.filter(time_type='PB1',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
-                tc['WFH'] = TimeCard.objects.filter(time_type='WFH',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
-                tc['OTO'] = TimeCard.objects.filter(time_type='OTO',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
+                tc['RHR'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='RHR',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
+                tc['SIC'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='SIC',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
+                tc['HOL'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='HOL',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
+                tc['PB1'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='PB1',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
+                tc['WFH'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='WFH',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
+                tc['OTO'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='OTO',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
 
             response = {
                 'success': 'True',
