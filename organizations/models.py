@@ -171,8 +171,6 @@ class HourType(models.Model):
     description = models.TextField(_('description'), max_length=150, blank=True, null=True)
     hours_allocated = models.IntegerField(_('hours allocated'), default=0, blank=False, null=False)
     year = models.IntegerField(_('year'), choices=YEAR_CHOICES, default=datetime.now().year, blank=False)
-    added_by = models.ForeignKey(CustomUser, related_name="added_by", blank=False, null=False,
-                                 on_delete=models.CASCADE)
     company = models.ForeignKey(Company, related_name="company", blank=False, null=False,
                                  on_delete=models.CASCADE)
     date_created = models.DateField(_('date created'), default=timezone.now)

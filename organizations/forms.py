@@ -32,5 +32,4 @@ class HourTypeForm(forms.ModelForm):
             'year',
             'description',
             'hours_allocated',
-            'added_by'
         ]

@@ -1,13 +1,8 @@
 from django.contrib import admin
 from django.contrib.admin.helpers import Fieldset
-from django.forms import ChoiceField
-
-from organizations import models
 from organizations.models import Company, Department, Designation, DmaCalender, HolidayCalender, Slc, HolidayType, \
     HourType
 from users.models import CustomUser
-from datetime import datetime
-from organizations.forms import CustomAddSLCForm, CustomEditSLCForm, HourTypeForm
 
 
 class CompanyAdmin(admin.ModelAdmin):
@@ -36,7 +31,7 @@ class HolidayTypeAdmin(admin.ModelAdmin):
 
 class HourTypeAdmin(admin.ModelAdmin):
     # fields = ['title', 'year']
-    list_display = ('company','title','hours_allocated','year')
+    list_display = ('company', 'title', 'hours_allocated', 'year')
     ordering = ('title',)
     search_fields = ('title', 'company')
 
@@ -109,7 +104,7 @@ class DmaCalenderAdmin(admin.ModelAdmin):
 
 class HolidayCalenderAdmin(admin.ModelAdmin):
     list_display = (
-        'Year', 'holiday_type', 'holiday_title', 'start_date', 'end_date', 'hours'
+        'Year', 'holiday_title', 'start_date', 'end_date', 'hours'
     )
     list_display_links = ('holiday_title',)
     search_fields = ['holiday_title']
@@ -134,8 +129,6 @@ class SlcAdmin(admin.ModelAdmin):
         if db_field.name == "employee":
             kwargs["queryset"] = CustomUser.objects.filter(slc_details=None)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-
 
 
 admin.site.register(Company, CompanyAdmin)
