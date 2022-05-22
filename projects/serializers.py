@@ -18,6 +18,7 @@ class TdoSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
+            'company',
             'description',
             'date_created',
             'date_updated'

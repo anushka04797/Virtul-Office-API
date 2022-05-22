@@ -32,10 +32,13 @@ class CreateProject(APIView):
         count_project_wp = Projects.objects.filter(work_package_number=request.data['work_package_number'])
         work_package_index = request.data['work_package_number'] + '.' + str(len(count_project_wp) + 1)
         request.data['work_package_index'] = work_package_index
+        user = UserDetailSerializer(request.user).data
+        user_company = user['slc_details']['slc']['department']['company']['id']
 
-        if not Tdo.objects.filter(title=request.data['task_delivery_order']).exists():
+        if not Tdo.objects.filter(title=request.data['task_delivery_order'],company=user_company).exists():
             # create tdo block #####################
             tdo_data = {
+                'company':user_company,
                 'title': request.data['task_delivery_order'],
                 'description': request.data['tdo_details']
             }
@@ -44,22 +47,15 @@ class CreateProject(APIView):
                 serializer_tdo.save()
                 request.data['task_delivery_order'] = serializer_tdo.data['id']
         else:
-            tdo = Tdo.objects.filter(title=request.data['task_delivery_order'])[0]
+            tdo = Tdo.objects.filter(title=request.data['task_delivery_order'],company=user_company)[0]
             tdo.description = request.data['tdo_details']
             tdo.save()
             request.data['task_delivery_order'] = TdoSerializer(tdo).data['id']
 
         if request.data['task_delivery_order'] is not None:
-            # create project block #####################
-            # request.data['date_created'] = datetime.datetime.now()
-            # request.data['date_updated'] = datetime.datetime.now()
             serializer = self.serializer_class2(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                # update subtask details
-                # for project in count_project_wp:
-                #     project.description = request.data['description']
-                #     project.save()
                 for idx, item in enumerate(request.data['assignee']):
                     print(idx, item)
                     if serializer.data is not None:
@@ -631,7 +627,9 @@ class TdoList(APIView):
     def get(self, request):
 
         try:
-            tdo_list = Tdo.objects.all()
+            user = UserDetailSerializer(request.user).data
+            user_company = user['slc_details']['slc']['department']['company']['id']
+            tdo_list = Tdo.objects.filter(company=user_company)
             serialized_data = TdoSerializer(tdo_list, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'data': serialized_data.data}
             return Response(response, status=status.HTTP_200_OK)

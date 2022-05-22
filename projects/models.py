@@ -1,12 +1,15 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+
+from organizations.models import Company
 from users.models import CustomUser
 
 
 class Tdo(models.Model):
     title = models.CharField(_('task delivery order'), max_length=50, blank=False, null=True, default=1)
     description = models.CharField(_('task delivery order details'), max_length=550, blank=True, null=True)
+    company = models.ForeignKey(Company, related_name="tdo_company", blank=True, null=True, on_delete=models.CASCADE)
     date_created = models.DateTimeField(_('date created'), default=timezone.now)
     date_updated = models.DateTimeField(_('date updated'), default=timezone.now)
 
