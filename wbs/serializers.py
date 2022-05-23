@@ -203,6 +203,7 @@ class SubmitWeeklyTimeCardSerializer(serializers.ModelSerializer):
             'total_hours',
             'approved_by',
             'submitted',
+            'submitted_by',
             'pdf_file',
             'date_created',
             'date_updated'
@@ -221,6 +222,7 @@ class UpdateWeeklyTimeCardSerializer(serializers.ModelSerializer):
             'approved_by',
             'submitted',
             'submitted_at',
+            'submitted_by',
             'pdf_file',
             'date_created',
             'date_updated'
@@ -230,6 +232,7 @@ class UpdateWeeklyTimeCardSerializer(serializers.ModelSerializer):
             instance.pdf_file = validated_data.get('pdf_file', instance.pdf_file)
             instance.total_hours = validated_data.get('total_hours', instance.total_hours)
             instance.date_updated = validated_data.get('date_updated', timezone.now)
+            instance.submitted_by = validated_data.get('user', instance.submitted_by)
             instance.save()
             return instance
 
@@ -248,6 +251,7 @@ class UserSubmitWeeklyTimeCardSerializer(serializers.ModelSerializer):
             'approved_by',
             'submitted',
             'submitted_at',
+            'submitted_by',
             'pdf_file',
             'date_created',
             'date_updated'

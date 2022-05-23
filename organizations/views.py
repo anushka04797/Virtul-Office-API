@@ -1,12 +1,16 @@
 import datetime
 import sys
+
+from django.db.models import Sum
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from organizations.serializers import DmaCalenderSerializer, HolidayCalenderSerializer, HourTypeSerializer
+from wbs.models import TimeCard
 from .models import DmaCalender, HolidayCalender, HourType
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from users.serializers import UserDetailSerializer
+from datetime import date
 
 
 class DmaCalenderDetails(APIView):
@@ -47,9 +51,15 @@ class HoursSpentAndLeft(APIView):
     def get(self, request):
         try:
             user = UserDetailSerializer(request.user).data
+            user_company = user['slc_details']['slc']['department']['company']['id']
+            current_year = date.today().year
+            hour_types=HourTypeSerializer(HourType.objects.filter(company=user_company),many=True).data
+            for type in hour_types:
+                hours_spent=TimeCard.objects.filter(time_card_assignee=user['id'], time_type=type['title'],date_created__year=current_year).aggregate(Sum('hours_today')).get('hours_today__sum')
+                type['spent']=hours_spent
 
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'DMA calender Details',
-                        'data': []}
+                        'data': hour_types}
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
             response = 'on line {}'.format(

@@ -236,6 +236,7 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
         )
 
     def update(self, instance, validated_data):
+        instance.sub_task = validated_data.get('sub_task', instance.sub_task)
         instance.task_title = validated_data.get('task_title', instance.task_title)
         instance.description = validated_data.get('description', instance.description)
         instance.start_date = validated_data.get('start_date', instance.start_date)

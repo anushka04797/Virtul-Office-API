@@ -80,6 +80,7 @@ class HourTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = HourType
         fields = (
+            'id',
             'title',
             'hours_allocated',
         )

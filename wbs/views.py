@@ -44,10 +44,12 @@ class CreateWbs(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        print(request.data)
-        assignee_list = request.data['assignee']
-        for assignee in assignee_list:
-            request.data['assignee'] = int(assignee)
+        # print(request.data)
+        # assignee_list = request.data['assignee']
+        # print('assignee list',assignee_list)
+        for assignee in request.data['assignee']:
+            print('assignee',assignee)
+            request.data['assignee'] = assignee
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -501,13 +503,14 @@ class SubmitTimeCard(APIView):
             TimeCard.objects.filter(pk=item).update(submitted=True)
 
         new_weekly_submission = {
-            'employee': request.user.id,
+            'employee': request.data['employee'],
             'total_hours': total_hours,
             'week_start': request.data['week_start'],
             # 'pdf_file': request.data.get('pdf_file'),
             'week_end': request.data['week_end'],
             'submitted': 1,
-            'submitted_at': datetime.now()
+            'submitted_at': datetime.now(),
+            'submitted_by': request.user.id
         }
         print(new_weekly_submission)
         week_timecard = WeekTimeCard.objects.filter(week_start=request.data['week_start'],

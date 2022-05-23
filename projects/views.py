@@ -188,11 +188,10 @@ class UpdateProject(APIView):
 
     def put(self, request, pk, format=None):
         try:
-            print(request.data)
             projects = Projects.objects.get(work_package_index=pk)
             serializer = UpdateProjectSerializer(projects, data=request.data)
-
-            if serializer.is_valid():
+            print(request.data['sub_task'])
+            if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 print(serializer.data)
 
@@ -200,7 +199,6 @@ class UpdateProject(APIView):
                 count=0
                 for assignee in assignees:
                     if not ProjectAssignee.objects.filter(assignee=assignee, project=serializer.data['id']).exists():
-                        # print('erfef'+request.data['estimated_person'][count])
                         temp_data = {
                             'assignee': assignee,
                             'estimated_person': request.data['estimated_person'][count],
@@ -227,23 +225,9 @@ class UpdateProject(APIView):
                         ProjectAssignee.objects.filter(assignee=assignee['assignee']['id'],project=serializer.data['id']).delete()
                     else:
                         ProjectAssignee.objects.filter(assignee=assignee['assignee']['id'], project=serializer.data['id']).update(estimated_person=request.data['estimated_person'][count])
-                        # updated_assignee=assignee
-                        # updated_assignee['estimated_person']=request.data['estimated_person'][count]
-                        # print(updated_assignee['estimated_person'])
-                        # assignee_update_serializer=UpdateProjectAssigneeSerializer(assignee,data=updated_assignee)
-                        # assignee_update_serializer.is_valid()
-                        # assignee_update_serializer.save()
 
                     count+=1
-                # if request.data['sub_task_updated']:
-                work_package_number = pk.split('.')[0]
-                # Projects.objects.filter(work_package_number=work_package_number).update(
-                #     sub_task=request.data['sub_task'])
-                # sub_task_to_update = Projects.objects.filter(work_package_number=work_package_number)
-                # for sub_task in sub_task_to_update:
-                #     serializer3 = UpdateSubTaskSerializer(sub_task, request.data)
-                #     if serializer3.is_valid():
-                #         serializer3.save()
+
                 response = {
                     'success': 'True',
                     'status code': status.HTTP_200_OK,
