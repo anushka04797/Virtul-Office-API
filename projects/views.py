@@ -259,7 +259,8 @@ class PmProjectAllAssigneeList(APIView):
                 'success': 'True',
                 'status code': status.HTTP_200_OK,
                 'message': 'My Heroes',
-                'data': assignees
+                'data': assignees,
+                'user': UserDetailSerializer(request.user).data
             }
             return Response(response, status=status.HTTP_200_OK)
             return Response(assignees)

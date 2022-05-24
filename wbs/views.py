@@ -496,8 +496,8 @@ class SubmitTimeCard(APIView):
 
     def post(self, request):
         total_hours = 0
-        print(request.data['time_cards'])
-        print(request.data['time_cards'].split(","))
+        print(request.data)
+
         for item in request.data['time_cards'].split(","):
             total_hours += float(TimeCard.objects.filter(pk=item)[0].hours_today)
             TimeCard.objects.filter(pk=item).update(submitted=True)
@@ -515,11 +515,11 @@ class SubmitTimeCard(APIView):
         print(new_weekly_submission)
         week_timecard = WeekTimeCard.objects.filter(week_start=request.data['week_start'],
                                                     week_end=request.data['week_end'],
-                                                    employee=request.user.id).exists()
+                                                    employee=request.data['employee']).exists()
         if week_timecard:
             existing_tc = WeekTimeCard.objects.filter(week_start=request.data['week_start'],
                                                       week_end=request.data['week_end'],
-                                                      employee=request.user.id).first()
+                                                      employee=request.data['employee']).first()
             print(existing_tc)
             updated_timecard = UpdateWeeklyTimeCardSerializer(existing_tc, data=new_weekly_submission)
 
