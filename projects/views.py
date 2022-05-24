@@ -507,10 +507,11 @@ class ProjectAssigneeList(APIView):
 
     def get(self, request, pk):
         try:
-            projects = Projects.objects.filter(work_package_index=pk)
-            serializer = ProjectDetailsSerializer(projects, many=True)
+            project =  ProjectDetailsSerializer(Projects.objects.get(work_package_index=pk)).data
+            
+            assignees= ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=project['id']),many=True).data
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'project assignee list',
-                        'data': serializer.data}
+                        'data': assignees}
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
         return Response(response)
