@@ -75,7 +75,7 @@ class CreateProject(APIView):
                             user_email = UserDetailSerializer(CustomUser.objects.get(id=item)).data['email']
 
                             html_template = 'create-project/index.html'
-                            html_message = render_to_string(html_template, {'name': UserDetailSerializer(CustomUser.objects.get(id=item)).data['first_name'],'href':'http://localhost:3000/#/login/?task_details='+serializer.data['work_package_index'] })
+                            html_message = render_to_string(html_template, {'name': UserDetailSerializer(CustomUser.objects.get(id=item)).data['first_name'],'href':'https://virtualoffice.com.bd/#/login/?task_details='+serializer.data['work_package_index'] })
                             message = EmailMessage('Project assigned', html_message, EMAIL_HOST_USER, [user_email])
                             message.content_subtype = 'html'  # this is required because there is no plain text email message
                             message.send()
