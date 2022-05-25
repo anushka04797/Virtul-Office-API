@@ -114,10 +114,11 @@ class UpdateWbs(APIView):
                     print(serializer2.errors)
                     if serializer2.is_valid():
                         serializer2.save()
-                        temp2 = {
-                            "remaining_hours": request.data['remaining_hours']
-                        }
                         project = Projects.objects.get(id=request.data['project'])
+                        temp2 = {
+                            "remaining_hours": project.remaining_hours-request.data['hours_worked']
+                        }
+
                         serializer3 = UpdateProjectRemainingHrsSerializer(project, data=temp2)
                         if serializer3.is_valid():
                             serializer3.save()
@@ -453,7 +454,7 @@ class TimecardUpdate(APIView):
                 sys.exc_info()[-1].tb_lineno), str(e)
             return Response(response)
 
-
+# add time card API
 class AddTimeCard(APIView):
     permission_classes = (AllowAny,)
     serializer_class = CreateTimeCardSerializer
