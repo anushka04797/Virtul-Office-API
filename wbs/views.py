@@ -116,9 +116,8 @@ class UpdateWbs(APIView):
                         serializer2.save()
                         project = Projects.objects.get(id=request.data['project'])
                         temp2 = {
-                            "remaining_hours": project.remaining_hours-request.data['hours_worked']
+                            "remaining_hours": float(project.remaining_hours)-float(request.data['hours_worked'])
                         }
-
                         serializer3 = UpdateProjectRemainingHrsSerializer(project, data=temp2)
                         if serializer3.is_valid():
                             serializer3.save()
