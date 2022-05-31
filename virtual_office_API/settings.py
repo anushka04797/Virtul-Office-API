@@ -132,10 +132,10 @@ DATABASES = {
             'sql_mode': 'traditional',
         },
         # 'NAME': 'virtual_office_v1',
-        'NAME': 'virtual_office_api',
+        'NAME': 'virtual_office',
         'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
+        'PASSWORD': 'Dhaka!027#',
+        'HOST': '203.96.226.226',
         'PORT': '3306',
     }
 }
