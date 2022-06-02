@@ -19,7 +19,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 # create project
 from users.serializers import UserDetailSerializer
 from virtual_office_API.settings import EMAIL_HOST_USER
-
+from post_office import mail
 
 class CreateProject(APIView):
     serializer_class = TdoSerializer
@@ -75,10 +75,23 @@ class CreateProject(APIView):
                             user_email = UserDetailSerializer(CustomUser.objects.get(id=item)).data['email']
 
                             html_template = 'create-project/index.html'
-                            html_message = render_to_string(html_template, {'name': UserDetailSerializer(CustomUser.objects.get(id=item)).data['first_name'],'href':'https://virtualoffice.com.bd/#/login/?task_details='+serializer.data['work_package_index'] })
-                            message = EmailMessage('Project assigned', html_message, EMAIL_HOST_USER, [user_email])
-                            message.content_subtype = 'html'  # this is required because there is no plain text email message
-                            message.send()
+                            # html_message = render_to_string(html_template, {'name': UserDetailSerializer(CustomUser.objects.get(id=item)).data['first_name'],'href':'https://virtualoffice.com.bd/#/login/?task_details='+serializer.data['work_package_index'] })
+                            # message = EmailMessage('Project assigned', html_message, EMAIL_HOST_USER, [user_email])
+                            # message.content_subtype = 'html'  # this is required because there is no plain text email message
+                            # message.send()
+                            #sending mail using post-office
+                            try:
+                                mail.send(
+                                    'shaif.rahi@northsouth.edu',  # List of email addresses also accepted
+                                    EMAIL_HOST_USER,
+                                    subject='My email',
+                                    message='Hi there!',
+                                    html_message='Hi <strong>there</strong>!',
+                                    priority='high'
+                                )
+                            except Exception as e:
+                                print(e)
+                            #sending email using post-office ends here
 
                             # message = "A project named '" + serializer.data['sub_task'] + "' -> '" + serializer.data[
                             #     'task_title'] + "' has been assigned to you. Please check the Virtual Office for details."
@@ -645,6 +658,7 @@ class WPList(APIView):
         try:
             work_package_numbers = Projects.objects.values_list('work_package_number', flat=True)
             sub_tasks = Projects.objects.values_list('sub_task', flat=True)
+
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'wp': unique(work_package_numbers),
                         'sub_tasks': unique(sub_tasks)}
             return Response(response, status=status.HTTP_200_OK)

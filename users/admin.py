@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from rangefilter.filter import DateRangeFilter
 from django.utils.translation import ugettext_lazy as _
 from users.models import CustomUser
-
+from post_office.models import *
 
 class UsersAdmin(UserAdmin):
     # The forms to add and change user instances
@@ -44,3 +44,9 @@ class UsersAdmin(UserAdmin):
 
 
 admin.site.register(CustomUser, UsersAdmin)
+
+
+admin.site.unregister(Email)
+admin.site.unregister(EmailTemplate)
+admin.site.unregister(Attachment)
+admin.site.unregister(Log)

@@ -95,7 +95,6 @@ class UpdateWbs(APIView):
             wbs = Wbs.objects.get(id=pk)
             temp_data = request.data
             temp_data['date_updated'] = dateformat.format(timezone.now(), 'Y-m-d')
-            # print(temp_data)
             serializer = WbsUpdateSerializer(wbs, data=temp_data)
             # print(serializer.errors)
             if serializer.is_valid():
@@ -109,6 +108,15 @@ class UpdateWbs(APIView):
                         "actual_work_done": request.data['actual_work_done'],
                         "hours_today": request.data['hours_worked'],
                     }
+                    wbs_status_data = {
+                        'id': pk,
+                        'status': 2,
+                        'date_updated': dateformat.format(timezone.now(), 'Y-m-d')
+                    }
+                    wbs_status_update_serializer = WbsStatusUpdateSerializer(wbs, data=wbs_status_data)
+                    if wbs_status_update_serializer.is_valid():
+                        wbs_status_update_serializer.save()
+
                     serializer2 = CreateTimeCardSerializer(data=temp)
                     serializer2.is_valid()
                     print(serializer2.errors)

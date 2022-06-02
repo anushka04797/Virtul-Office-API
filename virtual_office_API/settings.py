@@ -34,6 +34,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 INSTALLED_APPS = [
     'corsheaders',
+    "post_office",
+    'django_crontab',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -72,13 +74,22 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/?verification=1'
 
 SITE_ID = 1
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'post_office.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'dmavirtualoffice21@gmail.com'
 EMAIL_HOST_PASSWORD = 'tbvqoykxleivsqmu'
 # <==end of custom user
+POST_OFFICE = {
+    'THREADS_PER_PROCESS': 10,
+}
+# cron jobs
+CRONJOBS = [
+    ('*/5 * * * *', 'virtual_office_API.cron.my_scheduled_job', ['arg1', 'arg2'], {'verbose': 0}),
+    ('0   4 * * *', 'django.core.management.call_command', ['clearsessions']),
+]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -110,20 +121,25 @@ TEMPLATES = [
             ],
         },
     },
+    {
+        'BACKEND': 'post_office.template.backends.post_office.PostOfficeTemplates',
+        'APP_DIRS': True,
+        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.template.context_processors.request',
+            ]
+        }
+    }
 ]
 
 WSGI_APPLICATION = 'virtual_office_API.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 DATABASES = {
     'default': {
@@ -131,11 +147,11 @@ DATABASES = {
         'OPTIONS': {
             'sql_mode': 'traditional',
         },
-        # 'NAME': 'virtual_office_v1',
-        'NAME': 'virtual_office',
+        'NAME': 'virtual_office_v1',
+        # 'NAME': 'virtual_office',
         'USER': 'root',
         'PASSWORD': 'Dhaka!027#',
-        'HOST': '203.96.226.226',
+        'HOST': '192.168.0.225',
         'PORT': '3306',
     }
 }
@@ -175,13 +191,11 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
-
-STATIC_URL = '/static/'
 
 REST_USE_JWT = True
 
