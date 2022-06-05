@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import datetime
 from datetime import timedelta
 import os
 from pathlib import Path
@@ -35,7 +35,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 INSTALLED_APPS = [
     'corsheaders',
     "post_office",
-    'django_crontab',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -81,15 +80,7 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'dmavirtualoffice21@gmail.com'
 EMAIL_HOST_PASSWORD = 'tbvqoykxleivsqmu'
-# <==end of custom user
-POST_OFFICE = {
-    'THREADS_PER_PROCESS': 10,
-}
-# cron jobs
-CRONJOBS = [
-    ('*/5 * * * *', 'virtual_office_API.cron.my_scheduled_job', ['arg1', 'arg2'], {'verbose': 0}),
-    ('0   4 * * *', 'django.core.management.call_command', ['clearsessions']),
-]
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -138,6 +129,13 @@ TEMPLATES = [
         }
     }
 ]
+
+POST_OFFICE = {
+    'MAX_RETRIES': 4,
+    'RETRY_INTERVAL': datetime.timedelta(seconds=1),  # Schedule to be retried 15 minutes later
+    'THREADS_PER_PROCESS': 10,
+    'TEMPLATE_ENGINE': 'post_office',
+}
 
 WSGI_APPLICATION = 'virtual_office_API.wsgi.application'
 
@@ -191,7 +189,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)

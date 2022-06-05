@@ -8,6 +8,8 @@ from django.core.mail import send_mail
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from projects.mails import send_create_project_email
 from projects.serializers import SubTaskSerializer, CreateProjectSerializer, ProjectDetailsSerializer, \
     UpdateProjectSerializer, ProjectAssigneeSerializer, TdoSerializer, CreateProjectAssigneeSerializer, \
     UpdateSubTaskSerializer, TaskSerializer, ProjectFileSerializer, DocumentListSerializer, \
@@ -30,7 +32,7 @@ class CreateProject(APIView):
     def post(self, request):
         print(enumerate(request.data['assignee']))
         count_project_wp = Projects.objects.filter(work_package_number=request.data['work_package_number'])
-        work_package_index = request.data['work_package_number'] + '.' + str(len(count_project_wp) + 1)
+        work_package_index = str(request.data['work_package_number']) + '.' + str(len(count_project_wp) + 1)
         request.data['work_package_index'] = work_package_index
         user = UserDetailSerializer(request.user).data
         user_company = user['slc_details']['slc']['department']['company']['id']
@@ -81,22 +83,19 @@ class CreateProject(APIView):
                             # message.send()
                             #sending mail using post-office
                             try:
-                                mail.send(
-                                    'shaif.rahi@northsouth.edu',  # List of email addresses also accepted
-                                    EMAIL_HOST_USER,
-                                    subject='My email',
-                                    message='Hi there!',
-                                    html_message='Hi <strong>there</strong>!',
-                                    priority='high'
-                                )
+                                # mail.send(
+                                #     user_email,  # List of email addresses also accepted
+                                #     EMAIL_HOST_USER,
+                                #     subject='My email',
+                                #     message='Hi there!',
+                                #     html_message='Hi <strong>there</strong>!',
+                                #     priority='high',
+                                #     context={'name': UserDetailSerializer(CustomUser.objects.get(id=item)).data['first_name'],'href':'https://google.com'},
+                                # )
+                                send_create_project_email(user_email,UserDetailSerializer(CustomUser.objects.get(id=item)).data['first_name'],'https://virtualoffice.com.bd/#/login/?task_details='+serializer.data['work_package_index'])
                             except Exception as e:
                                 print(e)
-                            #sending email using post-office ends here
 
-                            # message = "A project named '" + serializer.data['sub_task'] + "' -> '" + serializer.data[
-                            #     'task_title'] + "' has been assigned to you. Please check the Virtual Office for details."
-                            # send_mail('Project Assigned', message, EMAIL_HOST_USER, [user_email],
-                            #           fail_silently=False, )
                             response = {
                                 'success': 'True',
                                 'status code': status.HTTP_200_OK,
@@ -656,10 +655,16 @@ class WPList(APIView):
 
     def get(self, request):
         try:
-            work_package_numbers = Projects.objects.values_list('work_package_number', flat=True)
+            work_package_numbers = Projects.objects.values_list('work_package_number', flat=True).distinct()
             sub_tasks = Projects.objects.values_list('sub_task', flat=True)
+            wp_nums=[]
+            for item in work_package_numbers:
+                wp_nums.append(item)
 
-            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'wp': unique(work_package_numbers),
+            if len(wp_nums)==0:
+                wp_nums.append(1000)
+
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'wp': wp_nums,
                         'sub_tasks': unique(sub_tasks)}
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
