@@ -34,6 +34,9 @@ import itertools
 
 
 # user register
+from .mails import send_registration_email
+
+
 class Register(APIView):
     serializer_class = RegisterSerializer
     permission_classes = (AllowAny,)
@@ -60,8 +63,9 @@ class Register(APIView):
             #         'message': message
             #     }
             # )
-            send_mail('New user registration', message, 'dmavirtualoffice21@gmail.com', [request.data['email']],
-                      fail_silently=False, )
+            send_registration_email(request.data['email'],serializer.data['first_name'])
+            # send_mail('New user registration', message, 'dmavirtualoffice21@gmail.com', [request.data['email']],
+            #           fail_silently=False, )
             return Response(response, status=status.HTTP_201_CREATED)
         except Exception as e:
             response = {
