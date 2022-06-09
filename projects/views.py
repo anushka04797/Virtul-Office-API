@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from projects.helper import calculate_hours_from_date_to_date
 from projects.mails import send_create_project_email
 from projects.serializers import SubTaskSerializer, CreateProjectSerializer, ProjectDetailsSerializer, \
     UpdateProjectSerializer, ProjectAssigneeSerializer, TdoSerializer, CreateProjectAssigneeSerializer, \
@@ -530,63 +531,19 @@ class ProjectAssigneeList(APIView):
         return Response(response)
 
 
-# update project
-# class AddProjectAssignee(APIView):
-#     permission_classes = (IsAuthenticated,)
+class DateToDate(APIView):
+    permission_classes = (AllowAny,)
 
-#     def put(self, request, pk, format=None):
-#         # print(request.data)
-#         work_package_index = request.data.get('work_package_index')
-#         assignee_id = request.data.get('assignee_id')
-#         try:
-#             projects = Projects.objects.filter(work_package_index=work_package_index, assignee_id=assignee_id)
-#             for project in projects:
-#                 serializer = UpdateProductSerializer(project, data=request.data)
-#                 # print(serializer.is_valid())
-#                 # print(serializer.errors)
-#                 if serializer.is_valid():
-#                     print('executed')
-#                     serializer.save()
-#                     response = {
-#                         'success': 'True',
-#                         'status code': status.HTTP_200_OK,
-#                         'message': 'Project Updated Successful',
-#                         'data': serializer.data
-#                     }
-#                     return Response(response, status=status.HTTP_200_OK)
-#                 else:
-#                     return Response(serializer.errors)
-#         except Exception as e:
-#             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
-#             return Response(response)
+    def get(self,request,from_date,to_date):
+        try:
+            hours = calculate_hours_from_date_to_date(from_date,to_date)
 
-
-# update project
-# class RemoveProjectAssignee(APIView):
-#     permission_classes = (IsAuthenticated,)
-
-#     def put(self, request, pk, format=None):
-#         # print(request.data)
-#         try:
-#             projects = Projects.objects.filter(work_package_index=pk)
-#             for project in projects:
-#                 serializer = UpdateProductSerializer(project, data=request.data)
-#                 # print(serializer.is_valid())
-#                 # print(serializer.errors)
-#                 if serializer.is_valid():
-#                     serializer.save()
-#                     response = {
-#                         'success': 'True',
-#                         'status code': status.HTTP_200_OK,
-#                         'message': 'Project Updated Successful',
-#                         'data': serializer.data
-#                     }
-#                     return Response(response, status=status.HTTP_200_OK)
-#                 else:
-#                     return Response(serializer.errors)
-#         except Exception as e:
-#             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
-#             return Response(response)
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'project assignee list',
+                        'total_hours': hours}
+            return Response(response)
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
 
 
 class DeleteSubTask(APIView):
