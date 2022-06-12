@@ -36,7 +36,7 @@ months = {
 
 def monthly_hours_in_fraction_for_start_month(start_date):
     date = int(start_date.strftime('%d'))
-    monthly_hours = int(DmaCalenderSerializer(DmaCalender.objects.get(Company_id=1)).data[months[int(start_date.strftime('%m'))]]) * 8
+    monthly_hours = int(DmaCalenderSerializer(DmaCalender.objects.get(Company_id=1,Year=date.today().year)).data[months[int(start_date.strftime('%m'))]]) * 8
 
     if date <= 7:
         return monthly_hours
@@ -50,7 +50,7 @@ def monthly_hours_in_fraction_for_start_month(start_date):
 
 def monthly_hours_in_fraction_for_end_month(start_date):
     date = int(start_date.strftime('%d'))
-    monthly_hours = int(DmaCalenderSerializer(DmaCalender.objects.get(Company_id=1)).data[months[int(start_date.strftime('%m'))]]) * 8
+    monthly_hours = int(DmaCalenderSerializer(DmaCalender.objects.get(Company_id=1,Year=date.today().year)).data[months[int(start_date.strftime('%m'))]]) * 8
 
     if date <= 7:
         return monthly_hours* 0.25
@@ -65,7 +65,7 @@ def monthly_hours_in_fraction_for_end_month(start_date):
 def same_month_hours(start_date, end_date):
     diff = (end_date-start_date).days
     print('diff',diff)
-    monthly_hours = int(DmaCalenderSerializer(DmaCalender.objects.get(Company_id=1)).data[months[int(start_date.strftime('%m'))]]) * 8
+    monthly_hours = int(DmaCalenderSerializer(DmaCalender.objects.get(Company_id=1,Year=date.today().year)).data[months[int(start_date.strftime('%m'))]]) * 8
     if diff <= 7:
         return monthly_hours * 0.25
     elif diff in range(8, 15):
@@ -79,8 +79,8 @@ def same_month_hours(start_date, end_date):
 def calculate_hours_from_date_to_date(from_date, to_date):
     total_hours = 0
     selected_months = []
-    start_date = datetime.fromisoformat(from_date)
-    end_date = datetime.fromisoformat(to_date)
+    start_date = datetime.strptime(from_date,'%Y-%m-%d').date()
+    end_date = datetime.strptime(to_date,'%Y-%m-%d').date()
 
     for single_date in pd.date_range(start_date, end_date):
         selected_months.append(int(single_date.strftime("%m")))

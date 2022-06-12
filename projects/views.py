@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from projects.helper import calculate_hours_from_date_to_date
-from projects.mails import send_create_project_email
+from projects.mails import send_create_project_email, send_update_project_email
 from projects.serializers import SubTaskSerializer, CreateProjectSerializer, ProjectDetailsSerializer, \
     UpdateProjectSerializer, ProjectAssigneeSerializer, TdoSerializer, CreateProjectAssigneeSerializer, \
     UpdateSubTaskSerializer, TaskSerializer, ProjectFileSerializer, DocumentListSerializer, \
@@ -76,23 +76,7 @@ class CreateProject(APIView):
                         if serializer2.is_valid(raise_exception=True):
                             serializer2.save()
                             user_email = UserDetailSerializer(CustomUser.objects.get(id=item)).data['email']
-
-                            html_template = 'create-project/index.html'
-                            # html_message = render_to_string(html_template, {'name': UserDetailSerializer(CustomUser.objects.get(id=item)).data['first_name'],'href':'https://virtualoffice.com.bd/#/login/?task_details='+serializer.data['work_package_index'] })
-                            # message = EmailMessage('Project assigned', html_message, EMAIL_HOST_USER, [user_email])
-                            # message.content_subtype = 'html'  # this is required because there is no plain text email message
-                            # message.send()
-                            #sending mail using post-office
                             try:
-                                # mail.send(
-                                #     user_email,  # List of email addresses also accepted
-                                #     EMAIL_HOST_USER,
-                                #     subject='My email',
-                                #     message='Hi there!',
-                                #     html_message='Hi <strong>there</strong>!',
-                                #     priority='high',
-                                #     context={'name': UserDetailSerializer(CustomUser.objects.get(id=item)).data['first_name'],'href':'https://google.com'},
-                                # )
                                 send_create_project_email(user_email,UserDetailSerializer(CustomUser.objects.get(id=item)).data['first_name'],'https://virtualoffice.com.bd/#/login/?task_details='+serializer.data['work_package_index'])
                             except Exception as e:
                                 print(e)
@@ -225,21 +209,20 @@ class UpdateProject(APIView):
                             serializer2.save()
                             user_email = UserDetailSerializer(CustomUser.objects.get(id=assignee)).data['email']
                             print(serializer.data)
-                        message = "A project named '" + serializer.data['sub_task'] + "' -> '" + serializer.data[
-                            'task_title'] + "' is updated that has been assigned to you. Please check the Virtual Office for details."
-                        send_mail('Project Updated', message, EMAIL_HOST_USER, [user_email],
-                                  fail_silently=False, )
+
+                            send_create_project_email(user_email,UserDetailSerializer(CustomUser.objects.get(id=assignee)).data['first_name'],'https://virtualoffice.com.bd/#/login/?task_details='+serializer.data['work_package_index'])
                     count+=1
 
                 all_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=serializer.data['id']),many=True).data
                 count=0
+                print(len(all_assignees))
                 for assignee in all_assignees:
                     if str(assignee['assignee']['id']) not in assignees:
                         ProjectAssignee.objects.filter(assignee=assignee['assignee']['id'],project=serializer.data['id']).delete()
                     else:
+                        print(request.data['estimated_person'],count)
                         ProjectAssignee.objects.filter(assignee=assignee['assignee']['id'], project=serializer.data['id']).update(estimated_person=request.data['estimated_person'][count])
-
-                    count+=1
+                        count += 1
 
                 response = {
                     'success': 'True',
