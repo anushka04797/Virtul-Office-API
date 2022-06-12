@@ -558,14 +558,14 @@ class UserSubmittedWeeklyTimecards(APIView):
             submitted_timecards = []
             if request.user.has_perm('projects.add_projects'):
 
-                projects = TaskSerializer(Projects.objects.filter(pm=user.id), many=True).data
-
+                my_projects = TaskSerializer(Projects.objects.filter(pm=user.id), many=True).data
                 assignees = []
-                for task in projects:
+                for task in my_projects:
                     task_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project_id=task['id']),many=True).data
                     for task_assignee in task_assignees:
-                        assignees.append(UserDetailSerializer(CustomUser.objects.get(pk=task_assignee['assignee']['id'])).data)
+                        assignees.append(UserDetailSerializer(CustomUser.objects.get(pk=task_assignee['assignee']['id']),many=False).data)
 
+                assignees.append(UserDetailSerializer(CustomUser.objects.get(pk=user.id),many=False).data)
                 assignees = unique(assignees)  #making assignees array distinct
 
                 for assignee in assignees:

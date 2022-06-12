@@ -16,10 +16,10 @@ class Wbs(models.Model):
                                  on_delete=models.CASCADE)
     title = models.CharField(_('title'), max_length=250, blank=False)
     description = models.TextField(_('description'), blank=True)
-    start_date = models.DateField(_('start date'), blank=False)
-    end_date = models.DateField(_('end date'), blank=False)
-    hours_worked = models.DecimalField(_('hours worked'), max_digits=6, decimal_places=1, blank=False)
-    status = models.IntegerField(_('wbs status'), default=True, blank=False)
+    start_date = models.DateField(_('start_date'), blank=False)
+    end_date = models.DateField(_('end_date'), blank=False)
+    hours_worked = models.DecimalField(_('hours_worked'), max_digits=6, decimal_places=1, blank=False)
+    status = models.IntegerField(_('wbs_status'), default=True, blank=False)
     progress = models.IntegerField(_('progress percentage'), blank=False)
     comments = models.TextField(_('comments'), max_length=150, blank=True)
     deliverable = models.CharField(_('deliverable'), max_length=550, blank=True)
@@ -56,11 +56,11 @@ class TimeCard(models.Model):
     submitted = models.BooleanField(_('submitted'), blank=True, null=True, default=False)
     time_card_assignee = models.ForeignKey(CustomUser, related_name="time_card_employee_assigned", blank=False, null=False,
                                  on_delete=models.CASCADE)
-    actual_work_done = models.CharField(_('actual work done'), max_length=250, blank=True, null=True)
+    actual_work_done = models.CharField(_('actual_work_done'), max_length=250, blank=True, null=True)
     hour_description = models.TextField(_('hour_description'), max_length=1050, blank=True, null=True)
-    hours_today = models.DecimalField(_('hours today'), max_digits=6, decimal_places=1, blank=False)
-    date_created = models.DateField(_('date created'), default=timezone.now)
-    date_updated = models.DateField(_('date updated'), default=timezone.now)
+    hours_today = models.DecimalField(_('hours_today'), max_digits=6, decimal_places=1, blank=False)
+    date_created = models.DateField(_('date_created'), default=timezone.now)
+    date_updated = models.DateField(_('date_updated'), default=timezone.now)
 
     class Meta:
         db_table = 'time_card'
@@ -82,7 +82,7 @@ class WeekTimeCard(models.Model):
     pdf_file = models.FileField(upload_to='uploads/weekly_time_cards/files/pdf', blank=True, null=True)
     approved_by=models.ForeignKey(CustomUser, related_name="approved_by", blank=True, null=True,
                                  on_delete=models.CASCADE)
-    submitted_at= models.DateTimeField(_('submitted at'), default=datetime.now())
+    submitted_at= models.DateTimeField(_('submitted_at'), default=datetime.now())
     submitted_by = models.ForeignKey(CustomUser, related_name="submitted_by", blank=False, null=False,on_delete=models.CASCADE)
     date_created = models.DateField(_('date created'), default=timezone.now)
     date_updated = models.DateField(_('date updated'), default=timezone.now)
