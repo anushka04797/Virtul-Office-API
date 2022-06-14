@@ -187,18 +187,17 @@ class UpdateProject(APIView):
         try:
             projects = Projects.objects.get(work_package_index=pk)
             serializer = UpdateProjectSerializer(projects, data=request.data)
-            print(request.data['sub_task'])
+
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                print(serializer.data)
-
                 assignees = request.data['assignee']
-                count=0
-                for assignee in assignees:
+
+                for key, assignee in enumerate(assignees):
+                    print(key)
                     if not ProjectAssignee.objects.filter(assignee=assignee, project=serializer.data['id']).exists():
                         temp_data = {
                             'assignee': assignee,
-                            'estimated_person': request.data['estimated_person'][count],
+                            'estimated_person': request.data['estimated_person'][int(key)],
                             'is_assignee_active': 1,
                             'project': serializer.data['id'],
                             'date_created': datetime.datetime.now(),
@@ -209,20 +208,16 @@ class UpdateProject(APIView):
                             serializer2.save()
                             user_email = UserDetailSerializer(CustomUser.objects.get(id=assignee)).data['email']
                             print(serializer.data)
+                            wp_index=SubTaskSerializer(Projects.objects.get(id=serializer.data['id'])).data['work_package_index']
+                            send_update_project_email(user_email,UserDetailSerializer(CustomUser.objects.get(id=assignee)).data['first_name'],'https://virtualoffice.com.bd/#/login/?task_details='+wp_index)
 
-                            send_create_project_email(user_email,UserDetailSerializer(CustomUser.objects.get(id=assignee)).data['first_name'],'https://virtualoffice.com.bd/#/login/?task_details='+serializer.data['work_package_index'])
-                    count+=1
+                    else:
+                        ProjectAssignee.objects.filter(assignee=assignee,project=serializer.data['id']).update(estimated_person=request.data['estimated_person'][int(key)])
 
                 all_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=serializer.data['id']),many=True).data
-                count=0
-                print(len(all_assignees))
                 for assignee in all_assignees:
                     if str(assignee['assignee']['id']) not in assignees:
                         ProjectAssignee.objects.filter(assignee=assignee['assignee']['id'],project=serializer.data['id']).delete()
-                    else:
-                        print(request.data['estimated_person'],count)
-                        ProjectAssignee.objects.filter(assignee=assignee['assignee']['id'], project=serializer.data['id']).update(estimated_person=request.data['estimated_person'][count])
-                        count += 1
 
                 response = {
                     'success': 'True',
