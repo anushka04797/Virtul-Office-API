@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from organizations.serializers import DmaCalenderSerializer, HolidayCalenderSerializer, HourTypeSerializer
+from users.models import CustomUser
 from wbs.models import TimeCard
 from .models import DmaCalender, HolidayCalender, HourType
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -48,9 +49,9 @@ class HolidayCalenderDetails(APIView):
 class HoursSpentAndLeft(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request):
+    def get(self, request,pk):
         try:
-            user = UserDetailSerializer(request.user).data
+            user = UserDetailSerializer(CustomUser.objects.get(pk=pk)).data
             user_company = user['slc_details']['slc']['department']['company']['id']
             current_year = date.today().year
             hour_types=HourTypeSerializer(HourType.objects.filter(company=user_company),many=True).data

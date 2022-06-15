@@ -145,11 +145,11 @@ DATABASES = {
         'OPTIONS': {
             'sql_mode': 'traditional',
         },
-        'NAME': 'virtual_office_v1',
+        'NAME': 'virtual_office_v2',
         # 'NAME': 'virtual_office',
         'USER': 'root',
-        'PASSWORD': 'Dhaka!027#',
-        'HOST': '192.168.0.225',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
         'PORT': '3306',
     }
 }
