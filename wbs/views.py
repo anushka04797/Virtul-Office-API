@@ -198,10 +198,14 @@ class WbsListForEmployee(APIView):
     def get(self, request, pk):
         try:
             wbsList = Wbs.objects.filter(assignee=pk).order_by('-date_updated')
-            Serializer = WbsDetailsSerializer(wbsList, many=True)
+            serializer = WbsDetailsSerializer(wbsList, many=True).data
+            for wbs in serializer:
+                if datetime.strptime(wbs['end_date'], '%Y-%m-%d').date() < date.today() and wbs['status'] is not 3:
+                    Wbs.objects.filter(pk=wbs['id']).update(status=4)
+
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
                         'message': 'Assigned WBS List for an employee',
-                        'data': Serializer.data}
+                        'data': serializer.data}
             return Response(response)
         except Exception as e:
             response = 'on line {}'.format(
@@ -244,6 +248,9 @@ class AllWbsListForPm(APIView):
                 serializer2 = WbsDetailsSerializer(data=pm_wbs_list, many=True)
                 serializer2.is_valid()
                 for wbs in serializer2.data:
+                    print('***',datetime.strptime(wbs['end_date'],'%Y-%m-%d').date()>date.today())
+                    if datetime.strptime(wbs['end_date'],'%Y-%m-%d').date()<date.today() and wbs['status'] is not 3:
+                        Wbs.objects.filter(pk=wbs['id']).update(status=4)
                     temp_data.append(wbs)
                     temp_id.append(wbs['id'])
 
@@ -253,11 +260,12 @@ class AllWbsListForPm(APIView):
             # print("temp_project_id_list", assignee_project_list_serializer.data)
             for project in assignee_project_list_serializer.data:
                 if project['project'] is not None:
-                    print("temp_project_id_list", project['project']['id'])
                     pm_wbs_list = Wbs.objects.filter(project=project['project']['id']).order_by('-id')
                     serializer2 = WbsDetailsSerializer(data=pm_wbs_list, many=True)
                     serializer2.is_valid()
                     for wbs in serializer2.data:
+                        if datetime.strptime(wbs['end_date'], '%Y-%m-%d').date() < date.today() and wbs['status'] is not 3:
+                            Wbs.objects.filter(pk=wbs['id']).update(status=4)
                         if wbs['id'] not in temp_id:
                             print('true')
                             temp_data.append(wbs)
