@@ -21,14 +21,14 @@ class CustomUser(AbstractUser):
         unique=True,
         help_text=('Required. 150 characters or fewer. Letters, digits and @/./+/-/ only.'),
         error_messages={
-            'unique': _("A user with that username already exists."),
+            'unique': _("An user with that username already exists."),
         },
         null=True,
         blank=True
     )
-    email = models.EmailField(_('email address'), unique=True, null=True, blank=True)
+    email = models.EmailField(_('email_address'), unique=True, null=True, blank=True)
 
-    phone = models.CharField(_('phone number'), max_length=15, blank=True, unique=True, null=True)
+    phone = models.CharField(_('phone_number'), max_length=15,error_messages={'unique': _("An user with this phone number already exists."),}, blank=True, unique=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
