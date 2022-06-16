@@ -35,36 +35,38 @@ months = {
 
 
 def monthly_hours_in_fraction_for_start_month(start_date):
-    date = int(start_date.strftime('%d'))
+    day = int(start_date.strftime('%d'))
+    print('diff', date.today().year)
     monthly_hours = int(DmaCalenderSerializer(DmaCalender.objects.get(Company_id=1,Year=date.today().year)).data[months[int(start_date.strftime('%m'))]]) * 8
 
-    if date <= 7:
+    if day <= 7:
         return monthly_hours
-    elif date in range(8,15):
+    elif day in range(8,15):
         return monthly_hours * 0.75
-    elif date in range(15,22):
+    elif day in range(15,22):
         return monthly_hours * 0.5
-    elif date in range(22,32):
+    elif day in range(22,32):
         return monthly_hours* 0.25
 
 
 def monthly_hours_in_fraction_for_end_month(start_date):
-    date = int(start_date.strftime('%d'))
+    day = int(start_date.strftime('%d'))
+    print('diff', date.today().year)
     monthly_hours = int(DmaCalenderSerializer(DmaCalender.objects.get(Company_id=1,Year=date.today().year)).data[months[int(start_date.strftime('%m'))]]) * 8
 
-    if date <= 7:
+    if day <= 7:
         return monthly_hours* 0.25
-    elif date in range(8,15):
+    elif day in range(8,15):
         return monthly_hours * 0.5
-    elif date in range(15,22):
+    elif day in range(15,22):
         return monthly_hours * 0.75
-    elif date in range(22,32):
+    elif day in range(22,32):
         return monthly_hours
 
 
 def same_month_hours(start_date, end_date):
     diff = (end_date-start_date).days
-    print('diff',diff)
+    print('diff',date.today().year)
     monthly_hours = int(DmaCalenderSerializer(DmaCalender.objects.get(Company_id=1,Year=date.today().year)).data[months[int(start_date.strftime('%m'))]]) * 8
     if diff <= 7:
         return monthly_hours * 0.25
@@ -92,7 +94,7 @@ def calculate_hours_from_date_to_date(from_date, to_date):
         total_hours += monthly_hours_in_fraction_for_start_month(start_date)
         total_hours += monthly_hours_in_fraction_for_end_month(end_date)
         for month in selected_months[1:len(selected_months)-1]:
-            total_hours += int(DmaCalenderSerializer(DmaCalender.objects.get(Company_id=1)).data[months[month]]) * 8
+            total_hours += int(DmaCalenderSerializer(DmaCalender.objects.get(Company_id=1,Year=date.today().year)).data[months[month]]) * 8
     elif len(selected_months) == 1:
         total_hours = same_month_hours(start_date,end_date)
 
