@@ -82,5 +82,6 @@ class HourTypeSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
+            'description',
             'hours_allocated',
         )
