@@ -134,8 +134,7 @@ class NewProjectDetails(APIView):
                                                            many=True).data
                 task['assignees'] = task_assignees
                 for task_assignee in task_assignees:
-                    assignees.append(
-                        UserDetailSerializer(CustomUser.objects.get(pk=task_assignee['assignee']['id'])).data)
+                    assignees.append(UserDetailSerializer(CustomUser.objects.get(pk=task_assignee['assignee']['id'])).data)
 
             assignees = unique(assignees)
             response_data = {

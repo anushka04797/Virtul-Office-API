@@ -8,6 +8,7 @@ from users.serializers import CustomUser
 from rest_framework.permissions import IsAuthenticated
 from django.core.mail import send_mail
 from datetime import datetime
+from django.db.models import Q
 import sms_api
 
 
@@ -30,6 +31,7 @@ class CreateMeetings(APIView):
                 'data': []
             }
             participants = request.data['participant'].split(',')
+
             for participant in participants:
                 user_mail = CustomUser.objects.get(pk=participant)
                 send_mail(
@@ -99,7 +101,7 @@ class MeetingsList(APIView):
     def get(self, request, pk):
         meeting_list = []
         try:
-            meetings = Meetings.objects.filter(participant__icontains=pk)
+            meetings = Meetings.objects.filter(Q(participant__icontains=pk)|Q(host=request.user.id))
             serializer = MeetingsDetailsSerializer(meetings, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Meetings list',
                         'data': serializer.data}

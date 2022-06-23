@@ -84,7 +84,7 @@ class PossibleAssigneeList(APIView):
 
     def get(self, request):
         try:
-            users = CustomUser.objects.all().exclude(is_superuser=1)
+            users = CustomUser.objects.filter(is_active=True).exclude(is_superuser=1)
             serializer = UserDetailSerializer(users, many=True)
             response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Possible assignee list',
                         'data': serializer.data}
