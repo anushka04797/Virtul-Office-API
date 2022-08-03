@@ -1,10 +1,6 @@
 from datetime import date
-from django.contrib.auth.models import Group
-from django.core.mail import send_mail
 from django.db.models import Sum
 from django.utils import timezone, dateformat
-from rest_framework.generics import RetrieveAPIView
-from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -12,13 +8,12 @@ import sys
 import os
 import pendulum
 from datetime import datetime
-
+import datetime as dt
 from projects.serializers import CreateProjectAssigneeSerializer, UpdateProjectRemainingHrsSerializer, \
     ProjectDetailsSerializer, ProjectAssigneeSerializer, TaskSerializer
 from projects.views import unique
 from users.models import CustomUser
 from users.serializers import UserDetailSerializer
-from virtual_office_API.settings import EMAIL_HOST_USER
 from wbs.mails import send_wbs_create_email
 from wbs.serializers import CreateTimeCardSerializer, CreateWbsSerializer, WbsDetailsSerializer, WbsUpdateSerializer, \
     TimeCardDetailsSerializer, WbsStatusUpdateSerializer, WbsWiseTimeCardListSerializer, TimecardUpdateSerializer, \
@@ -26,17 +21,9 @@ from wbs.serializers import CreateTimeCardSerializer, CreateWbsSerializer, WbsDe
     UserSubmitWeeklyTimeCardSerializer
 from wbs.models import TimeCard, Wbs, WeekTimeCard
 from projects.models import Projects, ProjectAssignee
-from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated
-# from django.contrib.auth.models import User
-from rest_framework import generics
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import AllowAny
-from django.contrib.auth import logout
-from django.shortcuts import get_object_or_404
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_text
+
 
 
 # create wbs
@@ -200,7 +187,7 @@ class WbsListForEmployee(APIView):
             wbsList = Wbs.objects.filter(assignee=pk).order_by('-date_updated')
             serializer = WbsDetailsSerializer(wbsList, many=True).data
             for wbs in serializer:
-                if datetime.strptime(wbs['end_date'], '%Y-%m-%d').date() < date.today() and wbs['status'] is not 3:
+                if datetime.strptime(wbs['end_date'], '%Y-%m-%d').date() < date.today() and wbs['status'] != 3:
                     Wbs.objects.filter(pk=wbs['id']).update(status=4)
 
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
@@ -249,7 +236,7 @@ class AllWbsListForPm(APIView):
                 serializer2.is_valid()
                 for wbs in serializer2.data:
                     print('***',datetime.strptime(wbs['end_date'],'%Y-%m-%d').date()>date.today())
-                    if datetime.strptime(wbs['end_date'],'%Y-%m-%d').date()<date.today() and wbs['status'] is not 3:
+                    if datetime.strptime(wbs['end_date'],'%Y-%m-%d').date()<date.today() and wbs['status'] != 3:
                         Wbs.objects.filter(pk=wbs['id']).update(status=4)
                     temp_data.append(wbs)
                     temp_id.append(wbs['id'])
@@ -264,7 +251,7 @@ class AllWbsListForPm(APIView):
                     serializer2 = WbsDetailsSerializer(data=pm_wbs_list, many=True)
                     serializer2.is_valid()
                     for wbs in serializer2.data:
-                        if datetime.strptime(wbs['end_date'], '%Y-%m-%d').date() < date.today() and wbs['status'] is not 3:
+                        if datetime.strptime(wbs['end_date'], '%Y-%m-%d').date() < date.today() and wbs['status'] != 3:
                             Wbs.objects.filter(pk=wbs['id']).update(status=4)
                         if wbs['id'] not in temp_id:
                             print('true')
@@ -631,3 +618,19 @@ class UploadWbsDocs(APIView):
             'data': 'Time Cards Submitted'
         }
         return Response(response, status=status.HTTP_200_OK)
+
+
+class ConsumedHours(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self,request):
+        try:
+            user = UserDetailSerializer(request.user).data
+            hours={}
+            hours['RHR'] = TimeCard.objects.filter(time_card_assignee= user["id"], time_type='RHR', date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
+
+            return Response({'data':hours})
+        except Exception as e:
+            response = 'on line {}'.format(
+                sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
