@@ -103,6 +103,7 @@ class DmaCalenderAdmin(admin.ModelAdmin):
 
 
 class HolidayCalenderAdmin(admin.ModelAdmin):
+    exclude = ['hours']
     list_display = (
         'Year', 'holiday_title', 'start_date', 'end_date', 'hours'
     )

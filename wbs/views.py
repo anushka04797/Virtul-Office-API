@@ -586,6 +586,7 @@ class UserSubmittedWeeklyTimecards(APIView):
                 'message': 'Submitted Weekly timecards',
                 'data': submitted_timecards
             }
+            # print("response1111111", response)
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
             response = 'on line {}'.format(
@@ -627,7 +628,13 @@ class ConsumedHours(APIView):
         try:
             user = UserDetailSerializer(request.user).data
             hours={}
-            hours['RHR'] = TimeCard.objects.filter(time_card_assignee= user["id"], time_type='RHR', date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
+            hours['RHR'] = TimeCard.objects.filter(time_card_assignee=user["id"], time_type='RHR', date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
+            hours['SIC'] = TimeCard.objects.filter(time_card_assignee=user['id'], time_type='SIC',date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
+            hours['HOL'] = TimeCard.objects.filter(time_card_assignee=user['id'], time_type='HOL',date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
+            hours['PB1'] = TimeCard.objects.filter(time_card_assignee=user['id'], time_type='PB1',date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
+            hours['WFH'] = TimeCard.objects.filter(time_card_assignee=user['id'], time_type='WFH',date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
+            hours['OTO'] = TimeCard.objects.filter(time_card_assignee=user['id'], time_type='OTO',date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
+
 
             return Response({'data':hours})
         except Exception as e:

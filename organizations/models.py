@@ -11,6 +11,10 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from datetime import datetime, timedelta
+
 from users.models import CustomUser
 
 
@@ -194,6 +198,7 @@ class HolidayCalender(models.Model):
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     hours = models.IntegerField(_('Hours'), blank=True, null=True)
+    
 
     class Meta:
         db_table = 'holiday_calender'
@@ -247,5 +252,35 @@ def post_save_slc(sender, instance, **kwargs):
             obj = CustomUser.objects.get(id=slc.employee.id)
             obj.slc_details_id = slc.id
             obj.save()
+    except ObjectDoesNotExist:
+        pass
+
+@receiver(post_save, sender=HolidayCalender)
+def post_save_updated_days_hours(sender, instance, created, **kwargs):
+    
+    startDate = instance.start_date
+    endDate = instance.end_date
+
+    totalDays = endDate-startDate
+    print("total days", totalDays.days+1)
+    totalDays= totalDays.days+1
+
+    totalHours = totalDays*8 
+    print("total hours", totalHours)
+
+    try:
+        if created : 
+            instance.hours=totalHours
+            instance.save()
+        # else :
+        #     instance.hours=totalHours
+        #     instance.save()
+
+        # query = HolidayCalender.objects.get(id=instance.id)
+        # print(query)
+        # if query is not None:           
+        #     query.hours = totalHours
+        #     print(query.hours)
+        #     query.save()
     except ObjectDoesNotExist:
         pass
