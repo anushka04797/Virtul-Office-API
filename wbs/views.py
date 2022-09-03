@@ -577,9 +577,11 @@ class UserSubmittedWeeklyTimecards(APIView):
                 tc['SIC'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='SIC',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
                 tc['HOL'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='HOL',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
                 tc['PB1'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='PB1',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
+                tc['PB2'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='PB2',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
                 tc['WFH'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='WFH',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
                 tc['OTO'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='OTO',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
-
+                tc['VAC'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='VAC',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
+                tc['COM'] = TimeCard.objects.filter(time_card_assignee=tc['employee']['id'], time_type='COM',date_created__range=(tc['week_start'], tc['week_end'])).aggregate(Sum('hours_today')).get('hours_today__sum')
             response = {
                 'success': 'True',
                 'status code': status.HTTP_200_OK,
@@ -632,8 +634,11 @@ class ConsumedHours(APIView):
             hours['SIC'] = TimeCard.objects.filter(time_card_assignee=user['id'], time_type='SIC',date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
             hours['HOL'] = TimeCard.objects.filter(time_card_assignee=user['id'], time_type='HOL',date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
             hours['PB1'] = TimeCard.objects.filter(time_card_assignee=user['id'], time_type='PB1',date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
+            hours['PB2'] = TimeCard.objects.filter(time_card_assignee=user['id'], time_type='PB2',date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
             hours['WFH'] = TimeCard.objects.filter(time_card_assignee=user['id'], time_type='WFH',date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
             hours['OTO'] = TimeCard.objects.filter(time_card_assignee=user['id'], time_type='OTO',date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
+            hours['VAC'] = TimeCard.objects.filter(time_card_assignee=user['id'], time_type='VAC',date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
+            hours['COM'] = TimeCard.objects.filter(time_card_assignee=user['id'], time_type='COM',date_created__year=dt.date.today().year).aggregate(Sum('hours_today')).get('hours_today__sum')
 
 
             return Response({'data':hours})
