@@ -32,11 +32,11 @@ class CreateWbs(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        # print(request.data)
+        print(request.data)
         # assignee_list = request.data['assignee']
         # print('assignee list',assignee_list)
         for assignee in request.data['assignee']:
-            print('assignee',assignee)
+            # print('assignee',assignee)
             request.data['assignee'] = assignee
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)

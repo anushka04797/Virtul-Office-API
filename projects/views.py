@@ -234,7 +234,7 @@ class UpdateProject(APIView):
             return Response(response)
 
 
-class PmProjectAllAssigneeList(APIView):
+class   PmProjectAllAssigneeList(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):

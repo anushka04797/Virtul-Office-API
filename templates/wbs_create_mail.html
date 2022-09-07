@@ -168,9 +168,10 @@ table, td { color: #000000; } a { color: #0000ee; text-decoration: underline; } 
       <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:28px;font-family:arial,helvetica,sans-serif;" align="left">
 
   <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
-    <p style="font-size: 14px; line-height: 140%;">Hi {{data.name}},</p>
+    <p style="font-size: 14px; line-height: 140%;">Hi {{data.name}} {{ data }},</p>
     <p>A new WBS has been created under <a href="https://virtualoffice.com.bd/{{data.project_link}}">{{data.project}}</a></p>
     <p><a href="https://virtualoffice.com.bd/{{data.wbs_link}}">Click here</a> to view details</p>
+    <!-- <p><a href="https://virtualoffice.com.bd/vo-admin/project/assignees/all/4/">Click here</a> to view details</p> -->
 <p style="font-size: 14px; line-height: 140%;">Regards,</p>
 <p style="font-size: 14px; line-height: 140%;">Team VO</p>
   </div>
