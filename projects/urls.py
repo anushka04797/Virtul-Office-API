@@ -3,7 +3,7 @@ from .views import CreateProject, NoWBSList, UpdateProject, ChangePM, PmProjectL
     AssignedProjectList, \
     ProjectAssigneeList, SubTaskDetails, DeleteSubTask, ChangeTDOTitle, TdoList, NewProjectDetails, ChangeProjectStatus, \
     RemoveAssignee, ProjectWiseFileList, ProjectWiseFileInsert, ProjectManagerList, WPList, CheckWPandSubTask, \
-    AllProjectFiles, DateToDate, assigneesWithNoWbs
+    AllProjectFiles, DateToDate, assigneesWithNoWbs, AllProjectList,UpdateProjectDates
 
 urlpatterns = [
     path('tdo/list/', TdoList.as_view()),
@@ -11,6 +11,7 @@ urlpatterns = [
     path('details/<str:pk>/', NewProjectDetails.as_view()),
     path('update/<str:pk>/', UpdateProject.as_view()),
     path('all/<str:pk>/', PmProjectList.as_view()),
+    path('all/', AllProjectList.as_view()),
     path('assignees/all/<str:pk>/', PmProjectAllAssigneeList.as_view()),
     path('assigned/all/<str:pk>/', AssignedProjectList.as_view()),
     path('shared/document/list/<str:pk>/', ProjectWiseFileList.as_view()),
@@ -32,4 +33,5 @@ urlpatterns = [
     path('date-to-date/<str:from_date>/<str:to_date>/',DateToDate.as_view()),
     path('no-wbs/',NoWBSList.as_view()),
     path('assignees-with-no-wbs/', assigneesWithNoWbs.as_view()),
+    path('time-extension/', UpdateProjectDates.as_view()),
 ]

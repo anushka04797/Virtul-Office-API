@@ -83,7 +83,7 @@ class WeekTimeCard(models.Model):
     approved_by=models.ForeignKey(CustomUser, related_name="approved_by", blank=True, null=True,
                                  on_delete=models.CASCADE)
     # submitted_at= models.DateTimeField(_('submitted_at'), default=datetime.now())
-    submitted_at= models.DateTimeField(_('submitted_at'), default=timezone.localtime(timezone.now()))
+    submitted_at= models.DateTimeField(_('submitted_at'), default=timezone.now)
     submitted_by = models.ForeignKey(CustomUser, related_name="submitted_by", blank=False, null=False,on_delete=models.CASCADE)
     date_created = models.DateField(_('date created'), default=timezone.now)
     date_updated = models.DateField(_('date updated'), default=timezone.now)

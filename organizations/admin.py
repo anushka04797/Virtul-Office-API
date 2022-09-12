@@ -112,6 +112,12 @@ class HolidayCalenderAdmin(admin.ModelAdmin):
     ordering = ('Year',)
 
 
+class SlcInlineAdmin(admin.StackedInline):
+    model = Slc
+    min_num = 1
+    max_num = 1
+
+
 class SlcAdmin(admin.ModelAdmin):
     list_display = [
         'employee'

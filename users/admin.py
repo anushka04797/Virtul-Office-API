@@ -1,3 +1,4 @@
+from organizations.admin import SlcAdmin, SlcInlineAdmin
 from users.forms import UserChangeForm, UserCreationForm
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -26,6 +27,7 @@ class UsersAdmin(UserAdmin):
             'fields': ('username', 'password1', 'password2')}
          ),
     )
+    inlines = [SlcInlineAdmin]
 
     def user_type(self, obj):
         """
