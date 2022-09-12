@@ -361,7 +361,8 @@ class AllProjectList(APIView):
                     projects_data.append(temp_data)
             response = {'success': 'True', 'status code': status.HTTP_200_OK,
                         'message': 'All Project List',
-                        'data': projects_data}
+                        'data': projects_data,
+                        'length' : len(projects_data)}
             return Response(response)
         except Exception as e:
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e)

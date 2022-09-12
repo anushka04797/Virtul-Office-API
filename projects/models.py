@@ -41,6 +41,7 @@ class Projects(models.Model):
     start_date = models.DateField(blank=False, null=True)
     planned_delivery_date = models.DateField(blank=False, null=True)
     pm = models.ForeignKey(CustomUser, related_name="project_manager", blank=False, null=True, on_delete=models.CASCADE)
+    pl = models.ForeignKey(CustomUser, related_name="project_lead", blank=True, null=True, on_delete=models.CASCADE)
     planned_hours = models.DecimalField(_('planned hours'), max_digits=19, decimal_places=10, blank=False, null=True)
     planned_value = models.DecimalField(_('planned value'), blank=False,max_digits=19, decimal_places=10, null=True)
     remaining_hours = models.DecimalField(_('remaining hours'), max_digits=19, decimal_places=10, blank=False,null=True)
