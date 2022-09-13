@@ -101,7 +101,7 @@ ROOT_URLCONF = 'virtual_office_API.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -115,7 +115,7 @@ TEMPLATES = [
     {
         'BACKEND': 'post_office.template.backends.post_office.PostOfficeTemplates',
         'APP_DIRS': True,
-        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'OPTIONS': {
             'context_processors': [
                 'django.contrib.auth.context_processors.auth',
@@ -132,7 +132,8 @@ TEMPLATES = [
 
 POST_OFFICE = {
     'MAX_RETRIES': 4,
-    'RETRY_INTERVAL': datetime.timedelta(seconds=1),  # Schedule to be retried 15 minutes later
+    # Schedule to be retried 15 minutes later
+    'RETRY_INTERVAL': datetime.timedelta(seconds=1),
     'THREADS_PER_PROCESS': 10,
     'TEMPLATE_ENGINE': 'post_office',
 }
@@ -145,10 +146,10 @@ DATABASES = {
         'OPTIONS': {
             'sql_mode': 'traditional',
         },
-        'NAME': 'virtual_office_v1',
+        'NAME': 'virtual_office_v5',
         # 'NAME': 'virtual_office',
         'USER': 'root',
-        'PASSWORD': 'Dhaka!027#',
+        'PASSWORD': '',
         'HOST': '127.0.0.1',
         'PORT': '3306',
     }
@@ -201,10 +202,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
         'rest_framework.permissions.IsAdminUser',
-        ],
+    ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        ),
+    ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'

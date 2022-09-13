@@ -96,7 +96,7 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Projects
         fields = (
             'id',
-            'task_delivery_order',
+            'task_delivery_order', #this is the one
             'sub_task',
             'description',
             'work_package_number',
