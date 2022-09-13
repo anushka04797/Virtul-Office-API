@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import CreateProject, NoWBSList, UpdateProject, ChangePM, PmProjectList, PmProjectAllAssigneeList, \
-    AssignedProjectList, \
+    AssignedProjectList, RonPmProjectList, \
     ProjectAssigneeList, SubTaskDetails, DeleteSubTask, ChangeTDOTitle, TdoList, NewProjectDetails, ChangeProjectStatus, \
     RemoveAssignee, ProjectWiseFileList, ProjectWiseFileInsert, ProjectManagerList, WPList, CheckWPandSubTask, \
     AllProjectFiles, DateToDate, assigneesWithNoWbs, AllProjectList,UpdateProjectDates
@@ -12,6 +12,7 @@ urlpatterns = [
     path('update/<str:pk>/', UpdateProject.as_view()),
     path('all/<str:pk>/', PmProjectList.as_view()),
     path('all/', AllProjectList.as_view()),
+    path('rall/<str:pk>/', RonPmProjectList.as_view()),
     path('assignees/all/<str:pk>/', PmProjectAllAssigneeList.as_view()),
     path('assigned/all/<str:pk>/', AssignedProjectList.as_view()),
     path('shared/document/list/<str:pk>/', ProjectWiseFileList.as_view()),
@@ -26,12 +27,13 @@ urlpatterns = [
     # path('remove/assignee/', RemoveProjectAssignee.as_view()),
     path('managers/', ProjectManagerList.as_view()),
     path('work-package-numbers/', WPList.as_view()),
-    path('check-subtask-work-package-number-is-valid/<str:sub_task>/<str:wp>/', CheckWPandSubTask.as_view()),
-    #all project files
-    path('all-files/',AllProjectFiles.as_view()),
-    path('sub-task-details/<str:work_package_index>',SubTaskDetails.as_view()),
-    path('date-to-date/<str:from_date>/<str:to_date>/',DateToDate.as_view()),
-    path('no-wbs/',NoWBSList.as_view()),
+    path('check-subtask-work-package-number-is-valid/<str:sub_task>/<str:wp>/',
+         CheckWPandSubTask.as_view()),
+    # all project files
+    path('all-files/', AllProjectFiles.as_view()),
+    path('sub-task-details/<str:work_package_index>', SubTaskDetails.as_view()),
+    path('date-to-date/<str:from_date>/<str:to_date>/', DateToDate.as_view()),
+    path('no-wbs/', NoWBSList.as_view()),
     path('assignees-with-no-wbs/', assigneesWithNoWbs.as_view()),
     path('time-extension/', UpdateProjectDates.as_view()),
 ]
