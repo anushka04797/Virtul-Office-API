@@ -796,7 +796,7 @@ class UpdateProjectDates(APIView):
             return Response(response)
 
 
-# Ron pm wise project list
+# Ron pm wise project list OBSOLETE
 class RonPmProjectList(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self, request, pk):
@@ -860,3 +860,83 @@ class RonPmProjectList(APIView):
             response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e) 
 
         return Response(response) 
+
+
+# Fixed Ron
+class FixRonPmProjectList(APIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, pk):
+        try:
+            projects_data = []
+            traversed_projects = []
+            tdo_names = []
+            tdo_finder = {}
+            count = 0
+            assigned_projects = Projects.objects.filter(pm=pk).order_by("sub_task")
+            # assinged_projects: think it as 'project_manager_created_projects'
+            for project in assigned_projects:
+                temp_project = project
+                
+                if temp_project.work_package_number not in traversed_projects:
+                    traversed_projects.append(temp_project.work_package_number)
+                    subtask_query_set = Projects.objects.filter(work_package_number=temp_project.work_package_number)
+                    # print('subtasks',subtask_query_set)
+                    subtasks = []
+                    assignees = []
+                    if len(subtask_query_set) > 0:
+                        for task in subtask_query_set:
+                            serialized_task = TaskSerializer(task).data
+                            temp_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=task.id),
+                                                                    many=True).data
+                            serialized_task['assignees'] = temp_assignees
+                            subtasks.append(serialized_task)
+                            for assignee in temp_assignees:
+                                assignees.append(
+                                    UserDetailSerializer(CustomUser.objects.get(pk=assignee['assignee']['id'])).data)
+
+                    unique_assignees = unique(assignees)
+                    serializer = ProjectDetailsSerializer(temp_project)
+                    if temp_project.task_delivery_order_id not in tdo_names:
+                        tdo_names.append(temp_project.task_delivery_order_id)
+                        temp_data = {
+                            'id': temp_project.task_delivery_order_id,
+                            'title': temp_project.task_delivery_order.title,
+                            'projects': [
+                                {
+                                    'assignees': unique_assignees,
+                                    'project': serializer.data,
+                                    'subtasks': subtasks
+                                }
+                            ]
+                        }
+                        projects_data.append(temp_data)
+                        tdo_finder.update({temp_project.task_delivery_order_id: count})
+                        count += 1
+
+                    else:
+                        index = temp_project.task_delivery_order_id
+                        
+                        # projects_data[tdo_finder[index]]['assignees'].append(unique_assignees)
+                        projects_data[tdo_finder[index]]['projects'].append(
+                            {
+                                'assignees': unique_assignees,
+                                'project': serializer.data,
+                                'subtasks': subtasks,
+                            }
+                        )
+                        # projects_data[tdo_finder[index]]['subtasks'].append(subtasks)
+
+            
+
+            response = {
+                        'success': 'True',
+                        'status code': status.HTTP_200_OK,
+                        'message': 'Assigned Project List for a pm',
+                        'data': projects_data
+                        }
+            return Response(response)
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e) 
+
+        return Response(response) 
+

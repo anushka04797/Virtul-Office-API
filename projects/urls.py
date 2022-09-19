@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import CreateProject, NoWBSList, UpdateProject, ChangePM, PmProjectList, PmProjectAllAssigneeList, \
-    AssignedProjectList, RonPmProjectList, \
+    AssignedProjectList, RonPmProjectList, FixRonPmProjectList, \
     ProjectAssigneeList, SubTaskDetails, DeleteSubTask, ChangeTDOTitle, TdoList, NewProjectDetails, ChangeProjectStatus, \
     RemoveAssignee, ProjectWiseFileList, ProjectWiseFileInsert, ProjectManagerList, WPList, CheckWPandSubTask, \
     AllProjectFiles, DateToDate, assigneesWithNoWbs, AllProjectList,UpdateProjectDates
@@ -11,8 +11,9 @@ urlpatterns = [
     path('details/<str:pk>/', NewProjectDetails.as_view()),
     path('update/<str:pk>/', UpdateProject.as_view()),
     path('all/<str:pk>/', PmProjectList.as_view()),
+    path('fixronall/<str:pk>/', FixRonPmProjectList.as_view()), #fixed 
     path('all/', AllProjectList.as_view()),
-    path('rall/<str:pk>/', RonPmProjectList.as_view()),
+    path('rall/<str:pk>/', RonPmProjectList.as_view()), #Obsolete
     path('assignees/all/<str:pk>/', PmProjectAllAssigneeList.as_view()),
     path('assigned/all/<str:pk>/', AssignedProjectList.as_view()),
     path('shared/document/list/<str:pk>/', ProjectWiseFileList.as_view()),
