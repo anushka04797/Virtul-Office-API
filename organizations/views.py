@@ -59,7 +59,7 @@ class HoursSpentAndLeft(APIView):
                 hours_spent=TimeCard.objects.filter(time_card_assignee=user['id'], time_type=type['title'],date_created__year=current_year).aggregate(Sum('hours_today')).get('hours_today__sum')
                 type['spent']=hours_spent
 
-            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'DMA calender Details',
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Hours used and left',
                         'data': hour_types}
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
@@ -81,7 +81,7 @@ class WorkTypesList(APIView):
                 user_company = user['slc_details']['slc']['department']['company']['id']
                 hour_types = HourTypeSerializer(HourType.objects.filter(company=user_company), many=True).data
             print(hour_types)
-            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'DMA calender Details',
+            response = {'success': 'True', 'status code': status.HTTP_200_OK, 'message': 'Work type list',
                         'data': hour_types}
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
