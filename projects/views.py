@@ -924,7 +924,7 @@ class FixRonPmProjectList(APIView):
                                 'subtasks': subtasks,
                             }
                         )
-                        # projects_data[tdo_finder[index]]['subtasks'].append(subtasks)
+                       
 
             
 
