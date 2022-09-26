@@ -940,3 +940,76 @@ class FixRonPmProjectList(APIView):
 
         return Response(response) 
 
+class TdoIndex(APIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, idx):
+        try:
+            projects_data = []
+            traversed_projects = []
+            tdo_names = []
+            tdo_finder = {}
+            count = 0
+            company_name = ""
+            assigned_projects = Projects.objects.order_by("sub_task")
+            for project in assigned_projects:
+                if idx == project.task_delivery_order_id:
+                    temp_project = project
+                    company_name = temp_project.task_delivery_order.title
+                    
+                    if temp_project.task_delivery_order_id not in traversed_projects:
+                        traversed_projects.append(temp_project.work_package_number)
+                        subtask_query_set = Projects.objects.filter(work_package_number=temp_project.work_package_number)
+                        subtasks = []
+                        assignees = []
+                        if len(subtask_query_set) > 0:
+                            for task in subtask_query_set:
+                                serialized_task = TaskSerializer(task).data
+                                temp_assignees = ProjectAssigneeSerializer(ProjectAssignee.objects.filter(project=task.id),
+                                                                        many=True).data
+                                serialized_task['assignees'] = temp_assignees
+                                subtasks.append(serialized_task)
+                                for assignee in temp_assignees:
+                                    assignees.append(
+                                        UserDetailSerializer(CustomUser.objects.get(pk=assignee['assignee']['id'])).data)
+
+                        unique_assignees = unique(assignees)
+                        serializer = ProjectDetailsSerializer(temp_project)
+                        if temp_project.task_delivery_order_id not in tdo_names:
+                            tdo_names.append(temp_project.task_delivery_order_id)
+                            temp_data = {
+                                'id': temp_project.task_delivery_order_id,
+                                'title': temp_project.task_delivery_order.title,
+                                'projects': [
+                                    {
+                                        'assignees': unique_assignees,
+                                        'project': serializer.data,
+                                        'subtasks': subtasks
+                                    }
+                                ]
+                            }
+                            projects_data.append(temp_data)
+                            tdo_finder.update({temp_project.task_delivery_order_id: count})
+                            count += 1
+
+                        else:
+                            index = temp_project.task_delivery_order_id
+                            projects_data[tdo_finder[index]]['projects'].append(
+                                {
+                                    'assignees': unique_assignees,
+                                    'project': serializer.data,
+                                    'subtasks': subtasks,
+                                }
+                            )   
+
+            response = {
+                        'success': 'True',
+                        'status code': status.HTTP_200_OK,
+                        'message': 'Project List for ' + company_name,
+                        'data': projects_data
+                        }
+            return Response(response)
+        except Exception as e:
+            response = 'on line {}'.format(sys.exc_info()[-1].tb_lineno), str(e) 
+
+        return Response(response) 
+
