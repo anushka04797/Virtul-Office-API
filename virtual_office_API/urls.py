@@ -44,8 +44,7 @@ urlpatterns = [
     url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),
     url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
 
-    path('docs/', include_docs_urls(title="Virtual Office", description="A Project management platform",
-                                    permission_classes=(AllowAny,))),
+    path('docs/', include_docs_urls(title="Virtual Office", description="A Project management platform",permission_classes=(AllowAny,))),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns = [url(r'^vo-admin/', include(urlpatterns))]

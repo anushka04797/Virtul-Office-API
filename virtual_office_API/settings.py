@@ -75,11 +75,11 @@ SITE_ID = 1
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_BACKEND = 'post_office.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'mail.dma-bd.com'
 EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'dmavirtualoffice21@gmail.com'
-EMAIL_HOST_PASSWORD = 'tbvqoykxleivsqmu'
+EMAIL_PORT = 467
+EMAIL_HOST_USER = 'virtual.office@dma-bd.com'
+EMAIL_HOST_PASSWORD = 'Dhaka!027#'
 
 
 MIDDLEWARE = [
