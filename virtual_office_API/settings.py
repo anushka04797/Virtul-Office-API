@@ -150,8 +150,8 @@ DATABASES = {
         'NAME': 'virtual_office_v1',
         # 'NAME': 'virtual_office',
         'USER': 'root',
-        # 'PASSWORD': 'Dhaka!027#',
-        'PASSWORD': '',
+        'PASSWORD': 'Dhaka!027#',
+        # 'PASSWORD': '',
         'HOST': '127.0.0.1',
         'PORT': '3306',
     }

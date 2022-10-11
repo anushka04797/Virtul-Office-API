@@ -40,7 +40,8 @@ class WbsDetailsSerializer(serializers.ModelSerializer):
     files = serializers.SerializerMethodField()
 
     def get_files(self,obj):
-        return DocumentListSerializer(ProjectSharedFiles.objects.filter(work_package_number=obj.project.work_package_number),many=True).data
+        return WbsFileSerializer(WbsSharedFiles.objects.filter(wbs_id=obj.id),many=True).data
+        # return DocumentListSerializer(ProjectSharedFiles.objects.filter(work_package_number=obj.project.work_package_number),many=True).data
 
     class Meta:
         model = Wbs

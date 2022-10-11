@@ -46,10 +46,13 @@ class CreateWbs(APIView):
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
                 print('data',serializer.data)
+                if int(request.data['total_files']) > 0:
+                    result=wbs_wise_file_insert(request=request, wbs_id=serializer.data['id'], upload_by=UserDetailSerializer(request.user, many=False).data['id'])
+                    print(result)
                 user_data = UserDetailSerializer(CustomUser.objects.get(id=assignee)).data
                 send_wbs_create_email(user_data['email'], user_data['first_name'])
 
-            result = project_wise_file_insert(request=request, work_package_number=request.data.get('work_package_number'),upload_by=UserDetailSerializer(request.user, many=False).data['id'])
+            # result = project_wise_file_insert(request=request, work_package_number=request.data.get('work_package_number'),upload_by=UserDetailSerializer(request.user, many=False).data['id'])
             print(result)
             response = {
                 'success': 'True',
