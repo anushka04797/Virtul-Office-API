@@ -96,8 +96,7 @@ class WeekTimeCard(models.Model):
 
 
 class WbsSharedFiles(models.Model):
-    wbs = models.ForeignKey(CustomUser, related_name="wbs_id", blank=False, null=False,
-                                 on_delete=models.CASCADE)
+    wbs = models.ForeignKey(Wbs, related_name="wbs_id", blank=False, null=False,on_delete=models.CASCADE)
     file = models.FileField(upload_to='uploads/wbs/files/', blank=True, null=True)
     date_created = models.DateTimeField(_('date created'), default=timezone.now)
     date_updated = models.DateTimeField(_('date updated'), default=timezone.now)

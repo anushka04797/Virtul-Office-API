@@ -14,6 +14,7 @@ from projects.serializers import CreateProjectAssigneeSerializer, UpdateProjectR
 from projects.views import unique
 from users.models import CustomUser
 from users.serializers import UserDetailSerializer
+from wbs.helper import wbs_wise_file_insert, project_wise_file_insert
 from wbs.mails import send_wbs_create_email
 from wbs.serializers import CreateTimeCardSerializer, CreateWbsSerializer, WbsDetailsSerializer, WbsUpdateSerializer, \
     TimeCardDetailsSerializer, WbsStatusUpdateSerializer, WbsWiseTimeCardListSerializer, TimecardUpdateSerializer, \
@@ -29,28 +30,40 @@ from rest_framework.permissions import AllowAny
 # create wbs
 class CreateWbs(APIView):
     serializer_class = CreateWbsSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        print(request.data)
-        # assignee_list = request.data['assignee']
-        # print('assignee list',assignee_list)
-        for assignee in request.data['assignee']:
-            # print('assignee',assignee)
-            request.data['assignee'] = assignee
-            serializer = self.serializer_class(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            user_data = UserDetailSerializer(CustomUser.objects.get(id=assignee)).data
-            send_wbs_create_email(user_data['email'],user_data['first_name'])
-        response = {
-            'success': 'True',
-            'status code': status.HTTP_200_OK,
-            'message': 'WBS created  successfully',
-            'data': [serializer.data]
-        }
-        status_code = status.HTTP_200_OK
-        return Response(response, status=status_code)
+        try:
+            print('req data', request.data)
+            assignee_list = str(request.data['assignee']).replace('[','').replace(']','').split(',')
+            for assignee in assignee_list:
+                print('assignee',assignee)
+
+                wbs_create_data = request.data
+                wbs_create_data._mutable = True
+                wbs_create_data['assignee'] = int(assignee)
+                serializer = self.serializer_class(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                print('data',serializer.data)
+                user_data = UserDetailSerializer(CustomUser.objects.get(id=assignee)).data
+                send_wbs_create_email(user_data['email'], user_data['first_name'])
+
+            result = project_wise_file_insert(request=request, work_package_number=request.data.get('work_package_number'),upload_by=UserDetailSerializer(request.user, many=False).data['id'])
+            print(result)
+            response = {
+                'success': 'True',
+                'status code': status.HTTP_200_OK,
+                'message': 'WBS created  successfully',
+                'data': [serializer.data]
+            }
+            status_code = status.HTTP_200_OK
+            return Response(response, status=status_code)
+        except Exception as e:
+            response = 'on line {}'.format(
+                sys.exc_info()[-1].tb_lineno), str(e)
+            return Response(response)
+
 
 
 # wbs details
@@ -83,6 +96,10 @@ class UpdateWbs(APIView):
             # print(serializer.errors)
             if serializer.is_valid():
                 serializer.save()
+                # uploading files
+                result = project_wise_file_insert(request=request,work_package_number=wbs.project.work_package_number ,upload_by=UserDetailSerializer(request.user, many=False).data['id'])
+                print(result)
+                # uploading files end here
                 print(request.data)
                 if serializer.data:
                     temp = {

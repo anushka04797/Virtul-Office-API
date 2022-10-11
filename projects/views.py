@@ -80,11 +80,8 @@ class CreateProject(APIView):
                             serializer2.save()
                             user_email = UserDetailSerializer(CustomUser.objects.get(id=item)).data['email']
                             try:
-                                send_create_project_email(user_email,
-                                                          UserDetailSerializer(CustomUser.objects.get(id=item)).data[
-                                                              'first_name'],
-                                                          'https://virtualoffice.com.bd/#/login/?task_details=' +
-                                                          serializer.data['work_package_index'])
+                                send_create_project_email(user_email, UserDetailSerializer(CustomUser.objects.get(id=item)).data['first_name'],
+                                                          'https://virtualoffice.com.bd/#/login/?task_details=' + serializer.data['work_package_index'])
                             except Exception as e:
                                 print(e)
 

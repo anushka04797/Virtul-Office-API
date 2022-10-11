@@ -1,26 +1,47 @@
 import sys
 
+from projects.models import ProjectSharedFiles
+from wbs.models import WbsSharedFiles
 from wbs.serializers import WbsFileSerializer
 
 
-def wbs_wise_file_insert(request,files):
+def wbs_wise_file_insert(request,wbs_id,upload_by):
     try:
-        wbs_id = request.data.get('wbs_id')
-        upload_by = request.data.get('upload_by')
-        files = int(request.data.get('files')) + 1
+
+        files = int(request.data.get('total_files')) +1
 
         for i in range(1, files):
             indexval = str(i)
             attribute_name = str('file' + indexval)
             file = request.data.get(attribute_name)
-            requested_data = {"wbs_id": wbs_id, "file": file, "upload_by": upload_by}
-            serializer = WbsFileSerializer(data=requested_data)
-            if serializer.is_valid():
-                serializer.save()
-            else:
-                serializer.errors()
+            print(attribute_name,file)
+            new_wbs_file = WbsSharedFiles.objects.create(wbs_id=wbs_id, file=file, upload_by_id=upload_by)
 
-        return serializer.data
+
+        return True
 
     except Exception as e:
-        return 'on line {}'.format(sys.exc_info()[-1].tb_lineno)
+        response = 'on line {}'.format(
+            sys.exc_info()[-1].tb_lineno), str(e)
+        return response
+
+
+def project_wise_file_insert(work_package_number,request,upload_by):
+    try:
+
+        files = int(request.data.get('total_files')) +1
+
+        for i in range(1, files):
+            indexval = str(i)
+            attribute_name = str('file' + indexval)
+            file = request.data.get(attribute_name)
+            print(attribute_name,file)
+            new_project_file = ProjectSharedFiles.objects.create(work_package_number=work_package_number,file=file, upload_by_id=upload_by)
+
+        return True
+
+    except Exception as e:
+        response = 'on line {}'.format(
+            sys.exc_info()[-1].tb_lineno), str(e)
+        return response
+

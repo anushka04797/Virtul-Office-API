@@ -1,7 +1,9 @@
 from rest_framework import serializers
+
+from projects.models import ProjectSharedFiles
 from wbs.models import TimeCard, Wbs, WbsSharedFiles, WeekTimeCard
 from users.serializers import UserDetailSerializer
-from projects.serializers import ProjectDetailsForWbsSerializer, ProjectDetailsSerializer
+from projects.serializers import ProjectDetailsForWbsSerializer, ProjectDetailsSerializer, DocumentListSerializer
 from django.utils import timezone
 
 
@@ -35,6 +37,10 @@ class WbsDetailsSerializer(serializers.ModelSerializer):
     reporter = UserDetailSerializer()
     assignee = UserDetailSerializer()
     project = ProjectDetailsForWbsSerializer()
+    files = serializers.SerializerMethodField()
+
+    def get_files(self,obj):
+        return DocumentListSerializer(ProjectSharedFiles.objects.filter(work_package_number=obj.project.work_package_number),many=True).data
 
     class Meta:
         model = Wbs
@@ -48,6 +54,7 @@ class WbsDetailsSerializer(serializers.ModelSerializer):
             'start_date',
             'end_date',
             'hours_worked',
+            'files',
             'status',
             'progress',
             'comments',
